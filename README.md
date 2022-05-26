@@ -1,33 +1,27 @@
-# Telemetry
+# Jupyter Events
 
-[![Tests](https://github.com/jupyter/telemetry/workflows/Jupyter%20Telemetry%20Unit%20Tests/badge.svg)](https://github.com/jupyter/telemetry/actions?query=workflow%3A%22Jupyter+Telemetry+Unit+Tests%22)
-[![codecov](https://codecov.io/gh/jupyter/telemetry/branch/master/graph/badge.svg)](https://codecov.io/gh/jupyter/telemetry)
-[![Documentation Status](https://readthedocs.org/projects/jupyter-telemetry/badge/?version=latest)](https://jupyter-telemetry.readthedocs.io/en/latest/?badge=latest)
+*An event system for Jupyter Applications and extensions.*
 
-*Telemetry for Jupyter Applications and extensions.*
-
-> Telemetry (təˈlemətrē): the process of recording and transmitting the readings of an instrument. [Oxford Dictionaries]
-
-Jupyter Telemetry enables Jupyter Applications (e.g. Jupyter Server, Jupyter Notebook, JupyterLab, JupyterHub, etc.) to record **events**—i.e. actions by application users—and transmit them to remote (or local) destinations as **structured** data. It works with Python's standard `logging` library to handle the transmission of events allowing users to send events to local files, over the web, etc.
+Jupyter Events enables Jupyter Applications (e.g. Jupyter Server, Jupyter Notebook, JupyterLab, JupyterHub, etc.) to emit **events**—i.e. actions by application users—to remote (or local) destinations as **structured** data. It works with Python's standard `logging` library to handle the transmission of events allowing users to send events to local files, over the web, etc.
 
 ## Install
 
-Jupyter's Telemetry library can be installed from PyPI.
+The Jupyter Events library can be installed from PyPI.
 ```
-pip install jupyter_telemetry
+pip install jupyter_events
 ```
 
 ## Basic Usage
 
-Telemetry provides a configurable traitlets object, `EventLog`, for structured event-logging in Python. It leverages Python's standard `logging` library for filtering, handling, and recording events. All events are validated (using [jsonschema](https://pypi.org/project/jsonschema/)) against registered [JSON schemas](https://json-schema.org/).
+Jupyter Events provides a configurable traitlets object, `EventLogger`, for emitting structured event data in Python. It leverages Python's standard `logging` library for filtering, routing, and emitting events. All events are validated (using [jsonschema](https://pypi.org/project/jsonschema/)) against registered [JSON schemas](https://json-schema.org/).
 
-Let's look at a basic example of an `EventLog`.
+Let's look at a basic example of an `EventLogger`.
 ```python
 import logging
-from jupyter_telemetry import EventLog
+from jupyter_events import EventLogger
 
 
-eventlog = EventLog(
+logger = EventLogger(
     # Use logging handlers to route where events
     # should be record.
     handlers=[
@@ -40,11 +34,11 @@ eventlog = EventLog(
 )
 ```
 
-EventLog has two configurable traits:
+EventLogger has two configurable traits:
 * `handlers`: a list of Python's `logging` handlers.
 * `allowed_schemas`: a list of event schemas to record.
 
-Event schemas must be registered with the `EventLog` for events to be recorded. An event schema looks something like:
+Event schemas must be registered with the `EventLogger` for events to be recorded. An event schema looks something like:
 ```json
 {
   "$id": "url.to.event.schema",
@@ -71,14 +65,14 @@ The other fields follow standard JSON schema structure.
 Schemas can be registered from a Python `dict` object, a file, or a URL. This example loads the above example schema from file.
 ```python
 # Register the schema.
-eventlog.register_schema_file('schema.json')
+logger.register_schema_file('schema.json')
 ```
 
-Events are recorded using the `record_event` method. This method validates the event data and routes the JSON string to the Python `logging` handlers listed in the `EventLog`.
+Events are recorded using the `record_event` method. This method validates the event data and routes the JSON string to the Python `logging` handlers listed in the `EventLogger`.
 ```python
 # Record an example event.
 event = {'name': 'example event'}
-eventlog.record_event(
+logger.record_event(
     schema_id='url.to.event.schema',
     version=1,
     event=event

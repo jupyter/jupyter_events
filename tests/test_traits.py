@@ -3,7 +3,7 @@ import logging
 import pytest
 from traitlets import HasTraits, TraitError
 
-from jupyter_telemetry.traits import Handlers, SchemaOptions
+from jupyter_events.traits import Handlers, SchemaOptions
 
 
 class HasHandlers(HasTraits):

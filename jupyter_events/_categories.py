@@ -90,7 +90,7 @@ def extract_categories_from_event(event, schema):
     Parameters
     ----------
     event : dict
-        A telemetry event
+        Event data
 
     schema : dict
         A JSON schema
@@ -121,7 +121,7 @@ def filter_categories_from_event(event, schema, allowed_categories, allowed_prop
     Parameters
     ----------
     event : dict
-        The input telemetry event
+        The input event
 
     schema : dict
         A JSON schema that makes use of the the `categories` keyword to

@@ -26,7 +26,7 @@ except ImportError as e:
 from traitlets.config import Configurable, Config
 
 from .traits import Handlers, SchemaOptions
-from . import TELEMETRY_METADATA_VERSION
+from . import EVENTS_METADATA_VERSION
 
 from .categories import JSONSchemaValidator, filter_categories_from_event
 
@@ -43,7 +43,7 @@ def _skip_message(record, **kwargs):
     return json.dumps(record, **kwargs)
 
 
-class EventLog(Configurable):
+class EventLogger(Configurable):
     """
     Send structured events to a logging sink
     """
@@ -88,7 +88,7 @@ class EventLog(Configurable):
                 self.log.addHandler(handler)
 
     def _load_config(self, cfg, section_names=None, traits=None):
-        """Load EventLog traits from a Config object, patching the
+        """Load EventLogger traits from a Config object, patching the
         handlers trait in the Config object to avoid deepcopy errors.
         """
         my_cfg = self._find_my_config(cfg)
@@ -101,8 +101,8 @@ class EventLog(Configurable):
         my_cfg["handlers"] = get_handlers
 
         # Build a new eventlog config object.
-        eventlog_cfg = Config({"EventLog": my_cfg})
-        super(EventLog, self)._load_config(eventlog_cfg, section_names=None, traits=None)
+        eventlogger_cfg = Config({"EventLogger": my_cfg})
+        super(EventLogger, self)._load_config(eventlogger_cfg, section_names=None, traits=None)
 
     def register_schema_file(self, filename):
         """
@@ -237,7 +237,7 @@ class EventLog(Configurable):
             '__timestamp__': timestamp.isoformat() + 'Z',
             '__schema__': schema_name,
             '__schema_version__': version,
-            '__metadata_version__': TELEMETRY_METADATA_VERSION,
+            '__metadata_version__': EVENTS_METADATA_VERSION,
         }
 
         # Filter properties in the incoming event based on the

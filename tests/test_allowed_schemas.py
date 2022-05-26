@@ -1,7 +1,7 @@
 from textwrap import dedent as _
 from ruamel.yaml import YAML
 
-from jupyter_telemetry.eventlog import EventLog
+from jupyter_events.logger import EventLogger
 
 import pytest
 
@@ -56,8 +56,8 @@ def test_raised_exception_for_nonlist_categories():
     yaml = YAML(typ='safe')
     schema = yaml.load(yaml_schema)
 
-    # Register schema with an EventLog
-    e = EventLog(
+    # Register schema with an EventLogger
+    e = EventLogger(
         allowed_schemas={
             SCHEMA_ID: {
                 "allowed_categories": ["user-identifier"]
@@ -87,8 +87,8 @@ def test_missing_categories_label():
     yaml = YAML(typ='safe')
     schema = yaml.load(yaml_schema)
 
-    # Register schema with an EventLog
-    e = EventLog(
+    # Register schema with an EventLogger
+    e = EventLogger(
         allowed_schemas={
             SCHEMA_ID: {
                 "allowed_categories": ["random-category"]

@@ -3,12 +3,12 @@ import logging
 from traitlets.config.loader import PyFileConfigLoader
 from traitlets import TraitError
 
-from jupyter_telemetry.eventlog import EventLog
+from jupyter_events.logger import EventLogger
 
 GOOD_CONFIG = """
 import logging
 
-c.EventLog.handlers = [
+c.EventLogger.handlers = [
     logging.StreamHandler()
 ]
 """
@@ -16,7 +16,7 @@ c.EventLog.handlers = [
 BAD_CONFIG = """
 import logging
 
-c.EventLog.handlers = [
+c.EventLogger.handlers = [
     0
 ]
 """
@@ -37,8 +37,8 @@ def get_config_from_file(path, content):
 def test_good_config_file(tmp_path):
     cfg = get_config_from_file(tmp_path, GOOD_CONFIG)
 
-    # Pass config to EventLog
-    e = EventLog(config=cfg)
+    # Pass config to EventLogger
+    e = EventLogger(config=cfg)
 
     assert len(e.handlers) > 0
     assert isinstance(e.handlers[0], logging.Handler)
@@ -48,4 +48,4 @@ def test_bad_config_file(tmp_path):
     cfg = get_config_from_file(tmp_path, BAD_CONFIG)
 
     with pytest.raises(TraitError):
-        EventLog(config=cfg)
+        EventLogger(config=cfg)

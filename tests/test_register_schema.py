@@ -8,14 +8,14 @@ from datetime import datetime, timedelta
 import pytest
 from ruamel.yaml import YAML
 
-from jupyter_telemetry.eventlog import EventLog
+from jupyter_events.logger import EventLogger
 
 
 def test_register_invalid_schema():
     """
     Invalid JSON Schemas should fail registration
     """
-    el = EventLog()
+    el = EventLogger()
     with pytest.raises(jsonschema.SchemaError):
         el.register_schema({
             # Totally invalid
@@ -29,7 +29,7 @@ def test_missing_required_properties():
 
     They aren't required by JSON Schema itself
     """
-    el = EventLog()
+    el = EventLogger()
     with pytest.raises(ValueError):
         el.register_schema({
             'properties': {}
@@ -48,7 +48,7 @@ def test_reserved_properties():
 
     These are reserved
     """
-    el = EventLog()
+    el = EventLogger()
     with pytest.raises(ValueError):
         el.register_schema({
             '$id': 'test/test',
@@ -79,7 +79,7 @@ def test_timestamp_override():
 
     output = io.StringIO()
     handler = logging.StreamHandler(output)
-    el = EventLog(handlers=[handler])
+    el = EventLogger(handlers=[handler])
     el.register_schema(schema)
     el.allowed_schemas = ['test/test']
 
@@ -111,7 +111,7 @@ def test_record_event():
 
     output = io.StringIO()
     handler = logging.StreamHandler(output)
-    el = EventLog(handlers=[handler])
+    el = EventLogger(handlers=[handler])
     el.register_schema(schema)
     el.allowed_schemas = ['test/test']
 
@@ -148,7 +148,7 @@ def test_register_schema_file(tmp_path):
         },
     }
 
-    el = EventLog()
+    el = EventLogger()
 
     yaml = YAML(typ='safe')
 
@@ -174,7 +174,7 @@ def test_register_schema_file_object(tmp_path):
         },
     }
 
-    el = EventLog()
+    el = EventLogger()
 
     yaml = YAML(typ='safe')
 
@@ -203,7 +203,7 @@ def test_allowed_schemas():
 
     output = io.StringIO()
     handler = logging.StreamHandler(output)
-    el = EventLog(handlers=[handler])
+    el = EventLogger(handlers=[handler])
     # Just register schema, but do not mark it as allowed
     el.register_schema(schema)
 
@@ -234,7 +234,7 @@ def test_record_event_badschema():
         }
     }
 
-    el = EventLog(handlers=[logging.NullHandler()])
+    el = EventLogger(handlers=[logging.NullHandler()])
     el.register_schema(schema)
     el.allowed_schemas = ['test/test']
 
@@ -273,11 +273,11 @@ def test_unique_logger_instances():
     handler0 = logging.StreamHandler(output0)
     handler1 = logging.StreamHandler(output1)
 
-    el0 = EventLog(handlers=[handler0])
+    el0 = EventLogger(handlers=[handler0])
     el0.register_schema(schema0)
     el0.allowed_schemas = ['test/test0']
 
-    el1 = EventLog(handlers=[handler1])
+    el1 = EventLogger(handlers=[handler1])
     el1.register_schema(schema1)
     el1.allowed_schemas = ['test/test1']
 
@@ -338,7 +338,7 @@ def test_register_duplicate_schemas():
         },
     }
 
-    el = EventLog()
+    el = EventLogger()
     el.register_schema(schema0)
     with pytest.raises(ValueError):
         el.register_schema(schema1)

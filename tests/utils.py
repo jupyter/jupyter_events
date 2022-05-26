@@ -3,7 +3,7 @@ import io
 import json
 import logging
 
-from jupyter_telemetry.eventlog import EventLog
+from jupyter_events.logger import EventLogger
 
 
 def get_event_data(event, schema, schema_id, version, allowed_schemas):
@@ -12,7 +12,7 @@ def get_event_data(event, schema, schema_id, version, allowed_schemas):
     # Create a handler that captures+records events with allowed tags.
     handler = logging.StreamHandler(sink)
 
-    e = EventLog(
+    e = EventLogger(
         handlers=[handler],
         allowed_schemas=allowed_schemas
     )

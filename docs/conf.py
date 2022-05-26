@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'telemetry'
+project = 'jupyter_events'
 copyright = '2019, Project Jupyter'
 author = 'Project Jupyter'
 
