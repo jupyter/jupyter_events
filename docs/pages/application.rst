@@ -3,7 +3,10 @@
 Adding the Event System to an application
 =========================================
 
-Jupyter Events enables you to log events from your running application. (It's designed to work best with traitlet's `Application` object for simple configuration.) To use the system, begin by creating an instance of ``EventLogger``:
+Jupyter Events enables you to log events from your running application.
+(It's designed to work best with traitlet's `Application` object
+for simple configuration.) To use the system, begin by creating an
+instance of ``EventLogger``:
 
 .. code-block:: python
 
@@ -25,13 +28,18 @@ Jupyter Events enables you to log events from your running application. (It's de
 
 EventLogger has two configurable traits:
 
-    - ``handlers``: a list of Python's logging handlers that handle the recording of incoming events.
-    - ``allowed_schemas``: a dictionary of options for each schema describing what data should be collected.
+    - ``handlers``: a list of Python's logging handlers that
+        handle the recording of incoming events.
+    - ``allowed_schemas``: a dictionary of options for each schema
+        describing what data should be collected.
 
-Next, you'll need to register event schemas for your application. You can register schemas using the ``register_schema_file`` (JSON or YAML format) or ``register_schema`` methods.
+Next, you'll need to register event schemas for your application.
+You can register schemas using the ``register_schema_file``
+(JSON or YAML format) or ``register_schema`` methods.
 
 
-Once your have an instance of ``EventLogger`` and your registered schemas, you can use the ``record_event`` method to log that event.
+Once your have an instance of ``EventLogger`` and your registered
+schemas, you can use the ``record_event`` method to log that event.
 
 .. code-block:: python
 

@@ -1,7 +1,8 @@
 Writing a schema for Jupyter Events
 ===================================
 
-All Schemas should be a valid `JSON schema`_ and can be written in valid YAML or JSON.
+All Schemas should be a valid `JSON schema`_ and can be written in valid
+YAML or JSON.
 
 At a minimum, valid Jupyter Event schema requires have the following keys:
 
@@ -51,7 +52,9 @@ Here is a minimal example of a valid JSON schema for an event.
 Property Categories
 -------------------
 
-Each property can be labelled with ``categories`` field. This makes it easier to filter properties based on a category. We recommend that schema authors use valid URIs for these labels, e.g. something like ``category.jupyter.org/unrestricted``.
+Each property can be labelled with ``categories`` field. This makes it easier to
+filter properties based on a category. We recommend that schema authors use valid
+URIs for these labels, e.g. something like ``category.jupyter.org/unrestricted``.
 
 Below is a list of common category labels that Jupyter Events recommends using:
 

@@ -1,6 +1,6 @@
 import logging
 
-from traitlets import TraitType, TraitError
+from traitlets import TraitError, TraitType
 
 
 class Handlers(TraitType):
@@ -8,6 +8,7 @@ class Handlers(TraitType):
     it to a callable that returns that list (thus, making this
     trait pickleable).
     """
+
     info_text = "a list of logging handlers"
 
     def validate_elements(self, obj, value):
@@ -20,8 +21,9 @@ class Handlers(TraitType):
     def element_error(self, obj):
         raise TraitError(
             "Elements in the '{}' trait of an {} instance "
-            "must be Python `logging` handler instances."
-            .format(self.name, obj.__class__.__name__)
+            "must be Python `logging` handler instances.".format(
+                self.name, obj.__class__.__name__
+            )
         )
 
     def validate(self, obj, value):
@@ -43,8 +45,8 @@ class Handlers(TraitType):
 
 
 class SchemaOptions(TraitType):
-    """A trait for handling options for recording schemas.
-    """
+    """A trait for handling options for recording schemas."""
+
     info_text = "either a dictionary with schema options or a list with schema names."
 
     def validate(self, obj, val):
@@ -62,8 +64,7 @@ class SchemaOptions(TraitType):
                     raise TraitError(
                         "The schema option, {schema_name}, includes "
                         "unknown key(s): {unknown_keys}".format(
-                           schema_name=schema_name,
-                           unknown_keys=",".join(unknown_keys)
+                            schema_name=schema_name, unknown_keys=",".join(unknown_keys)
                         )
                     )
             validated_val = val
