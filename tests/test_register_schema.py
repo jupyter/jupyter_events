@@ -1,7 +1,6 @@
 import io
 import json
 import logging
-import tempfile
 from datetime import datetime, timedelta
 
 import jsonschema

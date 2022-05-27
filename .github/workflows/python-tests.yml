@@ -31,9 +31,14 @@ jobs:
         run: |
           pip install -e ".[test]" codecov
       - name: Run the tests
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
         run: |
-          args="-vv --cov jupyter_events --cov-branch --cov-report term-missing:skip-covered"
+          args="-vv --cov jupyter_server --cov-branch --cov-report term-missing:skip-covered"
           python -m pytest $args  --cov-fail-under 70 || python -m pytest $args --lf
+      - name: Run the tests on pypy and windows
+        if: ${{ startsWith(matrix.python-version, 'pypy') || startsWith(matrix.os, 'windows') }}
+        run: |
+          python -m pytest -vv || python -m pytest -vv --lf
       - name: Coverage
         run: |
           codecov

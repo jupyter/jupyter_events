@@ -1,5 +1,3 @@
-from itertools import product
-
 import pytest
 
 from .utils import get_event_data
