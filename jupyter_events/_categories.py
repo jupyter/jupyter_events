@@ -51,13 +51,16 @@ def extend_with_categories(validator_class):
             if "categories" in subschema:
                 yield ExtractCategories(property, subschema["categories"], message=None)
 
-        for error in validate_properties(
-            validator, properties, instance, schema,
-        ):
-            yield error
+        yield from validate_properties(
+            validator,
+            properties,
+            instance,
+            schema,
+        )
 
     return validators.extend(
-        validator_class, {"properties": get_categories},
+        validator_class,
+        {"properties": get_categories},
     )
 
 
@@ -66,17 +69,13 @@ CategoryExtractor = extend_with_categories(JSONSchemaValidator)
 
 
 # Ignore categories under any of these jsonschema keywords
-IGNORE_CATEGORIES_SCHEMA_KEYWORDS = {
-    'if', 'not', 'anyOf', 'oneOf', 'then', 'else'
-}
+IGNORE_CATEGORIES_SCHEMA_KEYWORDS = {"if", "not", "anyOf", "oneOf", "then", "else"}
 
 
 def extract_categories_from_errors(errors):
     for e in errors:
-        if (
-            isinstance(e, ExtractCategories) and
-            not any(p in IGNORE_CATEGORIES_SCHEMA_KEYWORDS
-                    for p in e.absolute_schema_path)
+        if isinstance(e, ExtractCategories) and not any(
+            p in IGNORE_CATEGORIES_SCHEMA_KEYWORDS for p in e.absolute_schema_path
         ):
             yield e
         else:
@@ -153,9 +152,11 @@ def filter_categories_from_event(event, schema, allowed_categories, allowed_prop
     # Allow only properties whose categories are included in allowed_categories
     # and whose top-level parent is included in allowed_properties
     not_allowed = (
-        c for p, c in categories.items()
-        if not (set(c.categories).issubset(allowed_categories) or
-                p[0] in allowed_properties)
+        c
+        for p, c in categories.items()
+        if not (
+            set(c.categories).issubset(allowed_categories) or p[0] in allowed_properties
+        )
     )
 
     for c in not_allowed:

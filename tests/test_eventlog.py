@@ -1,7 +1,8 @@
-import pytest
 import logging
-from traitlets.config.loader import PyFileConfigLoader
+
+import pytest
 from traitlets import TraitError
+from traitlets.config.loader import PyFileConfigLoader
 
 from jupyter_events.logger import EventLogger
 
@@ -24,7 +25,7 @@ c.EventLogger.handlers = [
 
 def get_config_from_file(path, content):
     # Write config file
-    filename = 'config.py'
+    filename = "config.py"
     config_file = path / filename
     config_file.write_text(content)
 

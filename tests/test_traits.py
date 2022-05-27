@@ -7,20 +7,12 @@ from jupyter_events.traits import Handlers, SchemaOptions
 
 
 class HasHandlers(HasTraits):
-    handlers = Handlers(
-        None,
-        allow_none=True
-    )
+    handlers = Handlers(None, allow_none=True)
 
 
 def test_good_handlers_value():
-    handlers = [
-        logging.NullHandler(),
-        logging.NullHandler()
-    ]
-    obj = HasHandlers(
-        handlers=handlers
-    )
+    handlers = [logging.NullHandler(), logging.NullHandler()]
+    obj = HasHandlers(handlers=handlers)
     assert obj.handlers == handlers
 
 
@@ -28,20 +20,13 @@ def test_bad_handlers_values():
     handlers = [0, 1]
 
     with pytest.raises(TraitError):
-        HasHandlers(
-            handlers=handlers
-        )
+        HasHandlers(handlers=handlers)
 
 
 def test_mixed_handlers_values():
-    handlers = [
-        logging.NullHandler(),
-        1
-    ]
+    handlers = [logging.NullHandler(), 1]
     with pytest.raises(TraitError):
-        HasHandlers(
-            handlers=handlers
-        )
+        HasHandlers(handlers=handlers)
 
 
 class HasSchemaOptions(HasTraits):
@@ -63,7 +48,7 @@ class HasSchemaOptions(HasTraits):
         {"schema_name_1": {"allowed_categories": ["value"]}},
         # Test multiple values.
         {"schema_name_1": {"allowed_categories": ["value"]}, "schema_name_2": {}},
-    ]
+    ],
 )
 def test_good_schema_options(schema_options):
     obj = HasSchemaOptions(schema_options=schema_options)
@@ -77,14 +62,10 @@ def test_good_schema_options(schema_options):
         {"schema_name_1": {"unknown_attribute": []}},
         # Test multiple values.
         {
-            "schema_name_1": {
-                "allowed_categories": ["value"]
-            },
-            "schema_name_2": {
-                "unknown_attribute": []
-            }
+            "schema_name_1": {"allowed_categories": ["value"]},
+            "schema_name_2": {"unknown_attribute": []},
         },
-    ]
+    ],
 )
 def test_bad_schema_options(schema_options):
     with pytest.raises(TraitError):
