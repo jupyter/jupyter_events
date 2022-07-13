@@ -164,7 +164,7 @@ ARRAY_EVENT_DATA = {
     [
         (
             # User configuration for allowed_schemas
-            {SCHEMA_ID: {"allowed_categories": []}},
+            {SCHEMA_ID: {"allowed_policies": []}},
             # Expected properties in the recorded event
             {"nothing-exciting": "hello, world", "users": None},
         ),

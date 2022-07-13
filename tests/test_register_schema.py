@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 import jsonschema
 import pytest
+from jsonschema.exceptions import ValidationError
 from ruamel.yaml import YAML
 
 from jupyter_events.logger import EventLogger
@@ -15,7 +16,7 @@ def test_register_invalid_schema():
     Invalid JSON Schemas should fail registration
     """
     el = EventLogger()
-    with pytest.raises(jsonschema.SchemaError):
+    with pytest.raises(ValidationError):
         el.register_schema(
             {
                 # Totally invalid
@@ -31,10 +32,10 @@ def test_missing_required_properties():
     They aren't required by JSON Schema itself
     """
     el = EventLogger()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         el.register_schema({"properties": {}})
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         el.register_schema(
             {
                 "$id": "something",
@@ -50,13 +51,19 @@ def test_reserved_properties():
     These are reserved
     """
     el = EventLogger()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         el.register_schema(
             {
                 "$id": "test/test",
+                "title": "Test",
                 "version": 1,
+                "redactionPolicy": ["unrestricted"],
                 "properties": {
-                    "__fail__": {"type": "string", "categories": ["unrestricted"]},
+                    "__fail__": {
+                        "type": "string",
+                        "title": "test",
+                        "redactionPolicy": ["unrestricted"],
+                    },
                 },
             }
         )
@@ -67,10 +74,15 @@ def test_timestamp_override():
     Simple test for overriding timestamp
     """
     schema = {
-        "$id": "test/test",
+        "$id": "test/test2",
         "version": 1,
+        "redactionPolicy": ["unrestricted"],
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicy": ["unrestricted"],
+            },
         },
     }
 
@@ -78,33 +90,30 @@ def test_timestamp_override():
     handler = logging.StreamHandler(output)
     el = EventLogger(handlers=[handler])
     el.register_schema(schema)
-    el.allowed_schemas = ["test/test"]
 
     timestamp_override = datetime.utcnow() - timedelta(days=1)
-    el.record_event(
-        "test/test",
-        1,
-        {
-            "something": "blah",
-        },
-        timestamp_override=timestamp_override,
+    el.emit(
+        "test/test", 1, {"something": "blah"}, timestamp_override=timestamp_override
     )
     handler.flush()
-
     event_capsule = json.loads(output.getvalue())
-
     assert event_capsule["__timestamp__"] == timestamp_override.isoformat() + "Z"
 
 
-def test_record_event():
+def test_emit():
     """
     Simple test for emitting valid events
     """
     schema = {
-        "$id": "test/test",
+        "$id": "test/test3",
         "version": 1,
+        "redactionPolicy": ["unrestricted"],
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicy": ["unrestricted"],
+            },
         },
     }
 
@@ -112,9 +121,8 @@ def test_record_event():
     handler = logging.StreamHandler(output)
     el = EventLogger(handlers=[handler])
     el.register_schema(schema)
-    el.allowed_schemas = ["test/test"]
 
-    el.record_event(
+    el.emit(
         "test/test",
         1,
         {
@@ -141,22 +149,25 @@ def test_register_schema_file(tmp_path):
     Register schema from a file
     """
     schema = {
-        "$id": "test/test",
+        "$id": "test/test3",
         "version": 1,
+        "redactionPolicy": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicy": ["unrestricted"],
+            },
         },
     }
 
     el = EventLogger()
-
     yaml = YAML(typ="safe")
-
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
-    el.register_schema_file(str(schema_file))
-
-    assert schema in el.schemas.values()
+    el.register_schema_file(schema_file)
+    assert ("test/test3", 1) in el.schema_registry
 
 
 def test_register_schema_file_object(tmp_path):
@@ -177,6 +188,7 @@ def test_register_schema_file_object(tmp_path):
 
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
+
     with open(str(schema_file)) as f:
         el.register_schema_file(f)
 
