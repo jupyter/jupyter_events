@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 
 from pythonjsonlogger import jsonlogger
-from traitlets import Instance, List
+from traitlets import Instance, List, default
 from traitlets.config import Config, Configurable
 
 from . import EVENTS_METADATA_VERSION
@@ -40,11 +40,14 @@ class EventLogger(Configurable):
 
     schema_registry = Instance(SchemaRegistry)
 
+    @default("schema_registry")
+    def _default_schema_registry(self):
+        return SchemaRegistry(allowed_policies=self.allowed_policies)
+
     def __init__(self, *args, **kwargs):
         # We need to initialize the configurable before
         # adding the logging handlers.
         super().__init__(*args, **kwargs)
-        self.schema_registry = SchemaRegistry(allowed_policies=self.allowed_policies)
         # Use a unique name for the logger so that multiple instances of EventLog do not write
         # to each other's handlers.
         log_name = __name__ + "." + str(id(self))

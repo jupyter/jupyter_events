@@ -27,5 +27,5 @@ properties:
 required:
   - $id
   - version
-  - redactionPolicy
+  - redactionPolicies
   - properties

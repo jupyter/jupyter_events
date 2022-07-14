@@ -32,7 +32,7 @@ def _get_redaction_policies(schema: dict):
                 _extract_policies(obj, updated_key_sequence)
 
             # Update the list in place.
-            for policy in obj["redactionPolicy"]:
+            for policy in obj["redactionPolicies"]:
                 policies_list = redaction_policies.get(policy, [])
                 policies_list.append(updated_key_sequence)
                 redaction_policies[policy] = policies_list
@@ -163,7 +163,7 @@ class EventSchema:
         """Validate an incoming instance of this event schema."""
         self._validator.validate(data)
 
-    def enforce_redaction_policy(self, data: dict) -> None:
+    def enforce_redaction_policies(self, data: dict) -> None:
         """Redact fields from"""
         # Find all policies not explicitly allowed.
         named_policies = set(self.redaction_policies.keys())
@@ -175,4 +175,4 @@ class EventSchema:
     def process(self, data: dict) -> None:
         """Validate event data and enforce an redaction policies."""
         self.validate(data)
-        self.enforce_redaction_policy(data)
+        self.enforce_redaction_policies(data)

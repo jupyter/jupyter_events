@@ -8,8 +8,8 @@ class SchemaRegistryException(Exception):
 
 
 class SchemaRegistry:
-    def __init__(self, schemas={}, allowed_policies="all"):
-        self._schemas = schemas
+    def __init__(self, schemas=None, allowed_policies="all"):
+        self._schemas = schemas or {}
         self._allowed_policies = allowed_policies
 
     @property

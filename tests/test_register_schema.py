@@ -57,16 +57,21 @@ def test_reserved_properties():
                 "$id": "test/test",
                 "title": "Test",
                 "version": 1,
-                "redactionPolicy": ["unrestricted"],
+                "redactionPolicies": ["unrestricted"],
                 "properties": {
                     "__fail__": {
                         "type": "string",
                         "title": "test",
-                        "redactionPolicy": ["unrestricted"],
+                        "redactionPolicies": ["unrestricted"],
                     },
                 },
             }
         )
+
+
+@pytest.fixture(autouse=True)
+def resetter():
+    pass
 
 
 def test_timestamp_override():
@@ -74,14 +79,14 @@ def test_timestamp_override():
     Simple test for overriding timestamp
     """
     schema = {
-        "$id": "test/test2",
+        "$id": "test/test",
         "version": 1,
-        "redactionPolicy": ["unrestricted"],
+        "redactionPolicies": ["unrestricted"],
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
-                "redactionPolicy": ["unrestricted"],
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -105,14 +110,14 @@ def test_emit():
     Simple test for emitting valid events
     """
     schema = {
-        "$id": "test/test3",
+        "$id": "test/test",
         "version": 1,
-        "redactionPolicy": ["unrestricted"],
+        "redactionPolicies": ["unrestricted"],
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
-                "redactionPolicy": ["unrestricted"],
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -149,15 +154,15 @@ def test_register_schema_file(tmp_path):
     Register schema from a file
     """
     schema = {
-        "$id": "test/test3",
+        "$id": "test/test",
         "version": 1,
-        "redactionPolicy": ["unrestricted"],
+        "redactionPolicies": ["unrestricted"],
         "type": "object",
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
-                "redactionPolicy": ["unrestricted"],
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -177,8 +182,14 @@ def test_register_schema_file_object(tmp_path):
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
@@ -202,18 +213,23 @@ def test_allowed_schemas():
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
-
     output = io.StringIO()
     handler = logging.StreamHandler(output)
     el = EventLogger(handlers=[handler])
     # Just register schema, but do not mark it as allowed
     el.register_schema(schema)
 
-    el.record_event(
+    el.emit(
         "test/test",
         1,
         {
@@ -225,16 +241,25 @@ def test_allowed_schemas():
     assert output.getvalue() == ""
 
 
-def test_record_event_badschema():
+def test_emit_badschema():
     """
     Fail fast when an event doesn't conform to its schema
     """
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
-            "status": {"enum": ["success", "failure"], "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
+            "status": {
+                "enum": ["success", "failure"],
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
@@ -243,25 +268,35 @@ def test_record_event_badschema():
     el.allowed_schemas = ["test/test"]
 
     with pytest.raises(jsonschema.ValidationError):
-        el.record_event(
-            "test/test", 1, {"something": "blah", "status": "hi"}  # 'not-in-enum'
-        )
+        el.emit("test/test", 1, {"something": "blah", "status": "hi"})  # 'not-in-enum'
 
 
 def test_unique_logger_instances():
     schema0 = {
         "$id": "test/test0",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
     schema1 = {
         "$id": "test/test1",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
@@ -278,14 +313,14 @@ def test_unique_logger_instances():
     el1.register_schema(schema1)
     el1.allowed_schemas = ["test/test1"]
 
-    el0.record_event(
+    el0.emit(
         "test/test0",
         1,
         {
             "something": "blah",
         },
     )
-    el1.record_event(
+    el1.emit(
         "test/test1",
         1,
         {
@@ -322,18 +357,30 @@ def test_unique_logger_instances():
 
 def test_register_duplicate_schemas():
     schema0 = {
-        "$id": "test/test",
+        "$id": "test/test0",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
     schema1 = {
-        "$id": "test/test",
+        "$id": "test/test1",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "somethingelse": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
