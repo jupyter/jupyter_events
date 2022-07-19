@@ -28,8 +28,9 @@ class EventLogger(Configurable):
         """,
     ).tag(config=True)
 
-    allowed_policies = List(
-        default_value=["all"],
+    redacted_policies = List(
+        default_value=None,
+        allow_none=True,
         help=(
             """
             A list of the redaction policies that will not be redacted
@@ -42,7 +43,7 @@ class EventLogger(Configurable):
 
     @default("schema_registry")
     def _default_schema_registry(self):
-        return SchemaRegistry(allowed_policies=self.allowed_policies)
+        return SchemaRegistry(redacted_policies=self.redacted_policies)
 
     def __init__(self, *args, **kwargs):
         # We need to initialize the configurable before

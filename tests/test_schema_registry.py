@@ -9,6 +9,7 @@ from jsonschema.exceptions import ValidationError
 from ruamel.yaml import YAML
 
 from jupyter_events.logger import EventLogger
+from jupyter_events.schema_registry import SchemaRegistryException
 
 
 def test_register_invalid_schema():
@@ -44,34 +45,29 @@ def test_missing_required_properties():
         )
 
 
-def test_reserved_properties():
-    """
-    User schemas can't have properties starting with __
+# def test_reserved_properties():
+#     """
+#     User schemas can't have properties starting with __
 
-    These are reserved
-    """
-    el = EventLogger()
-    with pytest.raises(ValidationError):
-        el.register_schema(
-            {
-                "$id": "test/test",
-                "title": "Test",
-                "version": 1,
-                "redactionPolicies": ["unrestricted"],
-                "properties": {
-                    "__fail__": {
-                        "type": "string",
-                        "title": "test",
-                        "redactionPolicies": ["unrestricted"],
-                    },
-                },
-            }
-        )
-
-
-@pytest.fixture(autouse=True)
-def resetter():
-    pass
+#     These are reserved
+#     """
+#     el = EventLogger()
+#     # with pytest.raises(ValidationError):
+#     el.register_schema(
+#         {
+#             "$id": "test/test",
+#             "title": "Test",
+#             "version": 1,
+#             "redactionPolicies": ["unrestricted"],
+#             "properties": {
+#                 "__fail__": {
+#                     "type": "string",
+#                     "title": "test",
+#                     "redactionPolicies": ["unrestricted"],
+#                 },
+#             },
+#         }
+#     )
 
 
 def test_timestamp_override():
@@ -172,7 +168,7 @@ def test_register_schema_file(tmp_path):
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
     el.register_schema_file(schema_file)
-    assert ("test/test3", 1) in el.schema_registry
+    assert ("test/test", 1) in el.schema_registry
 
 
 def test_register_schema_file_object(tmp_path):
@@ -203,42 +199,7 @@ def test_register_schema_file_object(tmp_path):
     with open(str(schema_file)) as f:
         el.register_schema_file(f)
 
-    assert schema in el.schemas.values()
-
-
-def test_allowed_schemas():
-    """
-    Events should be emitted only if their schemas are allowed
-    """
-    schema = {
-        "$id": "test/test",
-        "version": 1,
-        "redactionPolicies": ["unrestricted"],
-        "type": "object",
-        "properties": {
-            "something": {
-                "type": "string",
-                "title": "test",
-                "redactionPolicies": ["unrestricted"],
-            },
-        },
-    }
-    output = io.StringIO()
-    handler = logging.StreamHandler(output)
-    el = EventLogger(handlers=[handler])
-    # Just register schema, but do not mark it as allowed
-    el.register_schema(schema)
-
-    el.emit(
-        "test/test",
-        1,
-        {
-            "something": "blah",
-        },
-    )
-    handler.flush()
-
-    assert output.getvalue() == ""
+    assert ("test/test", 1) in el.schema_registry
 
 
 def test_emit_badschema():
@@ -258,6 +219,7 @@ def test_emit_badschema():
             },
             "status": {
                 "enum": ["success", "failure"],
+                "title": "test 2",
                 "redactionPolicies": ["unrestricted"],
             },
         },
@@ -357,7 +319,7 @@ def test_unique_logger_instances():
 
 def test_register_duplicate_schemas():
     schema0 = {
-        "$id": "test/test0",
+        "$id": "test/test",
         "version": 1,
         "redactionPolicies": ["unrestricted"],
         "type": "object",
@@ -371,7 +333,7 @@ def test_register_duplicate_schemas():
     }
 
     schema1 = {
-        "$id": "test/test1",
+        "$id": "test/test",
         "version": 1,
         "redactionPolicies": ["unrestricted"],
         "type": "object",
@@ -386,5 +348,5 @@ def test_register_duplicate_schemas():
 
     el = EventLogger()
     el.register_schema(schema0)
-    with pytest.raises(ValueError):
+    with pytest.raises(SchemaRegistryException):
         el.register_schema(schema1)

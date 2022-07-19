@@ -1,23 +1,37 @@
-import pathlib
 from typing import Any, Dict, Hashable, List, Sequence, Union
 
-from jsonschema import RefResolver, validators
+from jsonschema import validators
 
+from .validators import JUPYTER_EVENTS_VALIDATOR
 from .yaml import yaml
 
 
-def _nested_pop(dictionary: dict, nested_keys: Sequence[Hashable]) -> Any:
+def _pop_nested_redacted_fields(
+    schema_data: dict, policy_location: Sequence[Hashable]
+) -> Any:
     """Pop a item nested anywhere in a dwictionary using the
     list of (hashable) keys to locate the item.
     """
-    d = dictionary
-    last_entry = nested_keys[-1]
-    for key in nested_keys[:-1]:
-        d = d[key]
-    return d.pop(last_entry)
+    # Begin walking the sequence of keys to the policy
+    # location given.
+    nested_data = schema_data
+    for i, el in enumerate(policy_location[:-1]):
+        # Handle arrays of objects.
+        if el == "__array__":
+            for j, _ in enumerate(nested_data):
+                branch = policy_location[i + 1 :]
+                _pop_nested_redacted_fields(nested_data[j], branch)
+            return
+        # Try moving into nested child schema.
+        try:
+            nested_data = nested_data[el]
+        except KeyError:
+            return
+    # If we made it this far, we ended on a policy that needs to be popped.
+    return nested_data.pop(policy_location[-1])
 
 
-def _get_redaction_policies(schema: dict):
+def _find_redaction_policies(schema: dict):
     """A recursive function that iterates an event schema
     and returns a mapping of redaction policies to
     (nested) properties (identified by a sequence of keys).
@@ -28,8 +42,17 @@ def _get_redaction_policies(schema: dict):
         props = subschema["properties"]
         for key, obj in props.items():
             updated_key_sequence = key_sequence + (key,)
-            if isinstance(obj, dict) and "properties" in obj:
-                _extract_policies(obj, updated_key_sequence)
+
+            def _nested_extract_policies(obj, updated_key_sequence):
+                if isinstance(obj, dict):
+                    if "properties" in obj:
+                        _extract_policies(obj, updated_key_sequence)
+                    if "items" in obj and "properties" in obj["items"]:
+                        _nested_extract_policies(
+                            obj["items"], updated_key_sequence + ("__array__",)
+                        )
+
+            _nested_extract_policies(obj, updated_key_sequence)
 
             # Update the list in place.
             for policy in obj["redactionPolicies"]:
@@ -40,21 +63,6 @@ def _get_redaction_policies(schema: dict):
     # Start the recursion
     _extract_policies(schema)
     return redaction_policies
-
-
-METASCHEMA_PATH = pathlib.Path(__file__).parent.joinpath("schemas")
-EVENT_METASCHEMA_FILEPATH = METASCHEMA_PATH.joinpath("event-metaschema.yml")
-EVENT_METASCHEMA = yaml.load(EVENT_METASCHEMA_FILEPATH)
-PROPERTY_METASCHEMA_FILEPATH = METASCHEMA_PATH.joinpath("property-metaschema.yml")
-PROPERTY_METASCHEMA = yaml.load(PROPERTY_METASCHEMA_FILEPATH)
-METASCHEMA_RESOLVER = RefResolver(
-    base_uri=EVENT_METASCHEMA["$id"],
-    referrer=EVENT_METASCHEMA,
-    store={PROPERTY_METASCHEMA["$id"]: PROPERTY_METASCHEMA},
-)
-METASCHEMA_VALIDATOR = validators.Draft7Validator(
-    EVENT_METASCHEMA, resolver=METASCHEMA_RESOLVER
-)
 
 
 class EventSchema:
@@ -93,25 +101,27 @@ class EventSchema:
         schema,
         validator_class=validators.Draft7Validator,
         resolver=None,
-        allowed_policies: Union[str, list] = "all",
+        redacted_policies: Union[str, list, None] = None,
     ):
         # Validate the schema against Jupyter Events metaschema.
-        METASCHEMA_VALIDATOR.validate(schema)
+        JUPYTER_EVENTS_VALIDATOR.validate(schema)
         # Build a mapping of all property redaction policies.
-        self._redaction_policies = _get_redaction_policies(schema)
-        self._allowed_policies = self._validate_allowed_policies(allowed_policies)
+        self._redaction_policies_locations = _find_redaction_policies(schema)
+        self._redacted_policies = self._validate_redacted_policies(redacted_policies)
         # Create a validator for this schema
         self._validator = validator_class(schema, resolver=resolver)
         self._schema = schema
 
-    def _validate_allowed_policies(self, allowed_policies):
-        value_type = type(allowed_policies)
-        if value_type == str and allowed_policies == "all":
-            return set(self.redaction_policies.keys())
-        elif value_type == list:
-            return set(["unrestricted"] + list(allowed_policies))
+    def _validate_redacted_policies(self, redacted_policies):
+        if redacted_policies is None:
+            return set()
+        value_type = type(redacted_policies)
+        if value_type == str and redacted_policies == "all":
+            return set(self.redaction_policies_locations.keys())
+        if value_type == list:
+            return set(redacted_policies)
         raise TypeError(
-            "allowed_policies must be the literal string, 'all', or a list of "
+            "redacted_policies must be the literal string, 'all', or a list of "
             "redaction polices"
         )
 
@@ -130,11 +140,11 @@ class EventSchema:
         return (self.id, self.version)
 
     @property
-    def allowed_policies(self):
+    def redacted_policies(self):
         """The redaction policies that will not be redacted when an
         incoming event is processed.
         """
-        return self._allowed_policies
+        return self._redacted_policies
 
     @classmethod
     def from_file(
@@ -142,22 +152,22 @@ class EventSchema:
         filepath,
         validator_class=validators.Draft7Validator,
         resolver=None,
-        allowed_policies="all",
+        redacted_policies=None,
     ):
         schema = yaml.load(filepath)
         return cls(
             schema=schema,
             validator_class=validator_class,
             resolver=resolver,
-            allowed_policies=allowed_policies,
+            redacted_policies=redacted_policies,
         )
 
     @property
-    def redaction_policies(self) -> Dict[str, List[str]]:
+    def redaction_policies_locations(self) -> Dict[str, List[str]]:
         """Mapping of the redaction policies in this schema to
         the (nested) properties where they are defined.
         """
-        return self._redaction_policies
+        return self._redaction_policies_locations
 
     def validate(self, data: dict) -> None:
         """Validate an incoming instance of this event schema."""
@@ -165,12 +175,14 @@ class EventSchema:
 
     def enforce_redaction_policies(self, data: dict) -> None:
         """Redact fields from"""
-        # Find all policies not explicitly allowed.
-        named_policies = set(self.redaction_policies.keys())
-        redacted_policies = named_policies - self.allowed_policies
-        for policy in redacted_policies:
-            for property in self.redaction_policies[policy]:
-                _nested_pop(data, property)
+        # # Find all policies not explicitly allowed.
+        # named_policies = set(self.redaction_policies_locations.keys())
+        # redacted_policies = named_policies - self.unredacted_policies
+        for policy_type in self.redacted_policies:
+            policy_locations = self._redaction_policies_locations[policy_type]
+            print(policy_type, policy_locations)
+            for item in policy_locations:
+                _pop_nested_redacted_fields(data, item)
 
     def process(self, data: dict) -> None:
         """Validate event data and enforce an redaction policies."""

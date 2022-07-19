@@ -14,6 +14,12 @@ properties:
     type: array
     items:
       type: string
+  properties:
+    type: object
+    additionalProperties:
+      $ref: http://event.jupyter.org/property-metaschema
+  items:
+    $ref: http://event.jupyter.org/property-metaschema
   additionalProperties: true
 required:
   - title

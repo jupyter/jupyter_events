@@ -4,17 +4,17 @@ from .schema import EventSchema
 
 
 class SchemaRegistryException(Exception):
-    pass
+    """Exception class for Jupyter Events Schema Registry Errors."""
 
 
 class SchemaRegistry:
-    def __init__(self, schemas=None, allowed_policies="all"):
+    def __init__(self, schemas=None, redacted_policies=None):
         self._schemas = schemas or {}
-        self._allowed_policies = allowed_policies
+        self._redacted_policies = redacted_policies
 
     @property
-    def allowed_policies(self):
-        return self._allowed_policies
+    def redacted_policies(self):
+        return self._redacted_policies
 
     def __contains__(self, registry_key):
         """Syntax sugar to check if a schema is found in the registry"""
@@ -31,13 +31,13 @@ class SchemaRegistry:
 
     def register(self, schema_data):
         """Register a schema."""
-        schema = EventSchema(schema_data, allowed_policies=self.allowed_policies)
+        schema = EventSchema(schema_data, redacted_policies=self.redacted_policies)
         self._add(schema)
 
     def register_from_file(self, schema_filepath):
         """Register a schema from a file."""
         schema = EventSchema.from_file(
-            schema_filepath, allowed_policies=self.allowed_policies
+            schema_filepath, redacted_policies=self.redacted_policies
         )
         self._add(schema)
 

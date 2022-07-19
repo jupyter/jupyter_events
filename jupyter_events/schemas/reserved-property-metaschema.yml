@@ -1,0 +1,17 @@
+$schema: http://json-schema.org/draft-07/schema
+$id: http://event.jupyter.org/reserved-property-metaschema
+version: 1
+title: Reserved Property Metaschema
+description: |
+  Property names that are reserved for Jupyter Events and should not
+  be included in an Event Schema.
+patternProperties:
+  ^__:
+    type:
+      - string
+      - object
+      - number
+      - integer
+      - boolean
+      - array
+minProperties: 1
