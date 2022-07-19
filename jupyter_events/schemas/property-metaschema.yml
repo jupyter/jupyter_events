@@ -21,6 +21,7 @@ properties:
   items:
     $ref: http://event.jupyter.org/property-metaschema
   additionalProperties: true
+
 required:
   - title
   - redactionPolicies

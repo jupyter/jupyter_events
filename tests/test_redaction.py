@@ -11,9 +11,11 @@ SCHEMA_PATH = pathlib.Path(__file__).parent / "schemas"
     "schema_file,redacted_policies,data,data_out",
     [
         [
-            # Redact fields from objects in a nested array.
+            # Schema name
             "array.yaml",
+            # Redacted policies
             ["user-identifier", "user-identifiable-information"],
+            # Unredacted data
             {
                 "nothing-exciting": "hello, world",
                 "users": [
@@ -21,14 +23,18 @@ SCHEMA_PATH = pathlib.Path(__file__).parent / "schemas"
                     {"id": "test id 1", "email": "test1@testemail.com"},
                 ],
             },
+            # Redacted data
             {
                 "nothing-exciting": "hello, world",
                 "users": [{}, {}],
             },
         ],
         [
+            # Schema name
             "nested-array.yaml",
+            # Redacted policies
             ["user-identifier", "user-identifiable-information"],
+            # Unredacted data
             {
                 "nothing-exciting": "hello, world",
                 "users": [
@@ -48,6 +54,7 @@ SCHEMA_PATH = pathlib.Path(__file__).parent / "schemas"
                     },
                 ],
             },
+            # Redacted data
             {
                 "nothing-exciting": "hello, world",
                 "users": [
