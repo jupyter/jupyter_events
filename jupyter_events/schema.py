@@ -2,8 +2,8 @@ from typing import Any, Dict, Hashable, List, Sequence, Union
 
 from jsonschema import validators
 
+from . import yaml
 from .validators import JUPYTER_EVENTS_VALIDATOR
-from .yaml import yaml
 
 
 def _pop_nested_redacted_fields(
@@ -180,11 +180,12 @@ class EventSchema:
         # redacted_policies = named_policies - self.unredacted_policies
         for policy_type in self.redacted_policies:
             policy_locations = self._redaction_policies_locations[policy_type]
-            print(policy_type, policy_locations)
             for item in policy_locations:
                 _pop_nested_redacted_fields(data, item)
 
     def process(self, data: dict) -> None:
-        """Validate event data and enforce an redaction policies."""
+        """Validate event data and enforce an redaction policies (in place).
+        Nothing is returned by this method, because the data is redacted in place.
+        """
         self.validate(data)
         self.enforce_redaction_policies(data)

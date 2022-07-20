@@ -1,8 +1,8 @@
 import pytest
 from jsonschema.exceptions import ValidationError
 
+from jupyter_events import yaml
 from jupyter_events.validators import JUPYTER_EVENTS_VALIDATOR
-from jupyter_events.yaml import yaml
 
 from .utils import SCHEMA_PATH
 
@@ -28,7 +28,7 @@ def test_bad_validations(schema_file, validation_error_msg):
     """
     # Read the schema file
     with open(SCHEMA_PATH / "bad" / schema_file) as f:
-        schema = yaml.load(f)
+        schema = yaml.loads(f)
     # Assert that the schema files for a known reason.
     with pytest.raises(ValidationError) as err:
         JUPYTER_EVENTS_VALIDATOR.validate(schema)
@@ -46,6 +46,6 @@ def test_good_validations(schema_file):
     """
     # Read the schema file
     with open(SCHEMA_PATH / "good" / schema_file) as f:
-        schema = yaml.load(f)
+        schema = yaml.loads(f)
     # Assert that the schema files for a known reason.
     JUPYTER_EVENTS_VALIDATOR.validate(schema)

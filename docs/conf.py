@@ -29,7 +29,7 @@ author = "Project Jupyter"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions: List = ["myst_parser"]
+extensions: List = ["myst_parser", "jupyterlite_sphinx"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -55,3 +55,6 @@ html_theme = "pydata_sphinx_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 master_doc = "index"
+
+# Configure jupyterlite to import jupyter_events package
+jupyterlite_contents = ["pages/demo-notebook.ipynb"]

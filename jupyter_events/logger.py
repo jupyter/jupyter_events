@@ -39,10 +39,10 @@ class EventLogger(Configurable):
         ),
     )
 
-    schema_registry = Instance(SchemaRegistry)
+    schemas = Instance(SchemaRegistry)
 
-    @default("schema_registry")
-    def _default_schema_registry(self):
+    @default("schemas")
+    def _default_schemas(self):
         return SchemaRegistry(redacted_policies=self.redacted_policies)
 
     def __init__(self, *args, **kwargs):
@@ -79,13 +79,19 @@ class EventLogger(Configurable):
         eventlogger_cfg = Config({"EventLogger": my_cfg})
         super()._load_config(eventlogger_cfg, section_names=None, traits=None)
 
-    def register_schema(self, schema: dict):
-        """Register events schema with the SchemaRegistry."""
-        self.schema_registry.register(schema)
+    def register_schema(self, schema):
+        """Register this schema with the schema registry.
 
-    def register_schema_file(self, schema_filepath):
-        """Register events schema with the SchemaRegistry."""
-        self.schema_registry.register_from_file(schema_filepath)
+        Get this registered schema using the EventLogger.schema.get() method.
+        """
+        self.schemas.register(schema)
+
+    def register_schema_file(self, schema_file):
+        """Register this schema with the schema registry.
+
+        Get this registered schema using the EventLogger.schema.get() method.
+        """
+        self.schemas.register_from_file(schema_file)
 
     def add_handler(self, handler: logging.Handler):
         """Add a new logging handler to the Event Logger.
@@ -134,7 +140,7 @@ class EventLogger(Configurable):
         dict
             The recorded event data
         """
-        if not self.handlers or (schema_name, version) not in self.schema_registry:
+        if not self.handlers or (schema_name, version) not in self.schemas:
             # if handler isn't set up or schema is not explicitly whitelisted,
             # don't do anything
             return
@@ -150,9 +156,8 @@ class EventLogger(Configurable):
             "__schema_version__": version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
-        schema = self.schema_registry.get((schema_name, version))
-        schema.validate(event)
-        schema.enforce_redaction_policies(event)
+        # Process this event, i.e. validate and redact (in place)
+        self.schemas.process_event(schema_name, version, event)
         capsule.update(event)
         self.log.info(capsule)
         return capsule

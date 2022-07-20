@@ -1,4 +1,4 @@
-from multiprocessing import Event
+from typing import Any, List, Optional, Tuple
 
 from .schema import EventSchema
 
@@ -8,15 +8,20 @@ class SchemaRegistryException(Exception):
 
 
 class SchemaRegistry:
-    def __init__(self, schemas=None, redacted_policies=None):
+    """A convenient API for storing and searching a group of schemas."""
+
+    def __init__(self, schemas: dict = None, redacted_policies: list = None):
         self._schemas = schemas or {}
         self._redacted_policies = redacted_policies
 
     @property
-    def redacted_policies(self):
+    def redacted_policies(self) -> Optional[List[Any]]:
+        """A list of policies that will be redacted from
+        all events validated against this registry.
+        """
         return self._redacted_policies
 
-    def __contains__(self, registry_key):
+    def __contains__(self, registry_key: Tuple):
         """Syntax sugar to check if a schema is found in the registry"""
         return registry_key in self._schemas
 
@@ -30,7 +35,11 @@ class SchemaRegistry:
         self._schemas[schema_obj.registry_key] = schema_obj
 
     def register(self, schema_data):
-        """Register a schema."""
+        """Add a valid schema to the registry.
+
+        All schemas are validated against the Jupyter Events meta-schema
+        found here:
+        """
         schema = EventSchema(schema_data, redacted_policies=self.redacted_policies)
         self._add(schema)
 
@@ -41,22 +50,42 @@ class SchemaRegistry:
         )
         self._add(schema)
 
-    def get(self, registry_key) -> EventSchema:
+    def get(self, id: str, version: int) -> EventSchema:
+        """Fetch a given schema. If the schema is not found,
+        this will raise a KeyError.
+        """
         try:
-            return self._schemas[registry_key]
+            return self._schemas[(id, version)]
         except KeyError:
             raise KeyError(
-                f"The requested schema, {registry_key[0]} "
-                f"(version {registry_key[1]}), was not found in the "
+                f"The requested schema, {id} "
+                f"(version {version}), was not found in the "
                 "schema registry. Are you sure it was previously registered?"
             )
 
-    def remove(self, registry_key):
+    def remove(self, id: str, version: int) -> None:
+        """Remove a given schema. If the schema is not found,
+        this will raise a KeyError.
+        """
         try:
-            del self._schemas[registry_key]
+            del self._schemas[(id, version)]
         except KeyError:
             raise KeyError(
-                f"The requested schema, {registry_key[0]} "
-                f"(version {registry_key[1]}), was not found in the "
+                f"The requested schema, {id} "
+                f"(version {version}), was not found in the "
                 "schema registry. Are you sure it was previously registered?"
             )
+
+    def validate_event(self, id: str, version: int, data: dict) -> None:
+        """Validate an event against a schema within this
+        registry.
+        """
+        schema = self.get(id, version)
+        schema.validate(data)
+
+    def process_event(self, id: str, version: int, data: dict) -> None:
+        """Validate and event and enforce an redaction policies (in place).
+        Nothing is returned by this method, because the data is redacted in place.
+        """
+        schema = self.get(id, version)
+        schema.process(data)

@@ -2,7 +2,7 @@ import pathlib
 
 from jsonschema import RefResolver, validators
 
-from .yaml import yaml
+from . import yaml
 
 METASCHEMA_PATH = pathlib.Path(__file__).parent.joinpath("schemas")
 EVENT_METASCHEMA_FILEPATH = METASCHEMA_PATH.joinpath("event-metaschema.yml")
