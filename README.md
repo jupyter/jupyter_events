@@ -29,10 +29,6 @@ logger = EventLogger(
     handlers=[
         logging.FileHandler('events.log')
     ],
-    # List schemas of events that should be recorded.
-    allowed_schemas=[
-        'uri.to.event.schema'
-    ]
 )
 ```
 
@@ -49,14 +45,16 @@ Event schemas must be registered with the `EventLogger` for events to be recorde
   "title": "My Event",
   "description": "All events must have a name property.",
   "type": "object",
+  "redactionPolicies": ["unrestricted"],
   "properties": {
-    "name": {
-      "title": "Name",
+    "event_name": {
+      "title": "Event Name",
       "description": "Name of event",
-      "type": "string"
+      "type": "string",
+      "redactionPolicies": ["unrestricted"]
     }
   },
-  "required": ["name"],
+  "required": ["event_name"],
   "version": 1
 }
 ```
@@ -79,7 +77,7 @@ Events are recorded using the `record_event` method. This method validates the e
 
 ```python
 # Record an example event.
-event = {'name': 'example event'}
+event = {'event_name': 'example event'}
 logger.record_event(
     schema_id='url.to.event.schema',
     version=1,
