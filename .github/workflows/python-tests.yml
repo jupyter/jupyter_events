@@ -30,6 +30,7 @@ jobs:
       - name: Install the Python dependencies
         run: |
           pip install -e ".[test]" codecov
+          pip list
       - name: Run the tests
         if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
         run: |

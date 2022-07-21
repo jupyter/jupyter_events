@@ -9,8 +9,7 @@ redactionPolicies:
 properties:
   prop:
     title: Test Property
-    description: |
-      Test property.
+    description: Test property.
     redactionPolicies:
       - unrestricted
     type: string

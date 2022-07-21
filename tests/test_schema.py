@@ -17,6 +17,7 @@ BAD_SCHEMAS = [
     ],
     ["missing-policy-array.yaml", MISSING_REDACTION_POLICY],
     ["missing-policy-nested-array.yaml", MISSING_REDACTION_POLICY],
+    #    ["reserved-property.yaml", "Something"]
 ]
 
 

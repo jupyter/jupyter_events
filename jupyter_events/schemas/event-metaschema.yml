@@ -7,8 +7,6 @@ description: |
   schemas are appropriately defined.
 type: object
 properties:
-  $id:
-    type: string
   version:
     type: integer
   title:

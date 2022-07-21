@@ -6,7 +6,7 @@ description: |
   Property names that are reserved for Jupyter Events and should not
   be included in an Event Schema.
 patternProperties:
-  ^__:
+  (?!__):
     type:
       - string
       - object
@@ -14,4 +14,4 @@ patternProperties:
       - integer
       - boolean
       - array
-minProperties: 1
+additionalProperties: false
