@@ -1,5 +1,4 @@
 import pathlib
-from xml.etree.ElementPath import prepare_self
 
 from jsonschema import RefResolver, ValidationError, validators
 
@@ -27,8 +26,8 @@ def validate_schema(schema: dict):
         JUPYTER_EVENTS_VALIDATOR.validate(schema)
     except ValidationError as err:
         reserved_property_msg = " does not match '^(?!__.*)'"
-        if reserved_property_msg in err.message:
-            bad_property = err.message[: -(len(reserved_property_msg))]
+        if reserved_property_msg in str(err):
+            bad_property = str(err)[: -(len(reserved_property_msg))]
             raise ValidationError(
                 f"{bad_property} is an invalid property name because it "
                 "starts with `__`. Properties starting with 'dunder' "
