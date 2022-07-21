@@ -92,31 +92,6 @@ def test_missing_required_properties():
         )
 
 
-# def test_reserved_properties():
-#     """
-#     User schemas can't have properties starting with __
-
-#     These are reserved
-#     """
-#     el = EventLogger()
-#     # with pytest.raises(ValidationError):
-#     el.register_schema(
-#         {
-#             "$id": "test/test",
-#             "title": "Test",
-#             "version": 1,
-#             "redactionPolicies": ["unrestricted"],
-#             "properties": {
-#                 "__fail__": {
-#                     "type": "string",
-#                     "title": "test",
-#                     "redactionPolicies": ["unrestricted"],
-#                 },
-#             },
-#         }
-#     )
-
-
 def test_timestamp_override():
     """
     Simple test for overriding timestamp
