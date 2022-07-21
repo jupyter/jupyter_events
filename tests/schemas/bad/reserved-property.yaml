@@ -1,0 +1,15 @@
+$id: http://event.jupyter.org/test
+version: 1
+title: Simple Test Schema
+description: |
+  A simple schema for testing
+type: object
+redactionPolicies:
+  - unrestricted
+properties:
+  __badName:
+    title: Test Property
+    description: Test property.
+    redactionPolicies:
+      - unrestricted
+    type: string

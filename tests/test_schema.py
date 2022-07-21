@@ -2,7 +2,7 @@ import pytest
 from jsonschema.exceptions import ValidationError
 
 from jupyter_events import yaml
-from jupyter_events.validators import JUPYTER_EVENTS_VALIDATOR
+from jupyter_events.validators import validate_schema
 
 from .utils import SCHEMA_PATH
 
@@ -17,7 +17,7 @@ BAD_SCHEMAS = [
     ],
     ["missing-policy-array.yaml", MISSING_REDACTION_POLICY],
     ["missing-policy-nested-array.yaml", MISSING_REDACTION_POLICY],
-    #    ["reserved-property.yaml", "Something"]
+    ["reserved-property.yaml", "Properties starting with 'dunder'"],
 ]
 
 
@@ -32,7 +32,7 @@ def test_bad_validations(schema_file, validation_error_msg):
         schema = yaml.loads(f)
     # Assert that the schema files for a known reason.
     with pytest.raises(ValidationError) as err:
-        JUPYTER_EVENTS_VALIDATOR.validate(schema)
+        validate_schema(schema)
     assert validation_error_msg in err.value.message
 
 
@@ -49,4 +49,4 @@ def test_good_validations(schema_file):
     with open(SCHEMA_PATH / "good" / schema_file) as f:
         schema = yaml.loads(f)
     # Assert that the schema files for a known reason.
-    JUPYTER_EVENTS_VALIDATOR.validate(schema)
+    validate_schema(schema)

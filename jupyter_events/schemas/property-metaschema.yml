@@ -5,6 +5,7 @@ title: Property Metaschema
 description: |
   A metaschema for validating properties within
   an event schema
+
 properties:
   title:
     type: string
@@ -18,9 +19,18 @@ properties:
     type: object
     additionalProperties:
       $ref: http://event.jupyter.org/property-metaschema
+    propertyNames:
+      pattern: ^(?!__.*)
+
   items:
     $ref: http://event.jupyter.org/property-metaschema
 
 required:
   - title
   - redactionPolicies
+
+additionalProperties:
+  $ref: http://event.jupyter.org/property-metaschema
+
+propertyNames:
+  pattern: ^(?!__.*)

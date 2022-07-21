@@ -21,6 +21,8 @@ properties:
     type: object
     additionalProperties:
       $ref: http://event.jupyter.org/property-metaschema
+    propertyNames:
+      pattern: ^(?!__.*)
 
 required:
   - $id

@@ -3,7 +3,7 @@ from typing import Any, Dict, Hashable, List, Sequence, Union
 from jsonschema import validators
 
 from . import yaml
-from .validators import JUPYTER_EVENTS_VALIDATOR
+from .validators import validate_schema
 
 
 def _pop_nested_redacted_fields(
@@ -104,7 +104,7 @@ class EventSchema:
         redacted_policies: Union[str, list, None] = None,
     ):
         # Validate the schema against Jupyter Events metaschema.
-        JUPYTER_EVENTS_VALIDATOR.validate(schema)
+        validate_schema(schema)
         # Build a mapping of all property redaction policies.
         self._redaction_policies_locations = _find_redaction_policies(schema)
         self._redacted_policies = self._validate_redacted_policies(redacted_policies)
