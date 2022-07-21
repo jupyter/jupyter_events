@@ -16,7 +16,12 @@ from .traits import Handlers
 
 class EventLogger(Configurable):
     """
-    Send structured events to a logging sink
+    An Event logger for emitting structured events.
+
+    Event schemas must be registered with the
+    EventLogger using the `register_schema` or
+    `register_schema_file` methods. Every schema
+    will be validated against Jupyter Event's metaschema.
     """
 
     handlers = Handlers(
@@ -24,25 +29,27 @@ class EventLogger(Configurable):
         allow_none=True,
         help="""A list of logging.Handler instances to send events to.
 
-        When set to None (the default), events are discarded.
+        When set to None (the default), all events are discarded.
         """,
     ).tag(config=True)
 
     redacted_policies = List(
         default_value=None,
         allow_none=True,
-        help=(
-            """
-            A list of the redaction policies that will not be redacted
-            from incoming, recorded events.
-            """
-        ),
+        help="""A list of the redactionPolicies that will be redacted
+        from emitted events.
+        """,
+    ).tag(config=True)
+
+    schemas = Instance(
+        SchemaRegistry,
+        help="""The SchemaRegistry for caching validated schemas
+        and their jsonschema validators.
+        """,
     )
 
-    schemas = Instance(SchemaRegistry)
-
     @default("schemas")
-    def _default_schemas(self):
+    def _default_schemas(self) -> SchemaRegistry:
         return SchemaRegistry(redacted_policies=self.redacted_policies)
 
     def __init__(self, *args, **kwargs):
@@ -79,14 +86,14 @@ class EventLogger(Configurable):
         eventlogger_cfg = Config({"EventLogger": my_cfg})
         super()._load_config(eventlogger_cfg, section_names=None, traits=None)
 
-    def register_schema(self, schema):
+    def register_schema(self, schema: dict):
         """Register this schema with the schema registry.
 
         Get this registered schema using the EventLogger.schema.get() method.
         """
         self.schemas.register(schema)
 
-    def register_schema_file(self, schema_file):
+    def register_schema_file(self, schema_file: str):
         """Register this schema with the schema registry.
 
         Get this registered schema using the EventLogger.schema.get() method.
@@ -114,13 +121,13 @@ class EventLogger(Configurable):
         if handler not in self.handlers:
             self.handlers.append(handler)
 
-    def remove_handler(self, handler):
+    def remove_handler(self, handler: logging.Handler):
         """Remove the logging handler from the logger and list of handlers."""
         self.log.removeHandler(handler)
         if handler in self.handlers:
             self.handlers.remove(handler)
 
-    def emit(self, schema_name, version, event, timestamp_override=None):
+    def emit(self, id: str, version: int, event: dict, timestamp_override=None):
         """
         Record given event with schema has occurred.
 
@@ -140,7 +147,7 @@ class EventLogger(Configurable):
         dict
             The recorded event data
         """
-        if not self.handlers or (schema_name, version) not in self.schemas:
+        if not self.handlers or (id, version) not in self.schemas:
             # if handler isn't set up or schema is not explicitly whitelisted,
             # don't do anything
             return
@@ -152,12 +159,12 @@ class EventLogger(Configurable):
             timestamp = timestamp_override
         capsule = {
             "__timestamp__": timestamp.isoformat() + "Z",
-            "__schema__": schema_name,
+            "__schema__": id,
             "__schema_version__": version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
         # Process this event, i.e. validate and redact (in place)
-        self.schemas.process_event(schema_name, version, event)
+        self.schemas.process_event(id, version, event)
         capsule.update(event)
         self.log.info(capsule)
         return capsule

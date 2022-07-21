@@ -21,7 +21,7 @@ class SchemaRegistry:
         """
         return self._redacted_policies
 
-    def __contains__(self, registry_key: Tuple):
+    def __contains__(self, registry_key: Tuple[str, int]):
         """Syntax sugar to check if a schema is found in the registry"""
         return registry_key in self._schemas
 
@@ -34,16 +34,16 @@ class SchemaRegistry:
             )
         self._schemas[schema_obj.registry_key] = schema_obj
 
-    def register(self, schema_data):
+    def register(self, data: dict):
         """Add a valid schema to the registry.
 
         All schemas are validated against the Jupyter Events meta-schema
         found here:
         """
-        schema = EventSchema(schema_data, redacted_policies=self.redacted_policies)
+        schema = EventSchema(data, redacted_policies=self.redacted_policies)
         self._add(schema)
 
-    def register_from_file(self, schema_filepath):
+    def register_from_file(self, schema_filepath: str):
         """Register a schema from a file."""
         schema = EventSchema.from_file(
             schema_filepath, redacted_policies=self.redacted_policies

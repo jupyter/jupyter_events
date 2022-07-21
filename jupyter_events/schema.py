@@ -1,4 +1,4 @@
-from typing import Any, Dict, Hashable, List, Sequence, Union
+from typing import Any, Dict, Hashable, List, Sequence, Tuple, Union
 
 from jsonschema import validators
 
@@ -31,7 +31,7 @@ def _pop_nested_redacted_fields(
     return nested_data.pop(policy_location[-1])
 
 
-def _find_redaction_policies(schema: dict):
+def _find_redaction_policies(schema: dict) -> Dict[str, list]:
     """A recursive function that iterates an event schema
     and returns a mapping of redaction policies to
     (nested) properties (identified by a sequence of keys).
@@ -112,13 +112,15 @@ class EventSchema:
         self._validator = validator_class(schema, resolver=resolver)
         self._schema = schema
 
-    def _validate_redacted_policies(self, redacted_policies):
+    def _validate_redacted_policies(
+        self, redacted_policies: Union[None, List, str, set]
+    ) -> set:
         if redacted_policies is None:
             return set()
         value_type = type(redacted_policies)
         if value_type == str and redacted_policies == "all":
             return set(self.redaction_policies_locations.keys())
-        if value_type == list:
+        if value_type == list or value_type == set:
             return set(redacted_policies)
         raise TypeError(
             "redacted_policies must be the literal string, 'all', or a list of "
@@ -126,21 +128,21 @@ class EventSchema:
         )
 
     @property
-    def id(self):
+    def id(self) -> str:
         """Schema $id field."""
         return self._schema["$id"]
 
     @property
-    def version(self):
+    def version(self) -> int:
         """Schema's version."""
         return self._schema["version"]
 
     @property
-    def registry_key(self):
+    def registry_key(self) -> Tuple[str, int]:
         return (self.id, self.version)
 
     @property
-    def redacted_policies(self):
+    def redacted_policies(self) -> set:
         """The redaction policies that will not be redacted when an
         incoming event is processed.
         """
