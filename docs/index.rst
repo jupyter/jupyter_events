@@ -42,6 +42,8 @@ Jupyter's Events library can be installed from PyPI.
    pages/configure
    pages/application
    pages/schemas
+   pages/redaction_policies
+   pages/demo
 
 Indices and tables
 ------------------

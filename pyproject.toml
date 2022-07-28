@@ -26,14 +26,14 @@ classifiers = [
 dependencies = [
     "jsonschema",
     "python-json-logger",
-    "ruamel.yaml",
+    "pyyaml",
     "traitlets",
 ]
 dynamic = [
     "version",
 ]
 
-[project.readme]
+[projects.readme]
 file = "README.md"
 content-type = "text/markdown"
 

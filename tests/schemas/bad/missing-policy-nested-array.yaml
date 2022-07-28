@@ -1,0 +1,47 @@
+$id: http://event.jupyter.org/test
+version: 1
+title: Schema with Array
+description: |
+  Fails validation because an element in the nested array
+  doesn't have a redactionPolicies field (see "position").
+type: object
+redactionPolicies:
+  - unrestricted
+properties:
+  users:
+    title: Test User Array
+    description: |
+      Test User array.
+    redactionPolicies:
+      - unrestricted
+    type: array
+    items:
+      type: object
+      title: User
+      redactionPolicies:
+        - unrestricted
+      properties:
+        name:
+          type: string
+          title: Name
+          redactionPolicies:
+            - user-identifier
+        hobbies:
+          type: array
+          title: Hobbies
+          redactionPolicies:
+            - unrestricted
+          items:
+            type: object
+            title: Hobby
+            redactionPolicies:
+              - unrestricted
+            properties:
+              sport:
+                title: Sport Name
+                type: string
+                redactionPolicies:
+                  - unrestricted
+              position:
+                title: Position
+                type: string

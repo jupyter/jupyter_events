@@ -5,9 +5,58 @@ from datetime import datetime, timedelta
 
 import jsonschema
 import pytest
-from ruamel.yaml import YAML
+from jsonschema.exceptions import ValidationError
+from traitlets import TraitError
+from traitlets.config.loader import PyFileConfigLoader
 
+from jupyter_events import yaml
 from jupyter_events.logger import EventLogger
+from jupyter_events.schema_registry import SchemaRegistryException
+
+GOOD_CONFIG = """
+import logging
+
+c.EventLogger.handlers = [
+    logging.StreamHandler()
+]
+"""
+
+BAD_CONFIG = """
+import logging
+
+c.EventLogger.handlers = [
+    0
+]
+"""
+
+
+def get_config_from_file(path, content):
+    # Write config file
+    filename = "config.py"
+    config_file = path / filename
+    config_file.write_text(content)
+
+    # Load written file.
+    loader = PyFileConfigLoader(filename, path=str(path))
+    cfg = loader.load_config()
+    return cfg
+
+
+def test_good_config_file(tmp_path):
+    cfg = get_config_from_file(tmp_path, GOOD_CONFIG)
+
+    # Pass config to EventLogger
+    e = EventLogger(config=cfg)
+
+    assert len(e.handlers) > 0
+    assert isinstance(e.handlers[0], logging.Handler)
+
+
+def test_bad_config_file(tmp_path):
+    cfg = get_config_from_file(tmp_path, BAD_CONFIG)
+
+    with pytest.raises(TraitError):
+        EventLogger(config=cfg)
 
 
 def test_register_invalid_schema():
@@ -15,7 +64,7 @@ def test_register_invalid_schema():
     Invalid JSON Schemas should fail registration
     """
     el = EventLogger()
-    with pytest.raises(jsonschema.SchemaError):
+    with pytest.raises(ValidationError):
         el.register_schema(
             {
                 # Totally invalid
@@ -31,33 +80,14 @@ def test_missing_required_properties():
     They aren't required by JSON Schema itself
     """
     el = EventLogger()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         el.register_schema({"properties": {}})
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         el.register_schema(
             {
                 "$id": "something",
                 "$version": 1,  # This should been 'version'
-            }
-        )
-
-
-def test_reserved_properties():
-    """
-    User schemas can't have properties starting with __
-
-    These are reserved
-    """
-    el = EventLogger()
-    with pytest.raises(ValueError):
-        el.register_schema(
-            {
-                "$id": "test/test",
-                "version": 1,
-                "properties": {
-                    "__fail__": {"type": "string", "categories": ["unrestricted"]},
-                },
             }
         )
 
@@ -69,8 +99,13 @@ def test_timestamp_override():
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
@@ -78,33 +113,30 @@ def test_timestamp_override():
     handler = logging.StreamHandler(output)
     el = EventLogger(handlers=[handler])
     el.register_schema(schema)
-    el.allowed_schemas = ["test/test"]
 
     timestamp_override = datetime.utcnow() - timedelta(days=1)
-    el.record_event(
-        "test/test",
-        1,
-        {
-            "something": "blah",
-        },
-        timestamp_override=timestamp_override,
+    el.emit(
+        "test/test", 1, {"something": "blah"}, timestamp_override=timestamp_override
     )
     handler.flush()
-
     event_capsule = json.loads(output.getvalue())
-
     assert event_capsule["__timestamp__"] == timestamp_override.isoformat() + "Z"
 
 
-def test_record_event():
+def test_emit():
     """
     Simple test for emitting valid events
     """
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
@@ -112,9 +144,8 @@ def test_record_event():
     handler = logging.StreamHandler(output)
     el = EventLogger(handlers=[handler])
     el.register_schema(schema)
-    el.allowed_schemas = ["test/test"]
 
-    el.record_event(
+    el.emit(
         "test/test",
         1,
         {
@@ -143,20 +174,22 @@ def test_register_schema_file(tmp_path):
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
     el = EventLogger()
-
-    yaml = YAML(typ="safe")
-
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
-    el.register_schema_file(str(schema_file))
-
-    assert schema in el.schemas.values()
+    el.register_schema_file(schema_file)
+    assert ("test/test", 1) in el.schemas
 
 
 def test_register_schema_file_object(tmp_path):
@@ -166,63 +199,45 @@ def test_register_schema_file_object(tmp_path):
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
     el = EventLogger()
-
-    yaml = YAML(typ="safe")
-
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
-    with open(str(schema_file)) as f:
-        el.register_schema_file(f)
+    el.register_schema_file(schema_file)
 
-    assert schema in el.schemas.values()
-
-
-def test_allowed_schemas():
-    """
-    Events should be emitted only if their schemas are allowed
-    """
-    schema = {
-        "$id": "test/test",
-        "version": 1,
-        "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
-        },
-    }
-
-    output = io.StringIO()
-    handler = logging.StreamHandler(output)
-    el = EventLogger(handlers=[handler])
-    # Just register schema, but do not mark it as allowed
-    el.register_schema(schema)
-
-    el.record_event(
-        "test/test",
-        1,
-        {
-            "something": "blah",
-        },
-    )
-    handler.flush()
-
-    assert output.getvalue() == ""
+    assert ("test/test", 1) in el.schemas
 
 
-def test_record_event_badschema():
+def test_emit_badschema():
     """
     Fail fast when an event doesn't conform to its schema
     """
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
-            "status": {"enum": ["success", "failure"], "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
+            "status": {
+                "enum": ["success", "failure"],
+                "title": "test 2",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
@@ -231,25 +246,35 @@ def test_record_event_badschema():
     el.allowed_schemas = ["test/test"]
 
     with pytest.raises(jsonschema.ValidationError):
-        el.record_event(
-            "test/test", 1, {"something": "blah", "status": "hi"}  # 'not-in-enum'
-        )
+        el.emit("test/test", 1, {"something": "blah", "status": "hi"})  # 'not-in-enum'
 
 
 def test_unique_logger_instances():
     schema0 = {
         "$id": "test/test0",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
     schema1 = {
         "$id": "test/test1",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
@@ -266,14 +291,14 @@ def test_unique_logger_instances():
     el1.register_schema(schema1)
     el1.allowed_schemas = ["test/test1"]
 
-    el0.record_event(
+    el0.emit(
         "test/test0",
         1,
         {
             "something": "blah",
         },
     )
-    el1.record_event(
+    el1.emit(
         "test/test1",
         1,
         {
@@ -312,20 +337,32 @@ def test_register_duplicate_schemas():
     schema0 = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "something": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
     schema1 = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
+        "type": "object",
         "properties": {
-            "somethingelse": {"type": "string", "categories": ["unrestricted"]},
+            "something": {
+                "type": "string",
+                "title": "test",
+                "redactionPolicies": ["unrestricted"],
+            },
         },
     }
 
     el = EventLogger()
     el.register_schema(schema0)
-    with pytest.raises(ValueError):
+    with pytest.raises(SchemaRegistryException):
         el.register_schema(schema1)
