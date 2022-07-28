@@ -1,0 +1,22 @@
+$id: http://event.jupyter.org/test
+version: 1
+title: Schema with Array
+description: |
+  A  schema for an array of objects.
+type: object
+properties:
+  users:
+    title: Test User Array
+    description: |
+      Test User array.
+    type: array
+    items:
+      type: object
+      title: User
+      properties:
+        email:
+          type: string
+          title: Email
+        id:
+          type: string
+          title: Name

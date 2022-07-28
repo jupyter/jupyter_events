@@ -30,8 +30,7 @@ EventLogger has two configurable traits:
 
     - ``handlers``: a list of Python's logging handlers that
         handle the recording of incoming events.
-    - ``allowed_schemas``: a dictionary of options for each schema
-        describing what data should be collected.
+    - ``redacted_policies``: a list of `redactionPolicies` that will be removed from all emitted events.
 
 Next, you'll need to register event schemas for your application.
 You can register schemas using the ``register_schema_file``
@@ -39,13 +38,13 @@ You can register schemas using the ``register_schema_file``
 
 
 Once your have an instance of ``EventLogger`` and your registered
-schemas, you can use the ``record_event`` method to log that event.
+schemas, you can use the ``emit`` method to log that event.
 
 .. code-block:: python
 
     # Record an example event.
     event = {'name': 'example event'}
-    self.eventlogger.record_event(
+    self.eventlogger.emit(
         schema_id='url.to.event.schema',
         version=1,
         event=event
