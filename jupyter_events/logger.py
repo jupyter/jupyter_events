@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 
 from pythonjsonlogger import jsonlogger
-from traitlets import Instance, List, default
+from traitlets import Instance, default
 from traitlets.config import Config, Configurable
 
 from . import EVENTS_METADATA_VERSION
@@ -33,14 +33,6 @@ class EventLogger(Configurable):
         """,
     ).tag(config=True)
 
-    redacted_policies = List(
-        default_value=None,
-        allow_none=True,
-        help="""A list of the redactionPolicies that will be redacted
-        from emitted events.
-        """,
-    ).tag(config=True)
-
     schemas = Instance(
         SchemaRegistry,
         help="""The SchemaRegistry for caching validated schemas
@@ -50,7 +42,7 @@ class EventLogger(Configurable):
 
     @default("schemas")
     def _default_schemas(self) -> SchemaRegistry:
-        return SchemaRegistry(redacted_policies=self.redacted_policies)
+        return SchemaRegistry()
 
     def __init__(self, *args, **kwargs):
         # We need to initialize the configurable before
@@ -164,7 +156,7 @@ class EventLogger(Configurable):
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
         # Process this event, i.e. validate and redact (in place)
-        self.schemas.process_event(id, version, event)
+        self.schemas.validate_event(id, version, event)
         capsule.update(event)
         self.log.info(capsule)
         return capsule

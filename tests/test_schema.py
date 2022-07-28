@@ -6,18 +6,9 @@ from jupyter_events.validators import validate_schema
 
 from .utils import SCHEMA_PATH
 
-MISSING_REDACTION_POLICY = "'redactionPolicies' is a required property"
-
 BAD_SCHEMAS = [
-    [
-        # Bad schema file.
-        "missing-parent-policies.yaml",
-        # The expected valdation error message.
-        MISSING_REDACTION_POLICY,
-    ],
-    ["missing-policy-array.yaml", MISSING_REDACTION_POLICY],
-    ["missing-policy-nested-array.yaml", MISSING_REDACTION_POLICY],
     ["reserved-property.yaml", "Properties starting with 'dunder'"],
+    ["nested-reserved-property.yaml", "Properties starting with 'dunder'"],
 ]
 
 

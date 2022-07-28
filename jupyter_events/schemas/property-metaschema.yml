@@ -11,10 +11,6 @@ properties:
     type: string
   description:
     type: string
-  redactionPolicies:
-    type: array
-    items:
-      type: string
   properties:
     type: object
     additionalProperties:
@@ -27,7 +23,6 @@ properties:
 
 required:
   - title
-  - redactionPolicies
 
 additionalProperties:
   $ref: http://event.jupyter.org/property-metaschema
