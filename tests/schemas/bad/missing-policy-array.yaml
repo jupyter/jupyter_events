@@ -4,29 +4,27 @@ title: Schema with Array
 description: |
   A  schema for an array of objects.
 type: object
+redactionPolicies:
+  - unrestricted
 properties:
   users:
     title: Test User Array
     description: |
       Test User array.
+    redactionPolicies:
+      - unrestricted
     type: array
     items:
       type: object
       title: User
+      redactionPolicies:
+        - unrestricted
       properties:
-        name:
+        email:
+          type: string
+          title: Email
+        id:
           type: string
           title: Name
-        hobbies:
-          type: array
-          title: Hobbies
-          items:
-            type: object
-            title: Hobby
-            properties:
-              __badName:
-                title: Sport Name
-                type: string
-              position:
-                title: Position
-                type: string
+          redactionPolicies:
+            - user-identifier

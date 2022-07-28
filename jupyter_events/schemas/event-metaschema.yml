@@ -13,6 +13,10 @@ properties:
     type: string
   description:
     type: string
+  redactionPolicies:
+    type: array
+    items:
+      type: string
   properties:
     type: object
     additionalProperties:
@@ -23,4 +27,5 @@ properties:
 required:
   - $id
   - version
+  - redactionPolicies
   - properties

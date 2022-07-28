@@ -2,7 +2,8 @@ $id: http://event.jupyter.org/test
 version: 1
 title: Schema with Array
 description: |
-  A  schema for an array of objects.
+  Fails validation because an element in the nested array
+  doesn't have a redactionPolicies field (see "position").
 type: object
 redactionPolicies:
   - unrestricted
@@ -44,5 +45,3 @@ properties:
               position:
                 title: Position
                 type: string
-                redactionPolicies:
-                  - user-identifiable-information

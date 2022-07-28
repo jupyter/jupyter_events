@@ -10,8 +10,16 @@ class SchemaRegistryException(Exception):
 class SchemaRegistry:
     """A convenient API for storing and searching a group of schemas."""
 
-    def __init__(self, schemas: dict = None):
+    def __init__(self, schemas: dict = None, redacted_policies: list = None):
         self._schemas = schemas or {}
+        self._redacted_policies = redacted_policies
+
+    @property
+    def redacted_policies(self) -> Optional[List[Any]]:
+        """A list of policies that will be redacted from
+        all events validated against this registry.
+        """
+        return self._redacted_policies
 
     def __contains__(self, registry_key: Tuple[str, int]):
         """Syntax sugar to check if a schema is found in the registry"""
@@ -32,12 +40,14 @@ class SchemaRegistry:
         All schemas are validated against the Jupyter Events meta-schema
         found here:
         """
-        schema = EventSchema(data)
+        schema = EventSchema(data, redacted_policies=self.redacted_policies)
         self._add(schema)
 
     def register_from_file(self, schema_filepath: str):
         """Register a schema from a file."""
-        schema = EventSchema.from_file(schema_filepath)
+        schema = EventSchema.from_file(
+            schema_filepath, redacted_policies=self.redacted_policies
+        )
         self._add(schema)
 
     def get(self, id: str, version: int) -> EventSchema:
@@ -72,3 +82,10 @@ class SchemaRegistry:
         """
         schema = self.get(id, version)
         schema.validate(data)
+
+    def process_event(self, id: str, version: int, data: dict) -> None:
+        """Validate and event and enforce an redaction policies (in place).
+        Nothing is returned by this method, because the data is redacted in place.
+        """
+        schema = self.get(id, version)
+        schema.process(data)

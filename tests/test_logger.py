@@ -99,10 +99,12 @@ def test_timestamp_override():
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -128,10 +130,12 @@ def test_emit():
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -170,11 +174,13 @@ def test_register_schema_file(tmp_path):
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "type": "object",
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -193,11 +199,13 @@ def test_register_schema_file_object(tmp_path):
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "type": "object",
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -217,15 +225,18 @@ def test_emit_badschema():
     schema = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "type": "object",
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
+                "redactionPolicies": ["unrestricted"],
             },
             "status": {
                 "enum": ["success", "failure"],
                 "title": "test 2",
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -242,11 +253,13 @@ def test_unique_logger_instances():
     schema0 = {
         "$id": "test/test0",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "type": "object",
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -254,11 +267,13 @@ def test_unique_logger_instances():
     schema1 = {
         "$id": "test/test1",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "type": "object",
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -322,11 +337,13 @@ def test_register_duplicate_schemas():
     schema0 = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "type": "object",
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
@@ -334,11 +351,13 @@ def test_register_duplicate_schemas():
     schema1 = {
         "$id": "test/test",
         "version": 1,
+        "redactionPolicies": ["unrestricted"],
         "type": "object",
         "properties": {
             "something": {
                 "type": "string",
                 "title": "test",
+                "redactionPolicies": ["unrestricted"],
             },
         },
     }
