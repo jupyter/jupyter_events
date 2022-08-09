@@ -1,5 +1,5 @@
 import json
-from typing import Any, List, Optional, Tuple, Union
+from typing import Tuple, Union
 
 from .schema import EventSchema
 

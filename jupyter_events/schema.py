@@ -1,6 +1,5 @@
 import json
-from ast import DictComp
-from typing import Any, Dict, Hashable, List, Sequence, Tuple, Union
+from typing import Tuple, Union
 
 from jsonschema import validators
 from jsonschema.protocols import Validator
