@@ -1,4 +1,3 @@
-import json
 from typing import Tuple, Union
 
 from .schema import EventSchema
