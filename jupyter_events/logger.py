@@ -4,6 +4,7 @@ Emit structured, discrete events when various actions happen.
 import json
 import logging
 from datetime import datetime
+from typing import Union
 
 from pythonjsonlogger import jsonlogger
 from traitlets import Instance, default
@@ -59,7 +60,7 @@ class EventLogger(Configurable):
         # Add each handler to the logger and format the handlers.
         if self.handlers:
             for handler in self.handlers:
-                self.add_handler(handler)
+                self.register_handler(handler)
 
     def _load_config(self, cfg, section_names=None, traits=None):
         """Load EventLogger traits from a Config object, patching the
@@ -78,22 +79,22 @@ class EventLogger(Configurable):
         eventlogger_cfg = Config({"EventLogger": my_cfg})
         super()._load_config(eventlogger_cfg, section_names=None, traits=None)
 
-    def register_schema(self, schema: dict):
+    def register_event_schema(self, schema: Union[dict, str]):
         """Register this schema with the schema registry.
 
         Get this registered schema using the EventLogger.schema.get() method.
         """
         self.schemas.register(schema)
 
-    def register_schema_file(self, schema_file: str):
+    def register_event_schema_file(self, schema_file: str):
         """Register this schema with the schema registry.
 
         Get this registered schema using the EventLogger.schema.get() method.
         """
         self.schemas.register_from_file(schema_file)
 
-    def add_handler(self, handler: logging.Handler):
-        """Add a new logging handler to the Event Logger.
+    def register_handler(self, handler: logging.Handler):
+        """Register a new logging handler to the Event Logger.
 
         All outgoing messages will be formatted as a JSON string.
         """
@@ -114,12 +115,12 @@ class EventLogger(Configurable):
             self.handlers.append(handler)
 
     def remove_handler(self, handler: logging.Handler):
-        """Remove the logging handler from the logger and list of handlers."""
+        """Remove a logging handler from the logger and list of handlers."""
         self.log.removeHandler(handler)
         if handler in self.handlers:
             self.handlers.remove(handler)
 
-    def emit(self, id: str, version: int, event: dict, timestamp_override=None):
+    def emit(self, id: str, version: int, data: dict, timestamp_override=None):
         """
         Record given event with schema has occurred.
 
@@ -156,7 +157,7 @@ class EventLogger(Configurable):
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
         # Process this event, i.e. validate and redact (in place)
-        self.schemas.validate_event(id, version, event)
-        capsule.update(event)
+        self.schemas.validate_event(id, version, data)
+        capsule.update(data)
         self.log.info(capsule)
         return capsule

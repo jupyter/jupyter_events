@@ -21,9 +21,6 @@ properties:
   items:
     $ref: http://event.jupyter.org/property-metaschema
 
-required:
-  - title
-
 additionalProperties:
   $ref: http://event.jupyter.org/property-metaschema
 

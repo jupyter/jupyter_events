@@ -65,7 +65,7 @@ def test_register_invalid_schema():
     """
     el = EventLogger()
     with pytest.raises(ValidationError):
-        el.register_schema(
+        el.register_event_schema(
             {
                 # Totally invalid
                 "properties": True
@@ -81,10 +81,10 @@ def test_missing_required_properties():
     """
     el = EventLogger()
     with pytest.raises(ValidationError):
-        el.register_schema({"properties": {}})
+        el.register_event_schema({"properties": {}})
 
     with pytest.raises(ValidationError):
-        el.register_schema(
+        el.register_event_schema(
             {
                 "$id": "something",
                 "$version": 1,  # This should been 'version'
@@ -110,7 +110,7 @@ def test_timestamp_override():
     output = io.StringIO()
     handler = logging.StreamHandler(output)
     el = EventLogger(handlers=[handler])
-    el.register_schema(schema)
+    el.register_event_schema(schema)
 
     timestamp_override = datetime.utcnow() - timedelta(days=1)
     el.emit(
@@ -139,7 +139,7 @@ def test_emit():
     output = io.StringIO()
     handler = logging.StreamHandler(output)
     el = EventLogger(handlers=[handler])
-    el.register_schema(schema)
+    el.register_event_schema(schema)
 
     el.emit(
         "test/test",
@@ -163,7 +163,7 @@ def test_emit():
     }
 
 
-def test_register_schema_file(tmp_path):
+def test_register_event_schema_file(tmp_path):
     """
     Register schema from a file
     """
@@ -182,11 +182,11 @@ def test_register_schema_file(tmp_path):
     el = EventLogger()
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
-    el.register_schema_file(schema_file)
+    el.register_event_schema_file(schema_file)
     assert ("test/test", 1) in el.schemas
 
 
-def test_register_schema_file_object(tmp_path):
+def test_register_event_schema_file_object(tmp_path):
     """
     Register schema from a file
     """
@@ -205,7 +205,7 @@ def test_register_schema_file_object(tmp_path):
     el = EventLogger()
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
-    el.register_schema_file(schema_file)
+    el.register_event_schema_file(schema_file)
 
     assert ("test/test", 1) in el.schemas
 
@@ -231,7 +231,7 @@ def test_emit_badschema():
     }
 
     el = EventLogger(handlers=[logging.NullHandler()])
-    el.register_schema(schema)
+    el.register_event_schema(schema)
     el.allowed_schemas = ["test/test"]
 
     with pytest.raises(jsonschema.ValidationError):
@@ -269,11 +269,11 @@ def test_unique_logger_instances():
     handler1 = logging.StreamHandler(output1)
 
     el0 = EventLogger(handlers=[handler0])
-    el0.register_schema(schema0)
+    el0.register_event_schema(schema0)
     el0.allowed_schemas = ["test/test0"]
 
     el1 = EventLogger(handlers=[handler1])
-    el1.register_schema(schema1)
+    el1.register_event_schema(schema1)
     el1.allowed_schemas = ["test/test1"]
 
     el0.emit(
@@ -344,6 +344,6 @@ def test_register_duplicate_schemas():
     }
 
     el = EventLogger()
-    el.register_schema(schema0)
+    el.register_event_schema(schema0)
     with pytest.raises(SchemaRegistryException):
-        el.register_schema(schema1)
+        el.register_event_schema(schema1)

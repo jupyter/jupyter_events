@@ -1,4 +1,5 @@
-from typing import Any, List, Optional, Tuple
+import json
+from typing import Any, List, Optional, Tuple, Union
 
 from .schema import EventSchema
 
@@ -17,6 +18,9 @@ class SchemaRegistry:
         """Syntax sugar to check if a schema is found in the registry"""
         return registry_key in self._schemas
 
+    def __repr__(self) -> str:
+        return ",\n".join([str(s) for s in self._schemas.values()])
+
     def _add(self, schema_obj: EventSchema):
         if schema_obj.registry_key in self._schemas:
             raise SchemaRegistryException(
@@ -26,13 +30,14 @@ class SchemaRegistry:
             )
         self._schemas[schema_obj.registry_key] = schema_obj
 
-    def register(self, data: dict):
+    def register(self, schema: Union[dict, str, EventSchema]):
         """Add a valid schema to the registry.
 
         All schemas are validated against the Jupyter Events meta-schema
         found here:
         """
-        schema = EventSchema(data)
+        if not isinstance(schema, EventSchema):
+            schema = EventSchema(schema)
         self._add(schema)
 
     def register_from_file(self, schema_filepath: str):
