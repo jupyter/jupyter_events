@@ -4,11 +4,14 @@ Emit structured, discrete events when various actions happen.
 import json
 import logging
 from datetime import datetime
+from pathlib import PurePath
 from typing import Union
 
 from pythonjsonlogger import jsonlogger
 from traitlets import Instance, default
 from traitlets.config import Config, Configurable
+
+from jupyter_events import yaml
 
 from . import EVENTS_METADATA_VERSION
 from .schema_registry import SchemaRegistry
@@ -79,19 +82,12 @@ class EventLogger(Configurable):
         eventlogger_cfg = Config({"EventLogger": my_cfg})
         super()._load_config(eventlogger_cfg, section_names=None, traits=None)
 
-    def register_event_schema(self, schema: Union[dict, str]):
+    def register_event_schema(self, schema: Union[dict, str, PurePath]):
         """Register this schema with the schema registry.
 
         Get this registered schema using the EventLogger.schema.get() method.
         """
         self.schemas.register(schema)
-
-    def register_event_schema_file(self, schema_file: str):
-        """Register this schema with the schema registry.
-
-        Get this registered schema using the EventLogger.schema.get() method.
-        """
-        self.schemas.register_from_file(schema_file)
 
     def register_handler(self, handler: logging.Handler):
         """Register a new logging handler to the Event Logger.
@@ -120,14 +116,14 @@ class EventLogger(Configurable):
         if handler in self.handlers:
             self.handlers.remove(handler)
 
-    def emit(self, id: str, version: int, data: dict, timestamp_override=None):
+    def emit(self, schema_id: str, version: int, data: dict, timestamp_override=None):
         """
         Record given event with schema has occurred.
 
         Parameters
         ----------
-        schema_name: str
-            Name of the schema
+        schema_id: str
+            $id of the schema
         version: str
             The schema version
         event: dict
@@ -140,7 +136,7 @@ class EventLogger(Configurable):
         dict
             The recorded event data
         """
-        if not self.handlers or (id, version) not in self.schemas:
+        if not self.handlers or (schema_id, version) not in self.schemas:
             # if handler isn't set up or schema is not explicitly whitelisted,
             # don't do anything
             return
@@ -152,12 +148,12 @@ class EventLogger(Configurable):
             timestamp = timestamp_override
         capsule = {
             "__timestamp__": timestamp.isoformat() + "Z",
-            "__schema__": id,
+            "__schema__": schema_id,
             "__schema_version__": version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
         # Process this event, i.e. validate and redact (in place)
-        self.schemas.validate_event(id, version, data)
+        self.schemas.validate_event(schema_id, version, data)
         capsule.update(data)
         self.log.info(capsule)
         return capsule

@@ -2,6 +2,7 @@ import pytest
 from jsonschema.exceptions import ValidationError
 
 from jupyter_events import yaml
+from jupyter_events.schema import EventSchema, EventSchemaLoadingError
 from jupyter_events.validators import validate_schema
 
 from .utils import SCHEMA_PATH
@@ -41,3 +42,19 @@ def test_good_validations(schema_file):
         schema = yaml.loads(f)
     # Assert that the schema files for a known reason.
     validate_schema(schema)
+
+
+@pytest.mark.parametrize(
+    "schema",
+    [
+        # Non existent paths
+        "non-existent-file.yml",
+        "non/existent/path",
+        "non/existent/path/file.yaml",
+        # Valid yaml string, but not a valid object
+        "random string",
+    ],
+)
+def test_loading_string_error(schema):
+    with pytest.raises(EventSchemaLoadingError):
+        EventSchema(schema)

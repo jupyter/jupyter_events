@@ -4,13 +4,13 @@
 
 All Jupyter Events schemas are valid [JSON schema](https://json-schema.org/) and can be written in valid YAML or JSON. More specifically, these schemas are validated against Jupyter Event's "meta"-JSON schema, [here](https://github.com/jupyter/jupyter_events/tree/main/jupyter_events/schemas/event-metaschema.yml).
 
-A common pattern is to define these schemas in separate files and register them with an `EventLogger` using the `.register_event_schema_file(...)` method:
+A common pattern is to define these schemas in separate files and register them with an `EventLogger` using the `.register_event_schema(...)` method:
 
 ```python
 schema_filepath = "/path/to/schema.yaml"
 
 logger = EventLogger()
-logger.register_event_schema_file(schema_file)
+logger.register_event_schema(schema_file)
 ```
 
 At a minimum, a valid Jupyter event schema requires the following keys:
@@ -26,7 +26,7 @@ $id: event.jupyter.org/example-event
 version: 1
 title: My Event
 description: |
-  All events must have a name property
+  Some information about my event
 type: object
 properties:
   thing:

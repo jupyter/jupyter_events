@@ -39,11 +39,6 @@ class SchemaRegistry:
             schema = EventSchema(schema)
         self._add(schema)
 
-    def register_from_file(self, schema_filepath: str):
-        """Register a schema from a file."""
-        schema = EventSchema.from_file(schema_filepath)
-        self._add(schema)
-
     def get(self, id: str, version: int) -> EventSchema:
         """Fetch a given schema. If the schema is not found,
         this will raise a KeyError.

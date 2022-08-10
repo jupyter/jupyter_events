@@ -163,7 +163,7 @@ def test_emit():
     }
 
 
-def test_register_event_schema_file(tmp_path):
+def test_register_event_schema(tmp_path):
     """
     Register schema from a file
     """
@@ -182,11 +182,11 @@ def test_register_event_schema_file(tmp_path):
     el = EventLogger()
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
-    el.register_event_schema_file(schema_file)
+    el.register_event_schema(schema_file)
     assert ("test/test", 1) in el.schemas
 
 
-def test_register_event_schema_file_object(tmp_path):
+def test_register_event_schema_object(tmp_path):
     """
     Register schema from a file
     """
@@ -205,7 +205,7 @@ def test_register_event_schema_file_object(tmp_path):
     el = EventLogger()
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
-    el.register_event_schema_file(schema_file)
+    el.register_event_schema(schema_file)
 
     assert ("test/test", 1) in el.schemas
 

@@ -28,7 +28,7 @@ properties:
 logger.register_event_schema(schema)
 ```
 
-Now that the logger knows about the event, it needs to know _where_ to send it. To do this, we register a logging _Handler_ —borrowed from Python's standard `logging` library—to route the events to the proper place.
+Now that the logger knows about the event, it needs to know _where_ to send it. To do this, we register a logging _Handler_ —borrowed from Python's standard [`logging`](https://docs.python.org/3/library/logging.html) library—to route the events to the proper place.
 
 ```python
 # We will import one of the handlers from Python's logging libray
