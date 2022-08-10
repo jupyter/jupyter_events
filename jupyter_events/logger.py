@@ -146,9 +146,13 @@ class EventLogger(Configurable):
         dict
             The recorded event data
         """
-        if not self.handlers or (schema_id, version) not in self.schemas:
-            # if handler isn't set up or schema is not explicitly listed,
-            # don't do anything.
+        # If no handlers are routing these events, there's no need to proceed.
+        if not self.handlers:
+            return
+
+        # If the schema hasn't been registered, raise a warning to make sure
+        # this was intended.
+        if (schema_id, version) not in self.schemas:
             warnings.warn(
                 f"({schema_id}, {version}) has not been registered yet. If "
                 "this was not intentional, please register the schema using the "
