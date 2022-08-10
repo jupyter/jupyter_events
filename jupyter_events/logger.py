@@ -3,6 +3,7 @@ Emit structured, discrete events when various actions happen.
 """
 import json
 import logging
+import warnings
 from datetime import datetime
 from pathlib import PurePath
 from typing import Union
@@ -14,6 +15,17 @@ from traitlets.config import Config, Configurable
 from . import EVENTS_METADATA_VERSION
 from .schema_registry import SchemaRegistry
 from .traits import Handlers
+
+
+class SchemaNotRegistered(Warning):
+    """A warning to raise when an event is given to the logger
+    but its schema has not be registered with the EventLogger
+    """
+
+
+# Only show this warning on the first instance
+# of each event type that fails to emit.
+warnings.simplefilter("once", SchemaNotRegistered)
 
 
 class EventLogger(Configurable):
@@ -135,8 +147,14 @@ class EventLogger(Configurable):
             The recorded event data
         """
         if not self.handlers or (schema_id, version) not in self.schemas:
-            # if handler isn't set up or schema is not explicitly whitelisted,
-            # don't do anything
+            # if handler isn't set up or schema is not explicitly listed,
+            # don't do anything.
+            warnings.warn(
+                f"({schema_id}, {version}) has not been registered yet. If "
+                "this was not intentional, please register the schema using the "
+                "`register_event_schema` method.",
+                SchemaNotRegistered,
+            )
             return
 
         # Generate the empty event capsule.
