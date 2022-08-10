@@ -11,8 +11,6 @@ from pythonjsonlogger import jsonlogger
 from traitlets import Instance, default
 from traitlets.config import Config, Configurable
 
-from jupyter_events import yaml
-
 from . import EVENTS_METADATA_VERSION
 from .schema_registry import SchemaRegistry
 from .traits import Handlers
