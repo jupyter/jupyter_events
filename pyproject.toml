@@ -40,12 +40,19 @@ file = 'COPYING.md'
 [project.urls]
 Homepage = "http://jupyter.org"
 
+[project.scripts]
+jupyter-events = "jupyter_events.cli:main"
+
 [project.optional-dependencies]
 test = [
     "coverage",
     "pre-commit",
     "pytest-cov",
     "pytest>=6.0",
+]
+cli = [
+    "click",
+    "rich"
 ]
 
 [tool.hatch.version]

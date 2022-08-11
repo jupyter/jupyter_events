@@ -27,10 +27,11 @@ def validate_schema(schema: dict):
     except ValidationError as err:
         reserved_property_msg = " does not match '^(?!__.*)'"
         if reserved_property_msg in str(err):
-            bad_property = str(err)[: -(len(reserved_property_msg))]
+            idx = str(err).find(reserved_property_msg)
+            bad_property = str(err)[:idx].strip()
             raise ValidationError(
                 f"{bad_property} is an invalid property name because it "
                 "starts with `__`. Properties starting with 'dunder' "
-                "are reserved for Jupyter Events."
+                "are reserved as special meta-fields for Jupyter Events to use."
             )
         raise err

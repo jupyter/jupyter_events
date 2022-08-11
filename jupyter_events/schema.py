@@ -49,9 +49,7 @@ class EventSchema:
         self._schema = _schema
 
     def __repr__(self):
-        out = f"Validator class: {self._validator.__class__.__name__}\n"
-        out += f"Schema: {json.dumps(self._schema, indent=2)}"
-        return out
+        return json.dumps(self._schema, indent=2)
 
     @staticmethod
     def _load_schema(schema: Union[dict, str, PurePath]) -> dict:
