@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Enhancements made
 
 - Add new EventSchema and SchemaRegistry API [#4](https://github.com/jupyter/jupyter_events/pull/4) ([@Zsailer](https://github.com/Zsailer))
-- Add redactionPolicies field to Jupyter Event schemas  [#2](https://github.com/jupyter/jupyter_events/pull/2) ([@Zsailer](https://github.com/Zsailer))
+- Add redactionPolicies field to Jupyter Event schemas [#2](https://github.com/jupyter/jupyter_events/pull/2) ([@Zsailer](https://github.com/Zsailer))
 
 ### Contributors to this release
 
