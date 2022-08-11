@@ -29,10 +29,13 @@ author = "Project Jupyter"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions: List = []
+extensions: List = ["myst_parser", "jupyterlite_sphinx"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
+
+source_suffix = [".rst", ".md"]
+
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -45,10 +48,39 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+html_logo = "_static/jupyter_logo.png"
+
 master_doc = "index"
+
+# Configure jupyterlite to import jupyter_events package
+jupyterlite_contents = ["demo/demo-notebook.ipynb"]
+
+html_theme_options = {
+    "logo": {
+        "text": "Jupyter Events",
+    },
+    "icon_links": [
+        {
+            # Label for this link
+            "name": "GitHub",
+            # URL where the link will redirect
+            "url": "https://github.com/jupyter/jupyter_events",  # required
+            # Icon class (if "type": "fontawesome"), or path to local image (if "type": "local")
+            "icon": "fab fa-github-square",
+            # The type of image to be used (see below for details)
+            "type": "fontawesome",
+        },
+        {
+            "name": "jupyter.org",
+            "url": "https://jupyter.org",
+            "icon": "_static/jupyter_logo.png",
+            "type": "local",
+        },
+    ],
+}

@@ -7,6 +7,7 @@ build-backend = "hatchling.build"
 [project]
 name = "jupyter-events"
 description = "Jupyter Event System library"
+readme = "README.md"
 requires-python = ">=3.7"
 authors = [
     { name = "Jupyter Development Team", email = "jupyter@googlegroups.com" },
@@ -26,16 +27,12 @@ classifiers = [
 dependencies = [
     "jsonschema",
     "python-json-logger",
-    "ruamel.yaml",
+    "pyyaml",
     "traitlets",
 ]
 dynamic = [
     "version",
 ]
-
-[project.readme]
-file = "README.md"
-content-type = "text/markdown"
 
 [project.license]
 file = 'COPYING.md'
@@ -55,7 +52,7 @@ test = [
 path = "jupyter_events/_version.py"
 
 [tool.tbump.version]
-current = "0.2.0.dev0"
+current = "0.1.0"
 regex = '''
   (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)
   ((?P<channel>a|b|rc|.dev)(?P<release>\d+))?

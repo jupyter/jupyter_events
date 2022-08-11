@@ -1,2 +1,2 @@
-version_info = (0, 2, 0, ".dev", "0")
-__version__ = "0.2.0.dev0"
+version_info = (0, 1, 0, "", "")
+__version__ = "0.1.0"

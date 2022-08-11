@@ -17,3 +17,19 @@ or conda-forge:
 ```
 conda install -c conda-forge jupyter_events
 ```
+
+## Contents
+
+```{toctree}
+---
+maxdepth: 2
+---
+user_guide/index
+demo/index
+```
+
+## Indices and tables
+
+- {ref}`genindex`
+- {ref}`modindex`
+- {ref}`search`
