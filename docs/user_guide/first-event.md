@@ -43,7 +43,7 @@ The logger knows about the event and where to send it; all that's left is to emi
 
 ```python
 logger.emit(
-   id="myapplication.org/example-event",
+   schema_id="myapplication.org/example-event",
    version=1,
    data={
       "name": "My Event"
