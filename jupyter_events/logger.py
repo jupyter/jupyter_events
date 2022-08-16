@@ -1,15 +1,16 @@
 """
 Emit structured, discrete events when various actions happen.
 """
+import inspect
 import json
 import logging
 import warnings
 from datetime import datetime
 from pathlib import PurePath
-from typing import Union
+from typing import Callable, Union
 
 from pythonjsonlogger import jsonlogger
-from traitlets import Instance, default
+from traitlets import Instance, List, default
 from traitlets.config import Config, Configurable
 
 from . import EVENTS_METADATA_VERSION
@@ -20,6 +21,12 @@ from .traits import Handlers
 class SchemaNotRegistered(Warning):
     """A warning to raise when an event is given to the logger
     but its schema has not be registered with the EventLogger
+    """
+
+
+class ModifierError(Exception):
+    """An exception to raise when a modifier does not
+    show the proper signature.
     """
 
 
@@ -53,6 +60,8 @@ class EventLogger(Configurable):
         and their jsonschema validators.
         """,
     )
+
+    modifiers = List([], help="A mapping of schemas to their list of modifiers.")
 
     @default("schemas")
     def _default_schemas(self) -> SchemaRegistry:
@@ -126,6 +135,34 @@ class EventLogger(Configurable):
         if handler in self.handlers:
             self.handlers.remove(handler)
 
+    def add_modifier(
+        self,
+        modifier: Callable[[dict], dict],
+    ):
+        """Add a modifier (callable) to a registered event.
+        Parameters
+        ----------
+        modifier: Callable
+            A callable function/method that executes when the named event occurs.
+        """
+        if not callable(modifier):
+            raise TypeError("`modifier` must be a callable")
+
+        signature = inspect.signature(modifier)
+        parameters = signature.parameters
+        # Check parameters.
+        if "self" in parameters and len(parameters) == 2:
+            data_param = list(parameters.values())[1]
+        elif len(parameters) == 1:
+            data_param = list(parameters.values())[0]
+        else:
+            raise ModifierError("Expected only one argument.")
+
+        if data_param.annotation != dict:
+            raise ModifierError("Expected the first argument to be a dict.")
+
+        self.modifiers.append(modifier)
+
     def emit(self, schema_id: str, version: int, data: dict, timestamp_override=None):
         """
         Record given event with schema has occurred.
@@ -136,7 +173,7 @@ class EventLogger(Configurable):
             $id of the schema
         version: str
             The schema version
-        event: dict
+        data: dict
             The event to record
         timestamp_override: datetime, optional
             Optionally override the event timestamp. By default it is set to the current timestamp.
@@ -161,6 +198,13 @@ class EventLogger(Configurable):
             )
             return
 
+        # Modify this event in-place.
+        for modifier in self.modifiers:
+            data = modifier(data)
+
+        # Process this event, i.e. validate and redact (in place)
+        self.schemas.validate_event(schema_id, version, data)
+
         # Generate the empty event capsule.
         if timestamp_override is None:
             timestamp = datetime.utcnow()
@@ -172,8 +216,6 @@ class EventLogger(Configurable):
             "__schema_version__": version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
-        # Process this event, i.e. validate and redact (in place)
-        self.schemas.validate_event(schema_id, version, data)
         capsule.update(data)
         self.log.info(capsule)
         return capsule
