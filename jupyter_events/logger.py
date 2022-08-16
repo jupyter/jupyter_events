@@ -1,6 +1,7 @@
 """
 Emit structured, discrete events when various actions happen.
 """
+import copy
 import inspect
 import json
 import logging
@@ -209,12 +210,13 @@ class EventLogger(Configurable):
             )
             return
 
-        # Modify this event in-place.
+        # Modifiers _should_ copy the data instead of modify in place.
+        modified_data = copy.deepcopy(data)
         for modifier in self.modifiers:
-            data = modifier(schema_id, version, data)
+            modified_data = modifier(schema_id, version, modified_data)
 
         # Process this event, i.e. validate and redact (in place)
-        self.schemas.validate_event(schema_id, version, data)
+        self.schemas.validate_event(schema_id, version, modified_data)
 
         # Generate the empty event capsule.
         if timestamp_override is None:
@@ -227,6 +229,6 @@ class EventLogger(Configurable):
             "__schema_version__": version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
-        capsule.update(data)
+        capsule.update(modified_data)
         self.log.info(capsule)
         return capsule

@@ -2,7 +2,10 @@
 that are useful for handling redacted data in a Jupyter
 Events logger.
 """
+import copy
 import re
+from tkinter import X
+from xml.etree.ElementPath import xpath_tokenizer
 
 from traitlets import Dict, List, TraitType, Unicode, default
 from traitlets.config import Configurable
@@ -95,24 +98,38 @@ class BaseRedactor(Configurable):
                 self._action(data, key)
             return data
 
-        # Build a list of keys to redact. We will iterate over
-        # these keys later, to avoid changing to dictionary size while iterating.
-        keys_to_redact = []
-        for key in data:
-            # First, check if this property is special cased in the redacted_properties
-            try:
-                if key in self._mapping_redacted_properties[(schema_id, version)]:
-                    keys_to_redact.append(key)
-            # If not, check if the property matches any redacted property patterns
-            except KeyError:
-                for pat in self._regex_redacted_patterns:
-                    # Compute a full match check:
-                    if pat.fullmatch(key):
-                        keys_to_redact.append(key)
+        redacted_data = copy.deepcopy(data)
 
-        for key in keys_to_redact:
-            self._action(data, key)
-        return data
+        def _nested_redact(original_data, redacted_data):
+            for key in original_data:
+                original_sub_data = original_data[key]
+                redacted_sub_data = redacted_data[key]
+                # Handle nested object
+                if type(original_sub_data) == dict:
+                    _nested_redact(original_sub_data, redacted_sub_data)
+                # Handle enum or nested enum objects.
+                elif type(original_sub_data) == list:
+                    for i, obj in enumerate(original_sub_data):
+                        _nested_redact(obj, redacted_sub_data[i])
+                # This is a "leaf" property. Redact if known.
+                else:
+                    # First, check if this property is special cased in the redacted_properties
+                    try:
+                        if (
+                            key
+                            in self._mapping_redacted_properties[(schema_id, version)]
+                        ):
+                            self._action(redacted_data, key)
+                    # If not, check if the property matches any redacted property patterns
+                    except KeyError:
+                        for pat in self._regex_redacted_patterns:
+                            # Compute a full match check:
+                            if pat.fullmatch(key):
+                                self._action(redacted_data, key)
+
+        _nested_redact(data, redacted_data)
+
+        return redacted_data
 
 
 class RemovalRedactor(BaseRedactor):
@@ -128,4 +145,5 @@ class MaskRedactor(BaseRedactor):
     mask_string = Unicode("<masked>").tag(config=True)
 
     def _action(self, data: dict, key: str):
+        print(data, key)
         data[key] = self.mask_string

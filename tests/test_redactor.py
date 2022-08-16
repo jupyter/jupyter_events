@@ -26,6 +26,13 @@ def schema2():
 
 
 @pytest.fixture
+def nested_schema():
+    # Read schema from path.
+    schema_path = SCHEMA_PATH / "good" / "nested-user.yaml"
+    return EventSchema(schema=schema_path)
+
+
+@pytest.fixture
 def sink():
     return io.StringIO()
 
@@ -36,11 +43,12 @@ def handler(sink):
 
 
 @pytest.fixture
-def event_logger(handler, schema1, schema2):
+def event_logger(handler, schema1, schema2, nested_schema):
     logger = EventLogger()
     logger.register_handler(handler)
     logger.register_event_schema(schema1)
     logger.register_event_schema(schema2)
+    logger.register_event_schema(nested_schema)
     return logger
 
 
@@ -105,6 +113,150 @@ def test_mask_properties_redactor(schema1, schema2, event_logger, read_emitted_e
     # Check that everything else was unchanged
     assert "username" in output
     assert output["username"] == "jovyan"
+    assert "hobby" in output
+    assert output["hobby"] == "Coding"
+    assert "name" in output
+    assert output["name"] == "Alice"
+
+
+def test_mask_nested_properties_redactor(
+    schema1, nested_schema, event_logger, read_emitted_event
+):
+    redactor = MaskRedactor(
+        redacted_properties=[(nested_schema.id, nested_schema.version, "username")]
+    )
+
+    # Add the modifier
+    event_logger.add_modifier(redactor)
+    data = {
+        "name": "Alice",
+        "username": "jovyan",
+        "nemesis": {"username": "bad-person"},
+    }
+    event_logger.emit(nested_schema.id, nested_schema.version, data)
+
+    output = read_emitted_event()
+    assert "username" in output
+    assert output["username"] == "<masked>"
+    assert "username" in output["nemesis"]
+    assert output["nemesis"]["username"] == "<masked>"
+    # Check that everything else was unchanged
+    assert "name" in output
+    assert output["name"] == "Alice"
+
+    # Emit an event from the second schema to make sure
+    # the properties were only applied to specific schema.
+    data = {"name": "Alice", "username": "jovyan", "hobby": "Coding"}
+    event_logger.emit(schema1.id, schema1.version, data)
+
+    output = read_emitted_event()
+
+    # Check that everything else was unchanged
+    assert "username" in output
+    assert output["username"] == "jovyan"
+    assert "hobby" in output
+    assert output["hobby"] == "Coding"
+    assert "name" in output
+    assert output["name"] == "Alice"
+
+
+def test_mask_nested_array_properties_redactor(
+    schema1, nested_schema, event_logger, read_emitted_event
+):
+    redactor = MaskRedactor(
+        redacted_properties=[(nested_schema.id, nested_schema.version, "username")]
+    )
+
+    # Add the modifier
+    event_logger.add_modifier(redactor)
+    data = {
+        "name": "Alice",
+        "username": "jovyan",
+        "friends": [
+            {
+                "name": "Bob",
+                "username": "jovyan-bob",
+            },
+            {
+                "name": "Carol",
+                "username": "jovyan-carol",
+            },
+        ],
+    }
+    event_logger.emit(nested_schema.id, nested_schema.version, data)
+
+    output = read_emitted_event()
+    assert "username" in output
+    assert output["username"] == "<masked>"
+    assert "friends" in output
+    assert type(output["friends"]) == list
+    assert "username" in output["friends"][0]
+    assert output["friends"][0]["username"] == "<masked>"
+    assert output["friends"][0]["name"] == "Bob"
+    # Check that everything else was unchanged
+    assert "name" in output
+    assert output["name"] == "Alice"
+
+    # Emit an event from the second schema to make sure
+    # the properties were only applied to specific schema.
+    data = {"name": "Alice", "username": "jovyan", "hobby": "Coding"}
+    event_logger.emit(schema1.id, schema1.version, data)
+
+    output = read_emitted_event()
+
+    # Check that everything else was unchanged
+    assert "username" in output
+    assert output["username"] == "jovyan"
+    assert "hobby" in output
+    assert output["hobby"] == "Coding"
+    assert "name" in output
+    assert output["name"] == "Alice"
+
+
+def test_mask_nested_array_pattern_redactor(
+    schema1, nested_schema, event_logger, read_emitted_event
+):
+    redactor = MaskRedactor(redacted_patterns=["username"])
+
+    # Add the modifier
+    event_logger.add_modifier(redactor)
+    data = {
+        "name": "Alice",
+        "username": "jovyan",
+        "friends": [
+            {
+                "name": "Bob",
+                "username": "jovyan-bob",
+            },
+            {
+                "name": "Carol",
+                "username": "jovyan-carol",
+            },
+        ],
+    }
+    event_logger.emit(nested_schema.id, nested_schema.version, data)
+
+    output = read_emitted_event()
+    assert "username" in output
+    assert output["username"] == "<masked>"
+    assert "friends" in output
+    assert type(output["friends"]) == list
+    assert "username" in output["friends"][0]
+    assert output["friends"][0]["username"] == "<masked>"
+    assert output["friends"][0]["name"] == "Bob"
+    # Check that everything else was unchanged
+    assert "name" in output
+    assert output["name"] == "Alice"
+
+    # Emit an event from the second schema to make sure
+    # the properties were only applied to specific schema.
+    data = {"name": "Alice", "username": "jovyan", "hobby": "Coding"}
+    event_logger.emit(schema1.id, schema1.version, data)
+
+    output = read_emitted_event()
+
+    assert "username" in output
+    assert output["username"] == "<masked>"
     assert "hobby" in output
     assert output["hobby"] == "Coding"
     assert "name" in output
