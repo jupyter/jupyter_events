@@ -145,5 +145,4 @@ class MaskRedactor(BaseRedactor):
     mask_string = Unicode("<masked>").tag(config=True)
 
     def _action(self, data: dict, key: str):
-        print(data, key)
         data[key] = self.mask_string
