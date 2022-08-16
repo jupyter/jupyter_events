@@ -140,28 +140,35 @@ class EventLogger(Configurable):
         modifier: Callable[[dict], dict],
     ):
         """Add a modifier (callable) to a registered event.
+
         Parameters
         ----------
         modifier: Callable
             A callable function/method that executes when the named event occurs.
+            This method enforces a string signature for modifiers:
+
+                (schema_id: str, version: int, data: dict) -> dict:
         """
+        # Ensure that this is a callable function/method
         if not callable(modifier):
             raise TypeError("`modifier` must be a callable")
 
+        # Now let's verify the function signature.
         signature = inspect.signature(modifier)
-        parameters = signature.parameters
-        # Check parameters.
-        if "self" in parameters and len(parameters) == 2:
-            data_param = list(parameters.values())[1]
-        elif len(parameters) == 1:
-            data_param = list(parameters.values())[0]
-        else:
-            raise ModifierError("Expected only one argument.")
 
-        if data_param.annotation != dict:
-            raise ModifierError("Expected the first argument to be a dict.")
+        def modifier_signature(schema_id: str, version: int, data: dict) -> dict:
+            """Signature to enforce"""
+            return {}
 
-        self.modifiers.append(modifier)
+        expected_signature = inspect.signature(modifier_signature)
+        # Assert this signature or raise an exception
+        try:
+            assert signature == expected_signature
+            self.modifiers.append(modifier)
+        except AssertionError:
+            raise ModifierError(
+                f"Modifiers are required to follow an exact function/method signature. The signature should look like:\n\n\tdef my_modifier{expected_signature}:\n\nCheck that you are using type annotations for each argument and the return value."
+            )
 
     def emit(self, schema_id: str, version: int, data: dict, timestamp_override=None):
         """
@@ -200,7 +207,7 @@ class EventLogger(Configurable):
 
         # Modify this event in-place.
         for modifier in self.modifiers:
-            data = modifier(data)
+            data = modifier(schema_id, version, data)
 
         # Process this event, i.e. validate and redact (in place)
         self.schemas.validate_event(schema_id, version, data)
