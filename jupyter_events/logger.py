@@ -167,7 +167,11 @@ class EventLogger(Configurable):
             self.modifiers.append(modifier)
         except AssertionError:
             raise ModifierError(
-                f"Modifiers are required to follow an exact function/method signature. The signature should look like:\n\n\tdef my_modifier{expected_signature}:\n\nCheck that you are using type annotations for each argument and the return value."
+                "Modifiers are required to follow an exact function/method "
+                "signature. The signature should look like:"
+                f"\n\n\tdef my_modifier{expected_signature}:\n\n"
+                "Check that you are using type annotations for each argument "
+                "and the return value."
             )
 
     def emit(self, schema_id: str, version: int, data: dict, timestamp_override=None):
