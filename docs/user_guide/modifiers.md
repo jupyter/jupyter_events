@@ -11,7 +11,7 @@ def my_modifier(event: Event) -> Event:
     ...
 ```
 
-`ModifierData` is a dataclass with three attributes: `schema_id` (`str`), `version` (`int`), and `data` (`dict`). The return value is the mutated `Event` object. This `Event` will be validated and emitted _after_ it is modified, so it still must follow the event's schema.
+`Event` is a dataclass with three attributes: `schema_id` (`str`), `version` (`int`), and `data` (`dict`). The return value is the mutated `Event` object. This `Event` will be validated and emitted _after_ it is modified, so it still must follow the event's schema.
 
 Next, add this modifier to the event logger using the `.add_modifier` method:
 

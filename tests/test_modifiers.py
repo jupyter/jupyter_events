@@ -77,7 +77,7 @@ def test_bad_modifier_functions():
     logger = EventLogger()
 
     def modifier_with_extra_args(event: Event, unknown_arg: dict) -> Event:
-        return event.data
+        return event
 
     with pytest.raises(ModifierError):
         logger.add_modifier(modifier_with_extra_args)
