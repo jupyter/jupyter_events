@@ -26,7 +26,7 @@ logger = EventLogger()
 logger.register_event_schema(schema)
 ```
 
-First, the schema is validated against [Jupyter Event's metaschema](https://github.com/jupyter/jupyter_events/tree/main/jupyter_events/schemas/event-metaschema.yml). This ensures that your schema adheres minimally to Jupyter Event's expected form (read about how to define a schema [here](../user_guide/defining-schema)).
+First, the schema is validated against [Jupyter Event's metaschema](https://github.com/jupyter/jupyter_events/tree/main/jupyter_events/schemas/event-metaschema.yml). This ensures that your schema adheres minimally to Jupyter Event's expected form (read about how to define a schema [here](../user_guide/defining-schema.md)).
 
 Second, a `jsonschema.Validator` is created and cached for each one of your event schemas in a "schema registry" object.
 
