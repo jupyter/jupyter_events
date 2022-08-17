@@ -5,6 +5,7 @@ import inspect
 import json
 import logging
 import warnings
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import PurePath
 from typing import Callable, Union
@@ -28,6 +29,13 @@ class ModifierError(Exception):
     """An exception to raise when a modifier does not
     show the proper signature.
     """
+
+
+@dataclass
+class ModifierData:
+    schema_id: str
+    version: int
+    data: dict
 
 
 # Only show this warning on the first instance
@@ -156,7 +164,7 @@ class EventLogger(Configurable):
         # Now let's verify the function signature.
         signature = inspect.signature(modifier)
 
-        def modifier_signature(schema_id: str, version: int, data: dict) -> dict:
+        def modifier_signature(data: ModifierData) -> dict:
             """Signature to enforce"""
             return {}
 

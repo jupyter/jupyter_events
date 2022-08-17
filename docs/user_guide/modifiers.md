@@ -5,11 +5,13 @@ If you're deploying a configurable application that uses Jupyter Events to emit 
 To modify events, define a callable (function or method) that modifies the event data dictionary. This callable **must** follow an exact signature (type annotations required):
 
 ```python
-def my_modifier(self, schema_id: str, version: id, data: dict) -> dict:
+from jupyter_events.logger import ModifierData
+
+def my_modifier(data: ModifierData) -> dict:
     ...
 ```
 
-The return value is the mutated data dictionary. This dictionary will be validated and emitted _after_ it is modified, so it still must follow the event's schema.
+`ModifierData` is a dataclass with three attributes: `schema_id` (`str`), `version` (`int`), and `data` (`dict`). The return value is the mutated data dictionary. This dictionary will be validated and emitted _after_ it is modified, so it still must follow the event's schema.
 
 Next, add this modifier to the event logger using the `.add_modifier` method:
 
