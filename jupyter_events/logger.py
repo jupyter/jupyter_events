@@ -1,11 +1,11 @@
 """
 Emit structured, discrete events when various actions happen.
 """
+import copy
 import inspect
 import json
 import logging
 import warnings
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import PurePath
 from typing import Callable, Union
@@ -14,9 +14,13 @@ from pythonjsonlogger import jsonlogger
 from traitlets import Instance, List, default
 from traitlets.config import Config, Configurable
 
-from . import EVENTS_METADATA_VERSION
+from .dataclasses import Event, ModifierData
 from .schema_registry import SchemaRegistry
 from .traits import Handlers
+
+# Increment this version when the metadata included with each event
+# changes.
+EVENTS_METADATA_VERSION = 1
 
 
 class SchemaNotRegistered(Warning):
@@ -29,13 +33,6 @@ class ModifierError(Exception):
     """An exception to raise when a modifier does not
     show the proper signature.
     """
-
-
-@dataclass
-class ModifierData:
-    schema_id: str
-    version: int
-    data: dict
 
 
 # Only show this warning on the first instance
@@ -182,7 +179,7 @@ class EventLogger(Configurable):
                 "and the return value."
             )
 
-    def emit(self, schema_id: str, version: int, data: dict, timestamp_override=None):
+    def emit(self, event: Event, timestamp_override=None):
         """
         Record given event with schema has occurred.
 
@@ -208,21 +205,27 @@ class EventLogger(Configurable):
 
         # If the schema hasn't been registered, raise a warning to make sure
         # this was intended.
-        if (schema_id, version) not in self.schemas:
+        if (event.schema_id, event.version) not in self.schemas:
             warnings.warn(
-                f"({schema_id}, {version}) has not been registered yet. If "
-                "this was not intentional, please register the schema using the "
+                f"({event.schema_id}, {event.version}) has not "
+                "been registered yet. If this was not intentional, "
+                "please register the schema using the "
                 "`register_event_schema` method.",
                 SchemaNotRegistered,
             )
             return
 
-        # Modify this event in-place.
+        # Deep copy the data and modify the copy.
+        data = copy.deepcopy(event.data)
         for modifier in self.modifiers:
-            data = modifier(schema_id, version, data)
+            data = modifier(
+                ModifierData(
+                    schema_id=event.schema_id, version=event.version, event_data=data
+                )
+            )
 
         # Process this event, i.e. validate and redact (in place)
-        self.schemas.validate_event(schema_id, version, data)
+        self.schemas.validate_event(event.schema_id, event.version, data)
 
         # Generate the empty event capsule.
         if timestamp_override is None:
@@ -231,8 +234,8 @@ class EventLogger(Configurable):
             timestamp = timestamp_override
         capsule = {
             "__timestamp__": timestamp.isoformat() + "Z",
-            "__schema__": schema_id,
-            "__schema_version__": version,
+            "__schema__": event.schema_id,
+            "__schema_version__": event.version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
         capsule.update(data)
