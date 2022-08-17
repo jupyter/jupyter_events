@@ -14,7 +14,7 @@ from pythonjsonlogger import jsonlogger
 from traitlets import Instance, List, default
 from traitlets.config import Config, Configurable
 
-from .dataclasses import Event, ModifierData
+from .dataclasses import Event
 from .schema_registry import SchemaRegistry
 from .traits import Handlers
 
@@ -142,7 +142,7 @@ class EventLogger(Configurable):
 
     def add_modifier(
         self,
-        modifier: Callable[[dict], dict],
+        modifier: Callable[[Event], Event],
     ):
         """Add a modifier (callable) to a registered event.
 
@@ -161,9 +161,9 @@ class EventLogger(Configurable):
         # Now let's verify the function signature.
         signature = inspect.signature(modifier)
 
-        def modifier_signature(data: ModifierData) -> dict:
+        def modifier_signature(event: Event) -> Event:
             """Signature to enforce"""
-            return {}
+            ...
 
         expected_signature = inspect.signature(modifier_signature)
         # Assert this signature or raise an exception
@@ -216,16 +216,14 @@ class EventLogger(Configurable):
             return
 
         # Deep copy the data and modify the copy.
-        data = copy.deepcopy(event.data)
+        modified_event = copy.deepcopy(event)
         for modifier in self.modifiers:
-            data = modifier(
-                ModifierData(
-                    schema_id=event.schema_id, version=event.version, event_data=data
-                )
-            )
+            modified_event = modifier(event=modified_event)
 
         # Process this event, i.e. validate and redact (in place)
-        self.schemas.validate_event(event.schema_id, event.version, data)
+        self.schemas.validate_event(
+            modified_event.schema_id, modified_event.version, modified_event.data
+        )
 
         # Generate the empty event capsule.
         if timestamp_override is None:
@@ -234,10 +232,10 @@ class EventLogger(Configurable):
             timestamp = timestamp_override
         capsule = {
             "__timestamp__": timestamp.isoformat() + "Z",
-            "__schema__": event.schema_id,
-            "__schema_version__": event.version,
+            "__schema__": modified_event.schema_id,
+            "__schema_version__": modified_event.version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
-        capsule.update(data)
+        capsule.update(modified_event.data)
         self.log.info(capsule)
         return capsule
