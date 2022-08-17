@@ -1,0 +1,16 @@
+$id: http://event.jupyter.org/user2
+version: 1
+title: User
+description: |
+  A User model.
+type: object
+properties:
+  name:
+    title: Name
+    type: string
+  username:
+    title: Username
+    type: string
+  hobby:
+    title: Hobby
+    type: string

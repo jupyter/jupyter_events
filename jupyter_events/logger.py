@@ -1,15 +1,17 @@
 """
 Emit structured, discrete events when various actions happen.
 """
+import copy
+import inspect
 import json
 import logging
 import warnings
 from datetime import datetime
 from pathlib import PurePath
-from typing import Union
+from typing import Callable, Union
 
 from pythonjsonlogger import jsonlogger
-from traitlets import Instance, default
+from traitlets import Instance, List, default
 from traitlets.config import Config, Configurable
 
 from . import EVENTS_METADATA_VERSION
@@ -20,6 +22,12 @@ from .traits import Handlers
 class SchemaNotRegistered(Warning):
     """A warning to raise when an event is given to the logger
     but its schema has not be registered with the EventLogger
+    """
+
+
+class ModifierError(Exception):
+    """An exception to raise when a modifier does not
+    show the proper signature.
     """
 
 
@@ -53,6 +61,8 @@ class EventLogger(Configurable):
         and their jsonschema validators.
         """,
     )
+
+    modifiers = List([], help="A mapping of schemas to their list of modifiers.")
 
     @default("schemas")
     def _default_schemas(self) -> SchemaRegistry:
@@ -126,6 +136,45 @@ class EventLogger(Configurable):
         if handler in self.handlers:
             self.handlers.remove(handler)
 
+    def add_modifier(
+        self,
+        modifier: Callable[[dict], dict],
+    ):
+        """Add a modifier (callable) to a registered event.
+
+        Parameters
+        ----------
+        modifier: Callable
+            A callable function/method that executes when the named event occurs.
+            This method enforces a string signature for modifiers:
+
+                (schema_id: str, version: int, data: dict) -> dict:
+        """
+        # Ensure that this is a callable function/method
+        if not callable(modifier):
+            raise TypeError("`modifier` must be a callable")
+
+        # Now let's verify the function signature.
+        signature = inspect.signature(modifier)
+
+        def modifier_signature(schema_id: str, version: int, data: dict) -> dict:
+            """Signature to enforce"""
+            return {}
+
+        expected_signature = inspect.signature(modifier_signature)
+        # Assert this signature or raise an exception
+        try:
+            assert signature == expected_signature
+            self.modifiers.append(modifier)
+        except AssertionError:
+            raise ModifierError(
+                "Modifiers are required to follow an exact function/method "
+                "signature. The signature should look like:"
+                f"\n\n\tdef my_modifier{expected_signature}:\n\n"
+                "Check that you are using type annotations for each argument "
+                "and the return value."
+            )
+
     def emit(self, schema_id: str, version: int, data: dict, timestamp_override=None):
         """
         Record given event with schema has occurred.
@@ -136,7 +185,7 @@ class EventLogger(Configurable):
             $id of the schema
         version: str
             The schema version
-        event: dict
+        data: dict
             The event to record
         timestamp_override: datetime, optional
             Optionally override the event timestamp. By default it is set to the current timestamp.
@@ -161,6 +210,14 @@ class EventLogger(Configurable):
             )
             return
 
+        # Modifiers _should_ copy the data instead of modify in place.
+        modified_data = copy.deepcopy(data)
+        for modifier in self.modifiers:
+            modified_data = modifier(schema_id, version, modified_data)
+
+        # Process this event, i.e. validate and redact (in place)
+        self.schemas.validate_event(schema_id, version, modified_data)
+
         # Generate the empty event capsule.
         if timestamp_override is None:
             timestamp = datetime.utcnow()
@@ -172,8 +229,6 @@ class EventLogger(Configurable):
             "__schema_version__": version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
-        # Process this event, i.e. validate and redact (in place)
-        self.schemas.validate_event(schema_id, version, data)
-        capsule.update(data)
+        capsule.update(modified_data)
         self.log.info(capsule)
         return capsule

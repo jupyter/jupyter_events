@@ -1,0 +1,35 @@
+$id: http://event.jupyter.org/nested-user
+version: 1
+title: Nested User
+description: |
+  A nested User model.
+type: object
+properties:
+  name:
+    title: Name
+    type: string
+  username:
+    title: Username
+    type: string
+  nemesis:
+    title: Nemesis
+    type: object
+    properties:
+      name:
+        title: Name
+        type: string
+      username:
+        title: Username
+        type: string
+  friends:
+    title: Friends
+    items:
+      type: object
+      title: Friend
+      properties:
+        name:
+          title: Friends Name
+          type: string
+        username:
+          title: Friends Username
+          type: string
