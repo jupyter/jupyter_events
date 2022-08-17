@@ -23,4 +23,5 @@ jobs:
         if: ${{ matrix.group == 'check_release' }}
         uses: jupyter-server/jupyter_releaser/.github/actions/check-release@v1
         with:
+          version_spec: 100.100.100
           token: ${{ secrets.GITHUB_TOKEN }}
