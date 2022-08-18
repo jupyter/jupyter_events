@@ -9,7 +9,7 @@ from jsonschema.exceptions import ValidationError
 from traitlets import TraitError
 from traitlets.config.loader import PyFileConfigLoader
 
-from jupyter_events import Event, yaml
+from jupyter_events import yaml
 from jupyter_events.logger import EventLogger
 from jupyter_events.schema_registry import SchemaRegistryException
 
@@ -114,7 +114,9 @@ def test_timestamp_override():
 
     timestamp_override = datetime.utcnow() - timedelta(days=1)
     el.emit(
-        Event(schema_id="test/test", version=1, data={"something": "blah"}),
+        schema_id="test/test",
+        version=1,
+        data={"something": "blah"},
         timestamp_override=timestamp_override,
     )
     handler.flush()
@@ -142,7 +144,7 @@ def test_emit():
     el = EventLogger(handlers=[handler])
     el.register_event_schema(schema)
 
-    el.emit(Event(schema_id="test/test", version=1, data={"something": "blah"}))
+    el.emit(schema_id="test/test", version=1, data={"something": "blah"})
     handler.flush()
 
     event_capsule = json.loads(output.getvalue())
@@ -231,7 +233,7 @@ def test_emit_badschema():
 
     with pytest.raises(jsonschema.ValidationError):
         el.emit(
-            Event("test/test", 1, {"something": "blah", "status": "hi"})
+            schema_id="test/test", version=1, data={"something": "blah", "status": "hi"}
         )  # 'not-in-enum'
 
 
@@ -274,22 +276,18 @@ def test_unique_logger_instances():
     el1.allowed_schemas = ["test/test1"]
 
     el0.emit(
-        Event(
-            "test/test0",
-            1,
-            {
-                "something": "blah",
-            },
-        )
+        schema_id="test/test0",
+        version=1,
+        data={
+            "something": "blah",
+        },
     )
     el1.emit(
-        Event(
-            "test/test1",
-            1,
-            {
-                "something": "blah",
-            },
-        )
+        schema_id="test/test1",
+        version=1,
+        data={
+            "something": "blah",
+        },
     )
     handler0.flush()
     handler1.flush()

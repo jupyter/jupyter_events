@@ -38,6 +38,7 @@ class SchemaRegistry:
         if not isinstance(schema, EventSchema):
             schema = EventSchema(schema)
         self._add(schema)
+        return schema
 
     def get(self, id: str, version: int) -> EventSchema:
         """Fetch a given schema. If the schema is not found,

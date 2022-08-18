@@ -4,7 +4,6 @@ import logging
 
 import pytest
 
-from jupyter_events import Event
 from jupyter_events.logger import EventLogger, ModifierError
 from jupyter_events.schema import EventSchema
 
@@ -23,15 +22,17 @@ def test_modifier_function():
     logger.register_handler(handler)
     logger.register_event_schema(schema)
 
-    def redactor(event: Event) -> Event:
-        if "username" in event.data:
-            event.data["username"] = "<masked>"
-        return event
+    def redactor(schema_id: str, version: int, data: dict) -> dict:
+        if "username" in data:
+            data["username"] = "<masked>"
+        return data
 
     # Add the modifier
-    logger.add_modifier(redactor)
+    logger.add_modifier(modifier=redactor)
 
-    logger.emit(Event(schema.id, schema.version, {"username": "jovyan"}))
+    logger.emit(
+        schema_id=schema.id, version=schema.version, data={"username": "jovyan"}
+    )
     # Flush from the handler
     handler.flush()
     # Read from the io
@@ -53,17 +54,19 @@ def test_modifier_method():
     logger.register_event_schema(schema)
 
     class Redactor:
-        def redact(self, event: Event) -> Event:
-            if "username" in event.data:
-                event.data["username"] = "<masked>"
-            return event
+        def redact(self, schema_id: str, version: int, data: dict) -> dict:
+            if "username" in data:
+                data["username"] = "<masked>"
+            return data
 
     redactor = Redactor()
 
     # Add the modifier
-    logger.add_modifier(redactor.redact)
+    logger.add_modifier(modifier=redactor.redact)
 
-    logger.emit(Event(schema.id, schema.version, {"username": "jovyan"}))
+    logger.emit(
+        schema_id=schema.id, version=schema.version, data={"username": "jovyan"}
+    )
 
     # Flush from the handler
     handler.flush()
@@ -76,11 +79,13 @@ def test_modifier_method():
 def test_bad_modifier_functions():
     logger = EventLogger()
 
-    def modifier_with_extra_args(event: Event, unknown_arg: dict) -> Event:
-        return event
+    def modifier_with_extra_args(
+        schema_id: str, version: int, data: dict, unknown_arg: dict
+    ) -> dict:
+        return data
 
     with pytest.raises(ModifierError):
-        logger.add_modifier(modifier_with_extra_args)
+        logger.add_modifier(modifier=modifier_with_extra_args)
 
     # Ensure no modifier was added.
     assert len(logger.modifiers) == 0
@@ -90,15 +95,15 @@ def test_bad_modifier_method():
     logger = EventLogger()
 
     class Redactor:
-        def redact(self, event: Event, extra_args: dict) -> Event:
-            if "username" in event.data:
-                event.data["username"] = "<masked>"
-            return event
+        def redact(
+            self, schema_id: str, version: int, data: dict, extra_args: dict
+        ) -> dict:
+            return data
 
     redactor = Redactor()
 
     with pytest.raises(ModifierError):
-        logger.add_modifier(redactor.redact)
+        logger.add_modifier(modifier=redactor.redact)
 
     # Ensure no modifier was added
     assert len(logger.modifiers) == 0
@@ -111,4 +116,4 @@ def test_modifier_without_annotations():
         return event
 
     with pytest.raises(ModifierError):
-        logger.add_modifier(modifier_with_extra_args)
+        logger.add_modifier(modifier=modifier_with_extra_args)
