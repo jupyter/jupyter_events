@@ -63,32 +63,14 @@ class EventSchema:
         Returns a dictionary with schema data.
         """
         if isinstance(schema, str):
-            # Path accepts any string, so this
-            # won't throw an error if give it
-            # a schema string (not a file name). We
-            # need to do further checks to ensure this
-            # is a file to read from.
-            fpath = Path(schema)
-            # Check if this is an existing file.
-            # If if doesn't exists, it could mean
-            # two different things: 1. this is the
-            # wrong file path or 2. this is actually
-            # a schema in the form of a string.
-            if fpath.exists():
-                _schema = yaml.load(schema)
-            # Try loading this string as a schema object.
-            else:
-                _schema = yaml.loads(schema)
-                # If _schema is still a string (not a schema dict),
-                # it means
-                if isinstance(_schema, str):
-                    raise EventSchemaLoadingError(
-                        "We tried reading the `schema` string as a file path, but "
-                        "the path did not exist. Then, we tried deserializing the "
-                        "`schema` string, but a string was returned where a schema "
-                        "dictionary was expected. Please check `schema` to make "
-                        "sures it is either a valid file path or schema string."
-                    )
+            _schema = yaml.loads(schema)
+            if not isinstance(_schema, dict):
+                raise EventSchemaLoadingError(
+                    "When deserializing `schema`, we expected a dictionary "
+                    f"to be returned but a {type(_schema)} was returned "
+                    "instead. Double check the `schema` to make sure it "
+                    "is in the proper form."
+                )
         # Load from a PurePath.
         elif isinstance(schema, PurePath):
             _schema = yaml.load(schema)
