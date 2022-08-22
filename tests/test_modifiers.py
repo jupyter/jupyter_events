@@ -10,49 +10,61 @@ from jupyter_events.schema import EventSchema
 from .utils import SCHEMA_PATH
 
 
-def test_modifier_function():
+@pytest.fixture
+def sink():
+    return io.StringIO()
+
+
+@pytest.fixture
+def schema():
     # Read schema from path.
     schema_path = SCHEMA_PATH / "good" / "user.yaml"
-    schema = EventSchema(schema=schema_path)
+    return EventSchema(schema=schema_path)
 
-    sink = io.StringIO()
-    handler = logging.StreamHandler(sink)
 
+@pytest.fixture
+def handler(sink):
+    return logging.StreamHandler(sink)
+
+
+@pytest.fixture
+def event_logger(handler, schema):
     logger = EventLogger()
     logger.register_handler(handler)
     logger.register_event_schema(schema)
+    return logger
 
+
+@pytest.fixture
+def read_emitted_event(handler, sink):
+    def _read():
+        handler.flush()
+        output = json.loads(sink.getvalue())
+        # Clear the sink.
+        sink.truncate(0)
+        sink.seek(0)
+        return output
+
+    return _read
+
+
+def test_modifier_function(schema, event_logger, read_emitted_event):
     def redactor(schema_id: str, version: int, data: dict) -> dict:
         if "username" in data:
             data["username"] = "<masked>"
         return data
 
     # Add the modifier
-    logger.add_modifier(modifier=redactor)
-
-    logger.emit(
+    event_logger.add_modifier(modifier=redactor)
+    event_logger.emit(
         schema_id=schema.id, version=schema.version, data={"username": "jovyan"}
     )
-    # Flush from the handler
-    handler.flush()
-    # Read from the io
-    output = json.loads(sink.getvalue())
+    output = read_emitted_event()
     assert "username" in output
     assert output["username"] == "<masked>"
 
 
-def test_modifier_method():
-    # Read schema from path.
-    schema_path = SCHEMA_PATH / "good" / "user.yaml"
-    schema = EventSchema(schema=schema_path)
-
-    sink = io.StringIO()
-    handler = logging.StreamHandler(sink)
-
-    logger = EventLogger()
-    logger.register_handler(handler)
-    logger.register_event_schema(schema)
-
+def test_modifier_method(schema, event_logger, read_emitted_event):
     class Redactor:
         def redact(self, schema_id: str, version: int, data: dict) -> dict:
             if "username" in data:
@@ -62,38 +74,30 @@ def test_modifier_method():
     redactor = Redactor()
 
     # Add the modifier
-    logger.add_modifier(modifier=redactor.redact)
+    event_logger.add_modifier(modifier=redactor.redact)
 
-    logger.emit(
+    event_logger.emit(
         schema_id=schema.id, version=schema.version, data={"username": "jovyan"}
     )
-
-    # Flush from the handler
-    handler.flush()
-    # Read from the io
-    output = json.loads(sink.getvalue())
+    output = read_emitted_event()
     assert "username" in output
     assert output["username"] == "<masked>"
 
 
-def test_bad_modifier_functions():
-    logger = EventLogger()
-
+def test_bad_modifier_functions(event_logger, schema: EventSchema):
     def modifier_with_extra_args(
         schema_id: str, version: int, data: dict, unknown_arg: dict
     ) -> dict:
         return data
 
     with pytest.raises(ModifierError):
-        logger.add_modifier(modifier=modifier_with_extra_args)
+        event_logger.add_modifier(modifier=modifier_with_extra_args)
 
     # Ensure no modifier was added.
-    assert len(logger.modifiers) == 0
+    assert len(event_logger._modifiers[schema.registry_key]) == 0
 
 
-def test_bad_modifier_method():
-    logger = EventLogger()
-
+def test_bad_modifier_method(event_logger, schema: EventSchema):
     class Redactor:
         def redact(
             self, schema_id: str, version: int, data: dict, extra_args: dict
@@ -103,10 +107,10 @@ def test_bad_modifier_method():
     redactor = Redactor()
 
     with pytest.raises(ModifierError):
-        logger.add_modifier(modifier=redactor.redact)
+        event_logger.add_modifier(modifier=redactor.redact)
 
     # Ensure no modifier was added
-    assert len(logger.modifiers) == 0
+    assert len(event_logger._modifiers[schema.registry_key]) == 0
 
 
 def test_modifier_without_annotations():
@@ -117,3 +121,33 @@ def test_modifier_without_annotations():
 
     with pytest.raises(ModifierError):
         logger.add_modifier(modifier=modifier_with_extra_args)
+
+
+def test_remove_modifier(schema, event_logger, read_emitted_event):
+    def redactor(schema_id: str, version: int, data: dict) -> dict:
+        if "username" in data:
+            data["username"] = "<masked>"
+        return data
+
+    # Add the modifier
+    event_logger.add_modifier(modifier=redactor)
+
+    assert len(event_logger._modifiers) == 1
+
+    event_logger.emit(
+        schema_id=schema.id, version=schema.version, data={"username": "jovyan"}
+    )
+    output = read_emitted_event()
+
+    assert "username" in output
+    assert output["username"] == "<masked>"
+
+    event_logger.remove_modifier(modifier=redactor)
+
+    event_logger.emit(
+        schema_id=schema.id, version=schema.version, data={"username": "jovyan"}
+    )
+    output = read_emitted_event()
+
+    assert "username" in output
+    assert output["username"] == "jovyan"

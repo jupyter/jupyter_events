@@ -65,7 +65,7 @@ class EventLogger(Configurable):
         """,
     )
 
-    modifiers = Dict({}, help="A mapping of schemas to their list of modifiers.")
+    _modifiers = Dict({}, help="A mapping of schemas to their list of modifiers.")
 
     @default("schemas")
     def _default_schemas(self) -> SchemaRegistry:
@@ -112,7 +112,7 @@ class EventLogger(Configurable):
         """
         event_schema = self.schemas.register(schema)
         key = event_schema.registry_key
-        self.modifiers[key] = set()
+        self._modifiers[key] = set()
 
     def register_handler(self, handler: logging.Handler):
         """Register a new logging handler to the Event Logger.
@@ -175,11 +175,11 @@ class EventLogger(Configurable):
             # If the schema ID and version is given, only add
             # this modifier to that schema
             if schema_id and version:
-                self.modifiers[(schema_id, version)].add(modifier)
+                self._modifiers[(schema_id, version)].add(modifier)
                 return
-            for (id, version) in self.modifiers:
+            for (id, version) in self._modifiers:
                 if schema_id is None or id == schema_id:
-                    self.modifiers[(id, version)].add(modifier)
+                    self._modifiers[(id, version)].add(modifier)
         else:
             raise ModifierError(
                 "Modifiers are required to follow an exact function/method "
@@ -188,6 +188,30 @@ class EventLogger(Configurable):
                 "Check that you are using type annotations for each argument "
                 "and the return value."
             )
+
+    def remove_modifier(
+        self, *, schema_id: str = None, modifier: Callable[[str, int, dict], dict]
+    ) -> None:
+        """Remove a modifier from an event or all events.
+
+        Parameters
+        ----------
+        schema_id: str
+            If given, remove this modifier only for a specific event type.
+        modifier: Callable[[str, int, dict], dict]
+            The modifier to remove.
+        """
+        # If schema_id is given remove the modifier from this schema.
+        if schema_id:
+            self._modifiers[schema_id].remove(modifier)
+        # If no schema_id is given, remove the modifier from all events.
+        else:
+            for modifier_list in self._modifiers.values():
+                # Remove the modifier if it is found in the list.
+                try:
+                    modifier_list.remove(modifier)
+                except ValueError:
+                    pass
 
     def emit(
         self, *, schema_id: str, version: int, data: dict, timestamp_override=None
@@ -229,7 +253,7 @@ class EventLogger(Configurable):
 
         # Deep copy the data and modify the copy.
         modified_data = copy.deepcopy(data)
-        for modifier in self.modifiers[(schema_id, version)]:
+        for modifier in self._modifiers[(schema_id, version)]:
             modified_data = modifier(
                 schema_id=schema_id, version=version, data=modified_data
             )
