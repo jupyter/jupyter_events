@@ -1,25 +1,36 @@
 """
 Emit structured, discrete events when various actions happen.
 """
+import copy
+import inspect
 import json
 import logging
 import warnings
 from datetime import datetime
 from pathlib import PurePath
-from typing import Union
+from typing import Callable, Union
 
 from pythonjsonlogger import jsonlogger
-from traitlets import Instance, default
+from traitlets import Dict, Instance, default
 from traitlets.config import Config, Configurable
 
-from . import EVENTS_METADATA_VERSION
 from .schema_registry import SchemaRegistry
 from .traits import Handlers
+
+# Increment this version when the metadata included with each event
+# changes.
+EVENTS_METADATA_VERSION = 1
 
 
 class SchemaNotRegistered(Warning):
     """A warning to raise when an event is given to the logger
     but its schema has not be registered with the EventLogger
+    """
+
+
+class ModifierError(Exception):
+    """An exception to raise when a modifier does not
+    show the proper signature.
     """
 
 
@@ -53,6 +64,8 @@ class EventLogger(Configurable):
         and their jsonschema validators.
         """,
     )
+
+    _modifiers = Dict({}, help="A mapping of schemas to their list of modifiers.")
 
     @default("schemas")
     def _default_schemas(self) -> SchemaRegistry:
@@ -97,7 +110,9 @@ class EventLogger(Configurable):
 
         Get this registered schema using the EventLogger.schema.get() method.
         """
-        self.schemas.register(schema)
+        event_schema = self.schemas.register(schema)
+        key = event_schema.registry_key
+        self._modifiers[key] = set()
 
     def register_handler(self, handler: logging.Handler):
         """Register a new logging handler to the Event Logger.
@@ -126,7 +141,81 @@ class EventLogger(Configurable):
         if handler in self.handlers:
             self.handlers.remove(handler)
 
-    def emit(self, schema_id: str, version: int, data: dict, timestamp_override=None):
+    def add_modifier(
+        self,
+        *,
+        schema_id: Union[str, None] = None,
+        version: Union[int, None] = None,
+        modifier: Callable[[str, int, dict], dict],
+    ):
+        """Add a modifier (callable) to a registered event.
+
+        Parameters
+        ----------
+        modifier: Callable
+            A callable function/method that executes when the named event occurs.
+            This method enforces a string signature for modifiers:
+
+                (schema_id: str, version: int, data: dict) -> dict:
+        """
+        # Ensure that this is a callable function/method
+        if not callable(modifier):
+            raise TypeError("`modifier` must be a callable")
+
+        # Now let's verify the function signature.
+        signature = inspect.signature(modifier)
+
+        def modifier_signature(schema_id: str, version: int, data: dict) -> dict:
+            """Signature to enforce"""
+            ...
+
+        expected_signature = inspect.signature(modifier_signature)
+        # Assert this signature or raise an exception
+        if signature == expected_signature:
+            # If the schema ID and version is given, only add
+            # this modifier to that schema
+            if schema_id and version:
+                self._modifiers[(schema_id, version)].add(modifier)
+                return
+            for (id, version) in self._modifiers:
+                if schema_id is None or id == schema_id:
+                    self._modifiers[(id, version)].add(modifier)
+        else:
+            raise ModifierError(
+                "Modifiers are required to follow an exact function/method "
+                "signature. The signature should look like:"
+                f"\n\n\tdef my_modifier{expected_signature}:\n\n"
+                "Check that you are using type annotations for each argument "
+                "and the return value."
+            )
+
+    def remove_modifier(
+        self, *, schema_id: str = None, modifier: Callable[[str, int, dict], dict]
+    ) -> None:
+        """Remove a modifier from an event or all events.
+
+        Parameters
+        ----------
+        schema_id: str
+            If given, remove this modifier only for a specific event type.
+        modifier: Callable[[str, int, dict], dict]
+            The modifier to remove.
+        """
+        # If schema_id is given remove the modifier from this schema.
+        if schema_id:
+            self._modifiers[schema_id].remove(modifier)
+        # If no schema_id is given, remove the modifier from all events.
+        else:
+            for modifier_list in self._modifiers.values():
+                # Remove the modifier if it is found in the list.
+                try:
+                    modifier_list.remove(modifier)
+                except ValueError:
+                    pass
+
+    def emit(
+        self, *, schema_id: str, version: int, data: dict, timestamp_override=None
+    ):
         """
         Record given event with schema has occurred.
 
@@ -136,7 +225,7 @@ class EventLogger(Configurable):
             $id of the schema
         version: str
             The schema version
-        event: dict
+        data: dict
             The event to record
         timestamp_override: datetime, optional
             Optionally override the event timestamp. By default it is set to the current timestamp.
@@ -154,12 +243,23 @@ class EventLogger(Configurable):
         # this was intended.
         if (schema_id, version) not in self.schemas:
             warnings.warn(
-                f"({schema_id}, {version}) has not been registered yet. If "
-                "this was not intentional, please register the schema using the "
+                f"({schema_id}, {version}) has not "
+                "been registered yet. If this was not intentional, "
+                "please register the schema using the "
                 "`register_event_schema` method.",
                 SchemaNotRegistered,
             )
             return
+
+        # Deep copy the data and modify the copy.
+        modified_data = copy.deepcopy(data)
+        for modifier in self._modifiers[(schema_id, version)]:
+            modified_data = modifier(
+                schema_id=schema_id, version=version, data=modified_data
+            )
+
+        # Process this event, i.e. validate and redact (in place)
+        self.schemas.validate_event(schema_id, version, modified_data)
 
         # Generate the empty event capsule.
         if timestamp_override is None:
@@ -172,8 +272,6 @@ class EventLogger(Configurable):
             "__schema_version__": version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
-        # Process this event, i.e. validate and redact (in place)
-        self.schemas.validate_event(schema_id, version, data)
-        capsule.update(data)
+        capsule.update(modified_data)
         self.log.info(capsule)
         return capsule

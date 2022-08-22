@@ -5,6 +5,7 @@ To begin using Jupyter Events in your Python application, create an instance of 
 ```python
 from jupyter_core.application import JupyterApp
 from jupyter_events import EventLogger
+from jupyter_events import Event
 
 
 class MyApplication(JupyterApp):
@@ -44,9 +45,11 @@ Call `.emit(...)` within the application to emit an instance of the event.
         ...
         # Emit event telling listeners that this event happened.
         self.eventlogger.emit(
-            id="myapplication.org/my-method",
-            version=1,
-            data={"msg": "Hello, world!"}
+            Event(
+                id="myapplication.org/my-method",
+                version=1,
+                data={"msg": "Hello, world!"}
+            )
         )
         # Do something else...
         ...
