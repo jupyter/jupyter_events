@@ -1,5 +1,5 @@
 import json
-from pathlib import Path, PurePath
+from pathlib import PurePath
 from typing import Tuple, Union
 
 from jsonschema import validators
