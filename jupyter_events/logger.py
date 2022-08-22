@@ -145,8 +145,7 @@ class EventLogger(Configurable):
         self,
         *,
         schema_id: Union[str, None] = None,
-        version: Union[int, None] = None,
-        modifier: Callable[[str, int, dict], dict],
+        modifier: Callable[[str, dict], dict],
     ):
         """Add a modifier (callable) to a registered event.
 
@@ -165,7 +164,7 @@ class EventLogger(Configurable):
         # Now let's verify the function signature.
         signature = inspect.signature(modifier)
 
-        def modifier_signature(schema_id: str, version: int, data: dict) -> dict:
+        def modifier_signature(schema_id: str, data: dict) -> dict:
             """Signature to enforce"""
             ...
 
@@ -174,12 +173,12 @@ class EventLogger(Configurable):
         if signature == expected_signature:
             # If the schema ID and version is given, only add
             # this modifier to that schema
-            if schema_id and version:
-                self._modifiers[(schema_id, version)].add(modifier)
+            if schema_id:
+                self._modifiers[schema_id].add(modifier)
                 return
-            for (id, version) in self._modifiers:
+            for id in self._modifiers:
                 if schema_id is None or id == schema_id:
-                    self._modifiers[(id, version)].add(modifier)
+                    self._modifiers[id].add(modifier)
         else:
             raise ModifierError(
                 "Modifiers are required to follow an exact function/method "
@@ -190,7 +189,7 @@ class EventLogger(Configurable):
             )
 
     def remove_modifier(
-        self, *, schema_id: str = None, modifier: Callable[[str, int, dict], dict]
+        self, *, schema_id: str = None, modifier: Callable[[str, dict], dict]
     ) -> None:
         """Remove a modifier from an event or all events.
 
@@ -213,9 +212,7 @@ class EventLogger(Configurable):
                 except ValueError:
                     pass
 
-    def emit(
-        self, *, schema_id: str, version: int, data: dict, timestamp_override=None
-    ):
+    def emit(self, *, schema_id: str, data: dict, timestamp_override=None):
         """
         Record given event with schema has occurred.
 
@@ -223,8 +220,6 @@ class EventLogger(Configurable):
         ----------
         schema_id: str
             $id of the schema
-        version: str
-            The schema version
         data: dict
             The event to record
         timestamp_override: datetime, optional
@@ -241,25 +236,26 @@ class EventLogger(Configurable):
 
         # If the schema hasn't been registered, raise a warning to make sure
         # this was intended.
-        if (schema_id, version) not in self.schemas:
+        if schema_id not in self.schemas:
             warnings.warn(
-                f"({schema_id}, {version}) has not "
-                "been registered yet. If this was not intentional, "
-                "please register the schema using the "
+                f"{schema_id} has not been registered yet. If "
+                "this was not intentional, please register the schema using the "
                 "`register_event_schema` method.",
                 SchemaNotRegistered,
             )
             return
 
+        schema = self.schemas.get(schema_id)
+
         # Deep copy the data and modify the copy.
         modified_data = copy.deepcopy(data)
-        for modifier in self._modifiers[(schema_id, version)]:
+        for modifier in self._modifiers[schema]:
             modified_data = modifier(
-                schema_id=schema_id, version=version, data=modified_data
+                schema_id=schema_id, data=modified_data
             )
 
-        # Process this event, i.e. validate and redact (in place)
-        self.schemas.validate_event(schema_id, version, modified_data)
+        # Process this event, i.e. validate and modify (in place)
+        self.schemas.validate_event(schema_id, modified_data)
 
         # Generate the empty event capsule.
         if timestamp_override is None:
@@ -269,7 +265,7 @@ class EventLogger(Configurable):
         capsule = {
             "__timestamp__": timestamp.isoformat() + "Z",
             "__schema__": schema_id,
-            "__schema_version__": version,
+            "__schema_version__": schema.version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
         capsule.update(modified_data)

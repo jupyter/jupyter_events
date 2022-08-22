@@ -88,10 +88,6 @@ class EventSchema:
         """Schema's version."""
         return self._schema["version"]
 
-    @property
-    def registry_key(self) -> Tuple[str, int]:
-        return (self.id, self.version)
-
     def validate(self, data: dict) -> None:
         """Validate an incoming instance of this event schema."""
         self._validator.validate(data)
