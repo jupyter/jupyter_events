@@ -111,7 +111,7 @@ class EventLogger(Configurable):
         Get this registered schema using the EventLogger.schema.get() method.
         """
         event_schema = self.schemas.register(schema)
-        key = event_schema.registry_key
+        key = event_schema.id
         self._modifiers[key] = set()
 
     def register_handler(self, handler: logging.Handler):
@@ -249,10 +249,8 @@ class EventLogger(Configurable):
 
         # Deep copy the data and modify the copy.
         modified_data = copy.deepcopy(data)
-        for modifier in self._modifiers[schema]:
-            modified_data = modifier(
-                schema_id=schema_id, data=modified_data
-            )
+        for modifier in self._modifiers[schema.id]:
+            modified_data = modifier(schema_id=schema_id, data=modified_data)
 
         # Process this event, i.e. validate and modify (in place)
         self.schemas.validate_event(schema_id, modified_data)

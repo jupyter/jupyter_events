@@ -44,13 +44,7 @@ Call `.emit(...)` within the application to emit an instance of the event.
         # Do something
         ...
         # Emit event telling listeners that this event happened.
-        self.eventlogger.emit(
-            Event(
-                id="myapplication.org/my-method",
-                version=1,
-                data={"msg": "Hello, world!"}
-            )
-        )
+        self.eventlogger.emit(schema_id="myapplication.org/my-method", data={"msg": "Hello, world!"})
         # Do something else...
         ...
 ```

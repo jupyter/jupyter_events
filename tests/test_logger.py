@@ -114,7 +114,11 @@ def test_timestamp_override():
 
     timestamp_override = datetime.utcnow() - timedelta(days=1)
 
-    el.emit("test/test", {"something": "blah"}, timestamp_override=timestamp_override)
+    el.emit(
+        schema_id="test/test",
+        data={"something": "blah"},
+        timestamp_override=timestamp_override,
+    )
     handler.flush()
     event_capsule = json.loads(output.getvalue())
     assert event_capsule["__timestamp__"] == timestamp_override.isoformat() + "Z"
@@ -141,8 +145,8 @@ def test_emit():
     el.register_event_schema(schema)
 
     el.emit(
-        "test/test",
-        {
+        schema_id="test/test",
+        data={
             "something": "blah",
         },
     )
@@ -233,7 +237,9 @@ def test_emit_badschema():
     el.allowed_schemas = ["test/test"]
 
     with pytest.raises(jsonschema.ValidationError):
-        el.emit("test/test", {"something": "blah", "status": "hi"})  # 'not-in-enum'
+        el.emit(
+            schema_id="test/test", data={"something": "blah", "status": "hi"}
+        )  # 'not-in-enum'
 
 
 def test_unique_logger_instances():
@@ -275,14 +281,14 @@ def test_unique_logger_instances():
     el1.allowed_schemas = ["test/test1"]
 
     el0.emit(
-        "test/test0",
-        {
+        schema_id="test/test0",
+        data={
             "something": "blah",
         },
     )
     el1.emit(
-        "test/test1",
-        {
+        schema_id="test/test1",
+        data={
             "something": "blah",
         },
     )
