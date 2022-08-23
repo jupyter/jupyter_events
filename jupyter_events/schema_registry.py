@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Union
 
 from .schema import EventSchema
 
