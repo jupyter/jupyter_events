@@ -39,15 +39,13 @@ handler = StreamHandler()
 logger.register_handler(handler)
 ```
 
-The logger knows about the event and where to send it; all that's left is to emit an instance of the event! To to do this, import and create an instance of the `Event` dataclass, setting the `schema_id`, `version`, and `data` attributes and pass it to the `.emit` method.
+The logger knows about the event and where to send it; all that's left is to emit an instance of the event! To to do this, call the `.emit(...)` method and set the (required) `schema_id` and `data` arguments.
 
 ```python
 from jupyter_events import Event
 
 logger.emit(
-   Event(
       schema_id="myapplication.org/example-event",
-      version=1,
       data={
          "name": "My Event"
       }

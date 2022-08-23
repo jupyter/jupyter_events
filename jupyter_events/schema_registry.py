@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Union
 
 from .schema import EventSchema
 
@@ -13,21 +13,20 @@ class SchemaRegistry:
     def __init__(self, schemas: dict = None):
         self._schemas = schemas or {}
 
-    def __contains__(self, registry_key: Tuple[str, int]):
+    def __contains__(self, key: str):
         """Syntax sugar to check if a schema is found in the registry"""
-        return registry_key in self._schemas
+        return key in self._schemas
 
     def __repr__(self) -> str:
         return ",\n".join([str(s) for s in self._schemas.values()])
 
     def _add(self, schema_obj: EventSchema):
-        if schema_obj.registry_key in self._schemas:
+        if schema_obj.id in self._schemas:
             raise SchemaRegistryException(
-                f"The schema, {schema_obj.id} "
-                f"(version {schema_obj.version}), is already "
+                f"The schema, {schema_obj.id}, is already "
                 "registered. Try removing it and registering it again."
             )
-        self._schemas[schema_obj.registry_key] = schema_obj
+        self._schemas[schema_obj.id] = schema_obj
 
     def register(self, schema: Union[dict, str, EventSchema]):
         """Add a valid schema to the registry.
@@ -40,35 +39,33 @@ class SchemaRegistry:
         self._add(schema)
         return schema
 
-    def get(self, id: str, version: int) -> EventSchema:
+    def get(self, id: str) -> EventSchema:
         """Fetch a given schema. If the schema is not found,
         this will raise a KeyError.
         """
         try:
-            return self._schemas[(id, version)]
+            return self._schemas[id]
         except KeyError:
             raise KeyError(
-                f"The requested schema, {id} "
-                f"(version {version}), was not found in the "
+                f"The requested schema, {id}, was not found in the "
                 "schema registry. Are you sure it was previously registered?"
             )
 
-    def remove(self, id: str, version: int) -> None:
+    def remove(self, id: str) -> None:
         """Remove a given schema. If the schema is not found,
         this will raise a KeyError.
         """
         try:
-            del self._schemas[(id, version)]
+            del self._schemas[id]
         except KeyError:
             raise KeyError(
-                f"The requested schema, {id} "
-                f"(version {version}), was not found in the "
+                f"The requested schema, {id}, was not found in the "
                 "schema registry. Are you sure it was previously registered?"
             )
 
-    def validate_event(self, id: str, version: int, data: dict) -> None:
+    def validate_event(self, id: str, data: dict) -> None:
         """Validate an event against a schema within this
         registry.
         """
-        schema = self.get(id, version)
+        schema = self.get(id)
         schema.validate(data)

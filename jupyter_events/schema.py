@@ -1,6 +1,6 @@
 import json
 from pathlib import PurePath
-from typing import Tuple, Union
+from typing import Union
 
 from jsonschema import validators
 from jsonschema.protocols import Validator
@@ -87,10 +87,6 @@ class EventSchema:
     def version(self) -> int:
         """Schema's version."""
         return self._schema["version"]
-
-    @property
-    def registry_key(self) -> Tuple[str, int]:
-        return (self.id, self.version)
 
     def validate(self, data: dict) -> None:
         """Validate an incoming instance of this event schema."""
