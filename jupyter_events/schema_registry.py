@@ -28,7 +28,7 @@ class SchemaRegistry:
             )
         self._schemas[schema_obj.id] = schema_obj
 
-    def register(self, schema: Union[dict, str, EventSchema]):
+    def register(self, schema: Union[dict, str, EventSchema]) -> EventSchema:
         """Add a valid schema to the registry.
 
         All schemas are validated against the Jupyter Events meta-schema

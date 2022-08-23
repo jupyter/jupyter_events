@@ -1,6 +1,7 @@
 """
 Emit structured, discrete events when various actions happen.
 """
+import asyncio
 import copy
 import inspect
 import json
@@ -11,7 +12,7 @@ from pathlib import PurePath
 from typing import Callable, Union
 
 from pythonjsonlogger import jsonlogger
-from traitlets import Dict, Instance, default
+from traitlets import Dict, Instance, List, default
 from traitlets.config import Config, Configurable
 
 from .schema_registry import SchemaRegistry
@@ -37,6 +38,12 @@ class ModifierError(Exception):
 # Only show this warning on the first instance
 # of each event type that fails to emit.
 warnings.simplefilter("once", SchemaNotRegistered)
+
+
+class ListenerError(Exception):
+    """An exception to raise when a listener does not
+    show the proper signature.
+    """
 
 
 class EventLogger(Configurable):
@@ -66,6 +73,20 @@ class EventLogger(Configurable):
     )
 
     _modifiers = Dict({}, help="A mapping of schemas to their list of modifiers.")
+
+    _modified_listeners = Dict(
+        {}, help="A mapping of schemas to the listeners of modified events."
+    )
+
+    _unmodified_listeners = Dict(
+        {}, help="A mapping of schemas to the listeners of unmodified/raw events."
+    )
+
+    _active_listeners = List()
+
+    async def gather_listeners(self):
+        await asyncio.gather(*self._active_listeners)
+        self.active_listeners = []
 
     @default("schemas")
     def _default_schemas(self) -> SchemaRegistry:
@@ -110,9 +131,13 @@ class EventLogger(Configurable):
 
         Get this registered schema using the EventLogger.schema.get() method.
         """
+
         event_schema = self.schemas.register(schema)
         key = event_schema.id
+
         self._modifiers[key] = set()
+        self._modified_listeners[key] = set()
+        self._unmodified_listeners[key] = set()
 
     def register_handler(self, handler: logging.Handler):
         """Register a new logging handler to the Event Logger.
@@ -192,7 +217,6 @@ class EventLogger(Configurable):
         self, *, schema_id: str = None, modifier: Callable[[str, dict], dict]
     ) -> None:
         """Remove a modifier from an event or all events.
-
         Parameters
         ----------
         schema_id: str
@@ -211,6 +235,64 @@ class EventLogger(Configurable):
                     modifier_list.remove(modifier)
                 except ValueError:
                     pass
+
+    def add_listener(
+        self,
+        *,
+        modified: bool = True,
+        schema_id: Union[str, None] = None,
+        listener: Callable[[str, int, dict], None],
+    ):
+        """Add a listener (callable) to a registered event.
+
+        Parameters
+        ----------
+        schema_id: str
+            $id of the schema
+        version: str
+            The schema version
+        listener: Callable
+            A callable function/method that executes when the named event occurs.
+        """
+        if not callable(listener):
+            raise TypeError("`listener` must be a callable")
+
+        if (schema_id, version) not in self.schemas:
+            raise SchemaNotRegistered(
+                "The schema given for this listener has not be registered yet."
+            )
+
+        signature = inspect.signature(listener)
+
+        async def listener_signature(
+            logger: EventLogger, schema_id: str, data: dict
+        ) -> None:
+            ...
+
+        expected_signature = inspect.signature(listener_signature)
+        # Assert this signature or raise an exception
+        if signature == expected_signature:
+            # If the schema ID and version is given, only add
+            # this modifier to that schema
+            if schema_id:
+                if modified:
+                    self._modified_listeners[schema_id].add(listener)
+                    return
+                self._unmodified_listeners[schema_id].add(listener)
+            for (id, version) in self.listeners:
+                if schema_id is None or id == schema_id:
+                    if modified:
+                        self._modified_listeners[id].add(listener)
+                    else:
+                        self._unmodified_listeners[schema_id].add(listener)
+        else:
+            raise ListenerError(
+                "Listeners are required to follow an exact function/method "
+                "signature. The signature should look like:"
+                f"\n\n\tdef my_listener{expected_signature}:\n\n"
+                "Check that you are using type annotations for each argument "
+                "and the return value."
+            )
 
     def emit(self, *, schema_id: str, data: dict, timestamp_override=None):
         """
@@ -231,7 +313,11 @@ class EventLogger(Configurable):
             The recorded event data
         """
         # If no handlers are routing these events, there's no need to proceed.
-        if not self.handlers:
+        if (
+            not self.handlers
+            and not self._modified_listeners
+            and not self._unmodified_listeners
+        ):
             return
 
         # If the schema hasn't been registered, raise a warning to make sure
@@ -252,7 +338,11 @@ class EventLogger(Configurable):
         for modifier in self._modifiers[schema.id]:
             modified_data = modifier(schema_id=schema_id, data=modified_data)
 
-        # Process this event, i.e. validate and modify (in place)
+        if self._unmodified_listeners[schema.id]:
+            # Process this event, i.e. validate and modify (in place)
+            self.schemas.validate_event(schema_id, data)
+
+        # Validate the modified data.
         self.schemas.validate_event(schema_id, modified_data)
 
         # Generate the empty event capsule.
@@ -268,4 +358,19 @@ class EventLogger(Configurable):
         }
         capsule.update(modified_data)
         self.log.info(capsule)
+        # Loop over listeners and execute them.
+        for listener in self._modified_listeners[schema_id]:
+            task = asyncio.create_task(
+                listener(
+                    logger=self,
+                    schema_id=schema_id,
+                    data=modified_data,
+                )
+            )
+            self._active_listeners.append(task)
+        for listener in self._unmodified_listeners[schema_id]:
+            task = asyncio.create_task(
+                listener(logger=self, schema_id=schema_id, data=data)
+            )
+            self._active_listeners.append(task)
         return capsule
