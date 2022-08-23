@@ -23,8 +23,7 @@ class SchemaRegistry:
     def _add(self, schema_obj: EventSchema):
         if schema_obj.id in self._schemas:
             raise SchemaRegistryException(
-                f"The schema, {schema_obj.id} "
-                f"(version {schema_obj.version}), is already "
+                f"The schema, {schema_obj.id}, is already "
                 "registered. Try removing it and registering it again."
             )
         self._schemas[schema_obj.id] = schema_obj

@@ -113,12 +113,8 @@ def test_timestamp_override():
     el.register_event_schema(schema)
 
     timestamp_override = datetime.utcnow() - timedelta(days=1)
-    el.emit(
-        schema_id="test/test",
-        version=1,
-        data={"something": "blah"},
-        timestamp_override=timestamp_override,
-    )
+
+    el.emit("test/test", {"something": "blah"}, timestamp_override=timestamp_override)
     handler.flush()
     event_capsule = json.loads(output.getvalue())
     assert event_capsule["__timestamp__"] == timestamp_override.isoformat() + "Z"
@@ -144,7 +140,12 @@ def test_emit():
     el = EventLogger(handlers=[handler])
     el.register_event_schema(schema)
 
-    el.emit(schema_id="test/test", version=1, data={"something": "blah"})
+    el.emit(
+        "test/test",
+        {
+            "something": "blah",
+        },
+    )
     handler.flush()
 
     event_capsule = json.loads(output.getvalue())
@@ -180,7 +181,7 @@ def test_register_event_schema(tmp_path):
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
     el.register_event_schema(schema_file)
-    assert ("test/test", 1) in el.schemas
+    assert "test/test" in el.schemas
 
 
 def test_register_event_schema_object(tmp_path):
@@ -204,7 +205,7 @@ def test_register_event_schema_object(tmp_path):
     yaml.dump(schema, schema_file)
     el.register_event_schema(schema_file)
 
-    assert ("test/test", 1) in el.schemas
+    assert "test/test" in el.schemas
 
 
 def test_emit_badschema():
@@ -232,9 +233,7 @@ def test_emit_badschema():
     el.allowed_schemas = ["test/test"]
 
     with pytest.raises(jsonschema.ValidationError):
-        el.emit(
-            schema_id="test/test", version=1, data={"something": "blah", "status": "hi"}
-        )  # 'not-in-enum'
+        el.emit("test/test", {"something": "blah", "status": "hi"})  # 'not-in-enum'
 
 
 def test_unique_logger_instances():
@@ -276,16 +275,14 @@ def test_unique_logger_instances():
     el1.allowed_schemas = ["test/test1"]
 
     el0.emit(
-        schema_id="test/test0",
-        version=1,
-        data={
+        "test/test0",
+        {
             "something": "blah",
         },
     )
     el1.emit(
-        schema_id="test/test1",
-        version=1,
-        data={
+        "test/test1",
+        {
             "something": "blah",
         },
     )
