@@ -24,19 +24,13 @@ async def test_listener_function(event_logger, schema):
     global listener_was_called
     listener_was_called = False
 
-    async def my_listener(
-        logger: EventLogger, schema_id: str, version: int, data: dict
-    ) -> None:
+    async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
         global listener_was_called
         listener_was_called = True  # type: ignore
 
     # Add the modifier
-    event_logger.add_listener(
-        schema_id=schema.id, version=schema.version, listener=my_listener
-    )
-    event_logger.emit(
-        schema_id=schema.id, version=schema.version, data={"prop": "hello, world"}
-    )
+    event_logger.add_listener(schema_id=schema.id, listener=my_listener)
+    event_logger.emit(schema_id=schema.id, data={"prop": "hello, world"})
     await event_logger.gather_listeners()
     assert listener_was_called
 
@@ -45,16 +39,15 @@ def test_bad_listener_function(event_logger, schema):
     logger = EventLogger()
 
     async def listener_with_extra_args(
-        logger: EventLogger, schema_id: str, version: int, data: dict, unknown_arg: dict
+        logger: EventLogger, schema_id: str, data: dict, unknown_arg: dict
     ) -> None:
         pass
 
     with pytest.raises(ListenerError):
         event_logger.add_listener(
             schema_id=schema.id,
-            version=schema.version,
             listener=listener_with_extra_args,
         )
 
     # Ensure no modifier was added.
-    assert len(logger.unmodified_listeners) == 0
+    assert len(logger._unmodified_listeners) == 0

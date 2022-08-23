@@ -257,7 +257,7 @@ class EventLogger(Configurable):
         if not callable(listener):
             raise TypeError("`listener` must be a callable")
 
-        if (schema_id, version) not in self.schemas:
+        if schema_id not in self.schemas:
             raise SchemaNotRegistered(
                 "The schema given for this listener has not be registered yet."
             )
@@ -279,7 +279,7 @@ class EventLogger(Configurable):
                     self._modified_listeners[schema_id].add(listener)
                     return
                 self._unmodified_listeners[schema_id].add(listener)
-            for (id, version) in self.listeners:
+            for id in self.listeners:
                 if schema_id is None or id == schema_id:
                     if modified:
                         self._modified_listeners[id].add(listener)
