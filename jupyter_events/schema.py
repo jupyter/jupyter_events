@@ -1,5 +1,4 @@
 import json
-
 from pathlib import PurePath
 from typing import Union
 
