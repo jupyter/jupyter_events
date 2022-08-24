@@ -12,8 +12,8 @@ from pathlib import PurePath
 from typing import Callable, Union
 
 from pythonjsonlogger import jsonlogger
-from traitlets import Dict, Instance, List, default
-from traitlets.config import Config, Configurable
+from traitlets import Dict, Instance, Set, default
+from traitlets.config import Config, LoggingConfigurable
 
 from .schema_registry import SchemaRegistry
 from .traits import Handlers
@@ -46,7 +46,7 @@ class ListenerError(Exception):
     """
 
 
-class EventLogger(Configurable):
+class EventLogger(LoggingConfigurable):
     """
     An Event logger for emitting structured events.
 
@@ -82,11 +82,10 @@ class EventLogger(Configurable):
         {}, help="A mapping of schemas to the listeners of unmodified/raw events."
     )
 
-    _active_listeners = List()
+    _active_listeners = Set()
 
     async def gather_listeners(self):
-        await asyncio.gather(*self._active_listeners)
-        self.active_listeners = []
+        return await asyncio.gather(*self._active_listeners, return_exceptions=True)
 
     @default("schemas")
     def _default_schemas(self) -> SchemaRegistry:
@@ -99,11 +98,11 @@ class EventLogger(Configurable):
         # Use a unique name for the logger so that multiple instances of EventLog do not write
         # to each other's handlers.
         log_name = __name__ + "." + str(id(self))
-        self.log = logging.getLogger(log_name)
+        self._logger = logging.getLogger(log_name)
         # We don't want events to show up in the default logs
-        self.log.propagate = False
+        self._logger.propagate = False
         # We will use log.info to emit
-        self.log.setLevel(logging.INFO)
+        self._logger.setLevel(logging.INFO)
         # Add each handler to the logger and format the handlers.
         if self.handlers:
             for handler in self.handlers:
@@ -134,7 +133,6 @@ class EventLogger(Configurable):
 
         event_schema = self.schemas.register(schema)
         key = event_schema.id
-
         self._modifiers[key] = set()
         self._modified_listeners[key] = set()
         self._unmodified_listeners[key] = set()
@@ -156,13 +154,13 @@ class EventLogger(Configurable):
 
         formatter = jsonlogger.JsonFormatter(json_serializer=_skip_message)
         handler.setFormatter(formatter)
-        self.log.addHandler(handler)
+        self._logger.addHandler(handler)
         if handler not in self.handlers:
             self.handlers.append(handler)
 
     def remove_handler(self, handler: logging.Handler):
         """Remove a logging handler from the logger and list of handlers."""
-        self.log.removeHandler(handler)
+        self._logger.removeHandler(handler)
         if handler in self.handlers:
             self.handlers.remove(handler)
 
@@ -357,9 +355,23 @@ class EventLogger(Configurable):
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
         capsule.update(modified_data)
-        self.log.info(capsule)
+
+        self._logger.info(capsule)
+
+        # callback for removing from finished listeners
+        # from active listeners set.
+        def _listener_task_done(task: asyncio.Task):
+            # If an exception happens, log it to the main
+            # applications logger
+            err = task.exception()
+            if err:
+                self.log.error(err)
+            self._active_listeners.discard(task)
+
         # Loop over listeners and execute them.
         for listener in self._modified_listeners[schema_id]:
+            # Schedule this listener as a task and add
+            # it to the list of active listeners
             task = asyncio.create_task(
                 listener(
                     logger=self,
@@ -367,10 +379,27 @@ class EventLogger(Configurable):
                     data=modified_data,
                 )
             )
-            self._active_listeners.append(task)
+            self._active_listeners.add(task)
+
+            # Adds the task and cleans it up later if needed.
+            task.add_done_callback(_listener_task_done)
+
         for listener in self._unmodified_listeners[schema_id]:
             task = asyncio.create_task(
                 listener(logger=self, schema_id=schema_id, data=data)
             )
-            self._active_listeners.append(task)
+            self._active_listeners.add(task)
+
+            # Remove task from active listeners once its finished.
+            def _listener_task_done(task: asyncio.Task):
+                # If an exception happens, log it to the main
+                # applications logger
+                err = task.exception()
+                if err:
+                    self.log.error(err)
+                self._active_listeners.discard(task)
+
+            # Adds the task and cleans it up later if needed.
+            task.add_done_callback(_listener_task_done)
+
         return capsule
