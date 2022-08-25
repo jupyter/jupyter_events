@@ -28,6 +28,10 @@ class SchemaRegistry:
             )
         self._schemas[schema_obj.id] = schema_obj
 
+    @property
+    def schema_ids(self):
+        return self._schemas.keys()
+
     def register(self, schema: Union[dict, str, EventSchema]) -> EventSchema:
         """Add a valid schema to the registry.
 

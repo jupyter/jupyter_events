@@ -40,6 +40,28 @@ async def test_listener_function(event_logger, schema):
     assert len(event_logger._active_listeners) == 0
 
 
+async def test_remove_listener_function(event_logger, schema):
+    global listener_was_called
+    listener_was_called = False
+
+    async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
+        global listener_was_called
+        listener_was_called = True  # type: ignore
+
+    # Add the modifier
+    event_logger.add_listener(schema_id=schema.id, listener=my_listener)
+    event_logger.emit(schema_id=schema.id, data={"prop": "hello, world"})
+    await event_logger.gather_listeners()
+    assert listener_was_called
+
+    # Check that the active listeners are cleaned up.
+    assert len(event_logger._active_listeners) == 0
+
+    event_logger.remove_listener(listener=my_listener)
+    assert len(event_logger._modified_listeners[schema.id]) == 0
+    assert len(event_logger._unmodified_listeners[schema.id]) == 0
+
+
 async def test_bad_listener_function_signature(event_logger, schema):
     async def listener_with_extra_args(
         logger: EventLogger, schema_id: str, data: dict, unknown_arg: dict

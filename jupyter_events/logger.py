@@ -178,7 +178,7 @@ class EventLogger(LoggingConfigurable):
             A callable function/method that executes when the named event occurs.
             This method enforces a string signature for modifiers:
 
-                (schema_id: str, version: int, data: dict) -> dict:
+                (schema_id: str, data: dict) -> dict:
         """
         # Ensure that this is a callable function/method
         if not callable(modifier):
@@ -215,31 +215,31 @@ class EventLogger(LoggingConfigurable):
         self, *, schema_id: str = None, modifier: Callable[[str, dict], dict]
     ) -> None:
         """Remove a modifier from an event or all events.
+
         Parameters
         ----------
         schema_id: str
             If given, remove this modifier only for a specific event type.
-        modifier: Callable[[str, int, dict], dict]
+        modifier: Callable[[str, dict], dict]
+
             The modifier to remove.
         """
         # If schema_id is given remove the modifier from this schema.
         if schema_id:
-            self._modifiers[schema_id].remove(modifier)
+            self._modifiers[schema_id].discard(modifier)
         # If no schema_id is given, remove the modifier from all events.
         else:
-            for modifier_list in self._modifiers.values():
+            for schema_id in self.schemas.schema_ids:
                 # Remove the modifier if it is found in the list.
-                try:
-                    modifier_list.remove(modifier)
-                except ValueError:
-                    pass
+                self._modifiers[schema_id].discard(modifier)
+                self._modifiers[schema_id].discard(modifier)
 
     def add_listener(
         self,
         *,
         modified: bool = True,
         schema_id: Union[str, None] = None,
-        listener: Callable[[str, int, dict], None],
+        listener: Callable[["EventLogger", str, dict], None],
     ):
         """Add a listener (callable) to a registered event.
 
@@ -291,6 +291,33 @@ class EventLogger(LoggingConfigurable):
                 "Check that you are using type annotations for each argument "
                 "and the return value."
             )
+
+    def remove_listener(
+        self,
+        *,
+        schema_id: str = None,
+        listener: Callable[["EventLogger", str, dict], None],
+    ) -> None:
+        """Remove a listener from an event or all events.
+
+        Parameters
+        ----------
+        schema_id: str
+            If given, remove this modifier only for a specific event type.
+
+        listener: Callable[[EventLogger, str, dict], dict]
+            The modifier to remove.
+        """
+        # If schema_id is given remove the listener from this schema.
+        if schema_id:
+            self._modified_listeners[schema_id].discard(listener)
+            self._unmodified_listeners[schema_id].discard(listener)
+        # If no schema_id is given, remove the listener from all events.
+        else:
+            for schema_id in self.schemas.schema_ids:
+                # Remove the listener if it is found in the list.
+                self._modified_listeners[schema_id].discard(listener)
+                self._unmodified_listeners[schema_id].discard(listener)
 
     def emit(self, *, schema_id: str, data: dict, timestamp_override=None):
         """
