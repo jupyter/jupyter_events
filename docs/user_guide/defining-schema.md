@@ -47,7 +47,7 @@ When authoring a schema, how do you check if you schema is following the expecte
 First, install the CLI:
 
 ```
-pip install jupyter_events[cli]
+pip install "jupyter_events[cli]"
 ```
 
 Then, run the CLI against your schema:
