@@ -39,3 +39,73 @@ required:
   - thing
   - user
 ```
+
+## Checking if a schema is valid
+
+When authoring a schema, how do you check if you schema is following the expected form? Jupyter Events offers a simple command line tool to validate your schema against its Jupyter Events metaschema.
+
+First, install the CLI:
+
+```
+pip install jupyter_events[cli]
+```
+
+Then, run the CLI against your schema:
+
+```
+jupyter events validate path/to/my_schema.json
+```
+
+The output will look like this, if it passes:
+
+```
+──────────────────────────────────── Validating the following schema ────────────────────────────────────
+
+    {
+      "$id": "http://event.jupyter.org/test",
+      "version": 1,
+      "title": "Simple Test Schema",
+      "description": "A simple schema for testing\n",
+      "type": "object",
+      "properties": {
+        "prop": {
+          "title": "Test Property",
+          "description": "Test property.",
+          "type": "string"
+        }
+      }
+    }
+
+──────────────────────────────────────────────── Results ────────────────────────────────────────────────
+
+✔ Nice work! This schema is valid.
+```
+
+or this if fails:
+
+```
+──────────────────────────────────── Validating the following schema ────────────────────────────────────
+
+    {
+      "$id": "http://event.jupyter.org/test",
+      "version": 1,
+      "title": "Simple Test Schema",
+      "description": "A simple schema for testing\n",
+      "type": "object",
+      "properties": {
+        "__badName": {
+          "title": "Test Property",
+          "description": "Test property.",
+          "type": "string"
+        }
+      }
+    }
+
+──────────────────────────────────────────────── Results ────────────────────────────────────────────────
+❌ The schema failed to validate.
+
+We found the following error with your schema:
+
+    '__badName' is an invalid property name because it starts with `__`. Properties starting with
+    'dunder' are reserved as special meta-fields for Jupyter Events to use.
+```

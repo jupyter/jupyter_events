@@ -245,10 +245,11 @@ class EventLogger(LoggingConfigurable):
 
         Parameters
         ----------
+        modified: bool
+            If True (default), listens to the data after it has been mutated/modified
+            by the list of modifiers.
         schema_id: str
             $id of the schema
-        version: str
-            The schema version
         listener: Callable
             A callable function/method that executes when the named event occurs.
         """
