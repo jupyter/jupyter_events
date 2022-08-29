@@ -59,7 +59,7 @@ cli = [
 path = "jupyter_events/_version.py"
 
 [tool.tbump.version]
-current = "0.4.0.dev0"
+current = "0.4.0"
 regex = '''
   (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)
   ((?P<channel>a|b|rc|.dev)(?P<release>\d+))?
