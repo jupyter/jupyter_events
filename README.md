@@ -17,3 +17,7 @@ or conda-forge:
 ```
 conda install -c conda-forge jupyter_events
 ```
+
+## Documentation
+
+Documentation is available at [jupyterlab.readthedocs.io](jupyterlab.readthedocs.io).
