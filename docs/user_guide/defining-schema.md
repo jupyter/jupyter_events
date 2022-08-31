@@ -7,11 +7,15 @@ All Jupyter Events schemas are valid [JSON schema](https://json-schema.org/) and
 A common pattern is to define these schemas in separate files and register them with an `EventLogger` using the `.register_event_schema(...)` method:
 
 ```python
-schema_filepath = "/path/to/schema.yaml"
+schema_filepath = Path("/path/to/schema.yaml")
 
 logger = EventLogger()
 logger.register_event_schema(schema_file)
 ```
+
+Note that a file path passed to `register_event_schema()` **must** be a Pathlib
+object. This is required for `register_event_schema()` to distinguish between
+file paths and schemas specified in a Python string.
 
 At a minimum, a valid Jupyter event schema requires the following keys:
 
