@@ -5,9 +5,12 @@ import pytest
 from jsonschema.exceptions import ValidationError
 
 from jupyter_events import yaml
-from jupyter_events.schema import (EventSchema, EventSchemaFileAbsent,
-                                   EventSchemaLoadingError,
-                                   EventSchemaUnrecognized)
+from jupyter_events.schema import (
+    EventSchema,
+    EventSchemaFileAbsent,
+    EventSchemaLoadingError,
+    EventSchemaUnrecognized,
+)
 from jupyter_events.validators import validate_schema
 
 from .utils import SCHEMA_PATH

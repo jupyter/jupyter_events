@@ -27,6 +27,8 @@ repos:
     rev: 5.10.1
     hooks:
       - id: isort
+        # https://github.com/PyCQA/isort/issues/1518
+        args: ["--profile", "black"]
         files: \.py$
 
   - repo: https://github.com/pre-commit/mirrors-mypy

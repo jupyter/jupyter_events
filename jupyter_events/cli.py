@@ -9,8 +9,11 @@ from rich.markup import escape
 from rich.padding import Padding
 from rich.style import Style
 
-from jupyter_events.schema import (EventSchema, EventSchemaFileAbsent,
-                                   EventSchemaLoadingError)
+from jupyter_events.schema import (
+    EventSchema,
+    EventSchemaFileAbsent,
+    EventSchemaLoadingError,
+)
 
 console = Console()
 
