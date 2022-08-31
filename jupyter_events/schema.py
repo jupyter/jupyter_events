@@ -116,7 +116,7 @@ class EventSchema:
             return loaded_schema
 
         raise EventSchemaUnrecognized(
-            "Expected a dictionary, string, or PurePath, but instead received {schema.__class__.__name__}."
+            f"Expected a dictionary, string, or PurePath, but instead received {schema.__class__.__name__}."
         )
 
     @property
