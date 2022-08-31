@@ -1,6 +1,5 @@
 import json
 import pathlib
-import traceback
 
 import click
 from jsonschema import ValidationError
