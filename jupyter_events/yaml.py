@@ -1,5 +1,5 @@
 # mypy: ignore-errors
-import pathlib
+from pathlib import Path
 
 from yaml import dump as ydump
 from yaml import load as yload
@@ -20,9 +20,10 @@ def dumps(stream):
 
 
 def load(fpath):
-    data = pathlib.Path(str(fpath)).read_text()
+    # coerce PurePath into Path, then read its contents
+    data = Path(str(fpath)).read_text()
     return loads(data)
 
 
 def dump(data, outpath):
-    pathlib.Path(outpath).write_text(dumps(data))
+    Path(outpath).write_text(dumps(data))

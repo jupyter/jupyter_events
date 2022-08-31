@@ -1,5 +1,5 @@
 import json
-from pathlib import PurePath
+from pathlib import Path, PurePath
 from typing import Union
 
 from jsonschema import validators
@@ -9,7 +9,15 @@ from . import yaml
 from .validators import validate_schema
 
 
+class EventSchemaUnrecognized(Exception):
+    pass
+
+
 class EventSchemaLoadingError(Exception):
+    pass
+
+
+class EventSchemaFileAbsent(Exception):
     pass
 
 
@@ -52,29 +60,64 @@ class EventSchema:
         return json.dumps(self._schema, indent=2)
 
     @staticmethod
+    def _ensure_yaml_loaded(schema, was_str=False) -> None:
+        """Ensures schema was correctly loaded into a dictionary. Raises
+        EventSchemaLoadingError otherwise."""
+        if isinstance(schema, dict):
+            return
+
+        error_msg = "Could not deserialize schema into a dictionary."
+
+        def intended_as_path(schema):
+            path = Path(schema)
+            return path.match("*.yml") or path.match("*.yaml") or path.match("*.json")
+
+        # detect whether the user specified a string but intended a PurePath to
+        # generate a more helpful error message
+        if was_str and intended_as_path(schema):
+            error_msg += (
+                " Paths to schema files must be explicitly wrapped in a Pathlib object."
+            )
+        else:
+            error_msg += " Double check the schema and ensure it is in the proper form."
+
+        raise EventSchemaLoadingError(error_msg)
+
+    @staticmethod
     def _load_schema(schema: Union[dict, str, PurePath]) -> dict:
         """Load a JSON schema from different sources/data types.
 
-        `schema` could be a dictionary, string, or pathlib object representing
-        a schema file on disk.
+        `schema` could be a dictionary or serialized string representing the
+        schema itself or a Pathlib object representing a schema file on disk.
 
         Returns a dictionary with schema data.
         """
-        if isinstance(schema, str):
-            _schema = yaml.loads(schema)
-            if not isinstance(_schema, dict):
-                raise EventSchemaLoadingError(
-                    "When deserializing `schema`, we expected a dictionary "
-                    f"to be returned but a {type(_schema)} was returned "
-                    "instead. Double check the `schema` to make sure it "
-                    "is in the proper form."
+
+        # if schema is already a dictionary, return it
+        if isinstance(schema, dict):
+            return schema
+
+        # if schema is PurePath, ensure file exists at path and then load from file
+        if isinstance(schema, PurePath):
+            if not Path(schema).exists():
+                raise EventSchemaFileAbsent(
+                    f'Schema file not present at path "{schema}".'
                 )
-        # Load from a PurePath.
-        elif isinstance(schema, PurePath):
-            _schema = yaml.load(schema)
-        else:
-            _schema = schema
-        return _schema
+
+            loaded_schema = yaml.load(schema)
+            EventSchema._ensure_yaml_loaded(loaded_schema)
+            return loaded_schema
+
+        # finally, if schema is string, attempt to deserialize and return the output
+        if isinstance(schema, str):
+            # note the diff b/w load v.s. loads
+            loaded_schema = yaml.loads(schema)
+            EventSchema._ensure_yaml_loaded(loaded_schema, was_str=True)
+            return loaded_schema
+
+        raise EventSchemaUnrecognized(
+            "Expected a dictionary, string, or PurePath, but instead received {schema.__class__.__name__}."
+        )
 
     @property
     def id(self) -> str:
