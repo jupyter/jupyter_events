@@ -9,7 +9,11 @@ from rich.markup import escape
 from rich.padding import Padding
 from rich.style import Style
 
-from jupyter_events.schema import EventSchema, EventSchemaLoadingError
+from jupyter_events.schema import (
+    EventSchema,
+    EventSchemaFileAbsent,
+    EventSchemaLoadingError,
+)
 
 console = Console()
 
@@ -28,18 +32,33 @@ def main():
 
 @click.command()
 @click.argument("schema")
-def validate(schema):
+def validate(schema: str):
     """Validate a SCHEMA against Jupyter Event's meta schema.
 
     SCHEMA can be a JSON/YAML string or filepath to a schema.
     """
     console.rule("Validating the following schema", style=Style(color="blue"))
-    # Soft load the schema without validating.
+
+    _schema = None
     try:
+        # attempt to read schema as a serialized string
         _schema = EventSchema._load_schema(schema)
     except EventSchemaLoadingError:
+        # pass here to avoid printing traceback of this exception if next block
+        # excepts
+        pass
+
+    # if not a serialized schema string, try to interpret it as a path to schema file
+    if _schema is None:
         schema_path = pathlib.Path(schema)
-        _schema = EventSchema._load_schema(schema_path)
+        try:
+            _schema = EventSchema._load_schema(schema_path)
+        except (EventSchemaLoadingError, EventSchemaFileAbsent) as e:
+            # no need for full tracestack for user error exceptions. just print
+            # the error message and return
+            console.log(f"[bold red]ERROR[/]: {e}")
+            return
+
     # Print what was found.
     schema_json = JSON(json.dumps(_schema))
     console.print(Padding(schema_json, (1, 0, 1, 4)))
