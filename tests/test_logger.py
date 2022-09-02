@@ -12,7 +12,6 @@ from traitlets.config.loader import PyFileConfigLoader
 
 from jupyter_events import yaml
 from jupyter_events.logger import EventLogger
-from jupyter_events.schema import EventSchema
 from jupyter_events.schema_registry import SchemaRegistryException
 
 GOOD_CONFIG = """
