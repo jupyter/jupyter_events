@@ -11,11 +11,6 @@ from .utils import SCHEMA_PATH
 
 
 @pytest.fixture
-def sink():
-    return io.StringIO()
-
-
-@pytest.fixture
 def schema():
     # Read schema from path.
     schema_path = SCHEMA_PATH / "good" / "user.yaml"
@@ -23,32 +18,13 @@ def schema():
 
 
 @pytest.fixture
-def handler(sink):
-    return logging.StreamHandler(sink)
+def jp_event_schemas(schema):
+    return [schema]
 
 
-@pytest.fixture
-def event_logger(handler, schema):
-    logger = EventLogger()
-    logger.register_handler(handler)
-    logger.register_event_schema(schema)
-    return logger
+def test_modifier_function(schema, jp_event_logger, jp_read_emitted_event):
+    event_logger = jp_event_logger
 
-
-@pytest.fixture
-def read_emitted_event(handler, sink):
-    def _read():
-        handler.flush()
-        output = json.loads(sink.getvalue())
-        # Clear the sink.
-        sink.truncate(0)
-        sink.seek(0)
-        return output
-
-    return _read
-
-
-def test_modifier_function(schema, event_logger, read_emitted_event):
     def redactor(schema_id: str, data: dict) -> dict:
         if "username" in data:
             data["username"] = "<masked>"
@@ -57,12 +33,14 @@ def test_modifier_function(schema, event_logger, read_emitted_event):
     # Add the modifier
     event_logger.add_modifier(modifier=redactor)
     event_logger.emit(schema_id=schema.id, data={"username": "jovyan"})
-    output = read_emitted_event()
+    output = jp_read_emitted_event()
     assert "username" in output
     assert output["username"] == "<masked>"
 
 
-def test_modifier_method(schema, event_logger, read_emitted_event):
+def test_modifier_method(schema, jp_event_logger, jp_read_emitted_event):
+    event_logger = jp_event_logger
+
     class Redactor:
         def redact(self, schema_id: str, data: dict) -> dict:
             if "username" in data:
@@ -75,12 +53,14 @@ def test_modifier_method(schema, event_logger, read_emitted_event):
     event_logger.add_modifier(modifier=redactor.redact)
 
     event_logger.emit(schema_id=schema.id, data={"username": "jovyan"})
-    output = read_emitted_event()
+    output = jp_read_emitted_event()
     assert "username" in output
     assert output["username"] == "<masked>"
 
 
-def test_bad_modifier_functions(event_logger, schema: EventSchema):
+def test_bad_modifier_functions(jp_event_logger, schema: EventSchema):
+    event_logger = jp_event_logger
+
     def modifier_with_extra_args(schema_id: str, data: dict, unknown_arg: dict) -> dict:
         return data
 
@@ -91,7 +71,9 @@ def test_bad_modifier_functions(event_logger, schema: EventSchema):
     assert len(event_logger._modifiers[schema.id]) == 0
 
 
-def test_bad_modifier_method(event_logger, schema: EventSchema):
+def test_bad_modifier_method(jp_event_logger, schema: EventSchema):
+    event_logger = jp_event_logger
+
     class Redactor:
         def redact(self, schema_id: str, data: dict, extra_args: dict) -> dict:
             return data
@@ -115,7 +97,9 @@ def test_modifier_without_annotations():
         logger.add_modifier(modifier=modifier_with_extra_args)
 
 
-def test_remove_modifier(schema, event_logger, read_emitted_event):
+def test_remove_modifier(schema, jp_event_logger, jp_read_emitted_event):
+    event_logger = jp_event_logger
+
     def redactor(schema_id: str, data: dict) -> dict:
         if "username" in data:
             data["username"] = "<masked>"
@@ -127,7 +111,7 @@ def test_remove_modifier(schema, event_logger, read_emitted_event):
     assert len(event_logger._modifiers) == 1
 
     event_logger.emit(schema_id=schema.id, data={"username": "jovyan"})
-    output = read_emitted_event()
+    output = jp_read_emitted_event()
 
     assert "username" in output
     assert output["username"] == "<masked>"
@@ -135,7 +119,7 @@ def test_remove_modifier(schema, event_logger, read_emitted_event):
     event_logger.remove_modifier(modifier=redactor)
 
     event_logger.emit(schema_id=schema.id, data={"username": "jovyan"})
-    output = read_emitted_event()
+    output = jp_read_emitted_event()
 
     assert "username" in output
     assert output["username"] == "jovyan"
