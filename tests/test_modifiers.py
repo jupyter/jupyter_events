@@ -1,7 +1,3 @@
-import io
-import json
-import logging
-
 import pytest
 
 from jupyter_events.logger import EventLogger, ModifierError
