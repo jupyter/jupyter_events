@@ -18,7 +18,7 @@ def jp_event_schemas(schema):
     return [schema]
 
 
-def test_modifier_function(schema, jp_event_logger, jp_read_emitted_event):
+def test_modifier_function(schema, jp_event_logger, jp_read_emitted_events):
     event_logger = jp_event_logger
 
     def redactor(schema_id: str, data: dict) -> dict:
@@ -29,12 +29,12 @@ def test_modifier_function(schema, jp_event_logger, jp_read_emitted_event):
     # Add the modifier
     event_logger.add_modifier(modifier=redactor)
     event_logger.emit(schema_id=schema.id, data={"username": "jovyan"})
-    output = jp_read_emitted_event()
+    output = jp_read_emitted_events()[0]
     assert "username" in output
     assert output["username"] == "<masked>"
 
 
-def test_modifier_method(schema, jp_event_logger, jp_read_emitted_event):
+def test_modifier_method(schema, jp_event_logger, jp_read_emitted_events):
     event_logger = jp_event_logger
 
     class Redactor:
@@ -49,7 +49,7 @@ def test_modifier_method(schema, jp_event_logger, jp_read_emitted_event):
     event_logger.add_modifier(modifier=redactor.redact)
 
     event_logger.emit(schema_id=schema.id, data={"username": "jovyan"})
-    output = jp_read_emitted_event()
+    output = jp_read_emitted_events()[0]
     assert "username" in output
     assert output["username"] == "<masked>"
 
@@ -93,7 +93,7 @@ def test_modifier_without_annotations():
         logger.add_modifier(modifier=modifier_with_extra_args)
 
 
-def test_remove_modifier(schema, jp_event_logger, jp_read_emitted_event):
+def test_remove_modifier(schema, jp_event_logger, jp_read_emitted_events):
     event_logger = jp_event_logger
 
     def redactor(schema_id: str, data: dict) -> dict:
@@ -107,7 +107,7 @@ def test_remove_modifier(schema, jp_event_logger, jp_read_emitted_event):
     assert len(event_logger._modifiers) == 1
 
     event_logger.emit(schema_id=schema.id, data={"username": "jovyan"})
-    output = jp_read_emitted_event()
+    output = jp_read_emitted_events()[0]
 
     assert "username" in output
     assert output["username"] == "<masked>"
@@ -115,7 +115,7 @@ def test_remove_modifier(schema, jp_event_logger, jp_read_emitted_event):
     event_logger.remove_modifier(modifier=redactor)
 
     event_logger.emit(schema_id=schema.id, data={"username": "jovyan"})
-    output = jp_read_emitted_event()
+    output = jp_read_emitted_events()[0]
 
     assert "username" in output
     assert output["username"] == "jovyan"

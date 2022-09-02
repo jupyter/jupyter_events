@@ -20,12 +20,13 @@ def jp_event_handler(jp_event_sink):
 
 
 @pytest.fixture
-def jp_read_emitted_event(jp_event_handler, jp_event_sink):
-    """Reads the last event emitted by the event_logger fixture"""
+def jp_read_emitted_events(jp_event_handler, jp_event_sink):
+    """Reads list of events since last time it was called."""
 
     def _read():
         jp_event_handler.flush()
-        output = json.loads(jp_event_sink.getvalue())
+        lines = jp_event_sink.getvalue().strip().split("\n")
+        output = [json.loads(item) for item in lines]
         # Clear the sink.
         jp_event_sink.truncate(0)
         jp_event_sink.seek(0)
