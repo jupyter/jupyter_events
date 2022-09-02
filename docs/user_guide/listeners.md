@@ -1,17 +1,17 @@
 # Adding event listeners
 
-Event listeners are callback functions/methods that are executed when an event is emitted.
+Event listeners are asynchronous callback functions/methods that are triggered when an event is emitted.
 
 Listeners can be used by extension authors to trigger custom logic every time an event occurs.
 
 ## Basic usage
 
-Define a listener function:
+Define a listener (async) function:
 
 ```python
 from jupyter_events.logger import EventLogger
 
-def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
+async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
     print("hello, from my listener")
 ```
 
