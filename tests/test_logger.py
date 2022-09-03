@@ -2,6 +2,7 @@ import io
 import json
 import logging
 from datetime import datetime, timedelta
+from unittest.mock import MagicMock
 
 import jsonschema
 import pytest
@@ -349,3 +350,83 @@ def test_register_duplicate_schemas():
     el.register_event_schema(schema0)
     with pytest.raises(SchemaRegistryException):
         el.register_event_schema(schema1)
+
+
+async def test_noop_emit():
+    """Tests that the emit method returns
+    immediately if no handlers are listeners
+    are mapped to the incoming event. This
+    is important for performance.
+    """
+    el = EventLogger()
+    # The `emit` method calls `validate_event` if
+    # it doesn't return immediately. We'll use the
+    # MagicMock here to see if/when this method is called
+    # to ensure `emit` is returning when it should.
+    el.schemas.validate_event = MagicMock(name="validate_event")
+
+    schema_id1 = "test/test"
+    schema1 = {
+        "$id": schema_id1,
+        "version": 1,
+        "type": "object",
+        "properties": {
+            "something": {
+                "type": "string",
+                "title": "test",
+            },
+        },
+    }
+    schema_id2 = "test/test2"
+    schema2 = {
+        "$id": schema_id2,
+        "version": 1,
+        "type": "object",
+        "properties": {
+            "something_elss": {
+                "type": "string",
+                "title": "test",
+            },
+        },
+    }
+    el.register_event_schema(schema1)
+    el.register_event_schema(schema2)
+
+    # No handlers or listeners are registered
+    # So the validate_event method should not
+    # be called.
+    el.emit(schema_id=schema_id1, data={"something": "hello"})
+
+    el.schemas.validate_event.assert_not_called()
+
+    # Register a handler and check that .emit
+    # validates the method.
+    handler = logging.StreamHandler()
+    el.register_handler(handler)
+
+    el.emit(schema_id=schema_id1, data={"something": "hello"})
+
+    el.schemas.validate_event.assert_called_once()
+
+    # Reset
+    el.remove_handler(handler)
+    el.schemas.validate_event.reset_mock()
+    assert el.schemas.validate_event.call_count == 0
+
+    # Create a listener and check that emit works
+
+    async def listener(logger: EventLogger, schema_id: str, data: dict) -> None:
+        return None
+
+    el.add_listener(schema_id=schema_id1, listener=listener)
+
+    el.emit(schema_id=schema_id1, data={"something": "hello"})
+
+    el.schemas.validate_event.assert_called_once()
+    el.schemas.validate_event.reset_mock()
+    assert el.schemas.validate_event.call_count == 0
+
+    # Emit a different event with no listeners or
+    # handlers and make sure it returns immediately.
+    el.emit(schema_id=schema_id2, data={"something_else": "hello again"})
+    el.schemas.validate_event.assert_not_called()

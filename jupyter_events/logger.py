@@ -283,7 +283,7 @@ class EventLogger(LoggingConfigurable):
             raise ListenerError(
                 "Listeners are required to follow an exact function/method "
                 "signature. The signature should look like:"
-                f"\n\n\tdef my_listener{expected_signature}:\n\n"
+                f"\n\n\tasync def my_listener{expected_signature}:\n\n"
                 "Check that you are using type annotations for each argument "
                 "and the return value."
             )
@@ -336,8 +336,8 @@ class EventLogger(LoggingConfigurable):
         # If no handlers are routing these events, there's no need to proceed.
         if (
             not self.handlers
-            and not self._modified_listeners
-            and not self._unmodified_listeners
+            and not self._modified_listeners[schema_id]
+            and not self._unmodified_listeners[schema_id]
         ):
             return
 
