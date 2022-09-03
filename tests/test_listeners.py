@@ -17,13 +17,12 @@ def schema():
 
 
 @pytest.fixture
-def event_logger(schema):
-    logger = EventLogger()
-    logger.register_event_schema(schema)
-    return logger
+def jp_event_schemas(schema):
+    return [schema]
 
 
-async def test_listener_function(event_logger, schema):
+async def test_listener_function(jp_event_logger, schema):
+    event_logger = jp_event_logger
     global listener_was_called
     listener_was_called = False
 
@@ -40,7 +39,8 @@ async def test_listener_function(event_logger, schema):
     assert len(event_logger._active_listeners) == 0
 
 
-async def test_remove_listener_function(event_logger, schema):
+async def test_remove_listener_function(jp_event_logger, schema):
+    event_logger = jp_event_logger
     global listener_was_called
     listener_was_called = False
 
@@ -62,7 +62,9 @@ async def test_remove_listener_function(event_logger, schema):
     assert len(event_logger._unmodified_listeners[schema.id]) == 0
 
 
-async def test_bad_listener_function_signature(event_logger, schema):
+async def test_bad_listener_function_signature(jp_event_logger, schema):
+    event_logger = jp_event_logger
+
     async def listener_with_extra_args(
         logger: EventLogger, schema_id: str, data: dict, unknown_arg: dict
     ) -> None:
@@ -78,7 +80,9 @@ async def test_bad_listener_function_signature(event_logger, schema):
     assert len(event_logger._unmodified_listeners[schema.id]) == 0
 
 
-async def test_listener_that_raises_exception(event_logger, schema):
+async def test_listener_that_raises_exception(jp_event_logger, schema):
+    event_logger = jp_event_logger
+
     # Get an application logger that will show the exception
     app_log = event_logger.log
     log_stream = io.StringIO()
@@ -103,7 +107,9 @@ async def test_listener_that_raises_exception(event_logger, schema):
     assert len(event_logger._active_listeners) == 0
 
 
-async def test_bad_listener_does_not_break_good_listener(event_logger, schema):
+async def test_bad_listener_does_not_break_good_listener(jp_event_logger, schema):
+    event_logger = jp_event_logger
+
     # Get an application logger that will show the exception
     app_log = event_logger.log
     log_stream = io.StringIO()

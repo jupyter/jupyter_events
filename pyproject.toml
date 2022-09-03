@@ -88,3 +88,9 @@ default = ""
 [[tool.tbump.field]]
 name = "release"
 default = ""
+
+[tool.pytest.ini_options]
+addopts = "-raXs --durations 10 --color=yes --doctest-modules"
+testpaths = [
+    "tests/"
+]
