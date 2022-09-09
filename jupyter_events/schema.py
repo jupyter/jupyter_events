@@ -6,7 +6,7 @@ from jsonschema import FormatChecker, validators
 from jsonschema.protocols import Validator
 
 from . import yaml
-from .validators import validate_schema
+from .validators import draft7_format_checker, validate_schema
 
 
 class EventSchemaUnrecognized(Exception):
@@ -47,7 +47,7 @@ class EventSchema:
         self,
         schema: Union[dict, str, PurePath],
         validator_class: Validator = validators.Draft7Validator,
-        format_checker: FormatChecker = validators.Draft7Validator.FORMAT_CHECKER,
+        format_checker: FormatChecker = draft7_format_checker,
         resolver=None,
     ):
         _schema = self._load_schema(schema)

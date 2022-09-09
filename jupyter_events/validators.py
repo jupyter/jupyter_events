@@ -1,6 +1,13 @@
 import pathlib
 
+import jsonschema
 from jsonschema import Draft7Validator, RefResolver, ValidationError
+
+draft7_format_checker = (
+    Draft7Validator.FORMAT_CHECKER
+    if hasattr(Draft7Validator, "FORMAT_CHECKER")
+    else jsonschema.draft7_format_checker
+)
 
 from . import yaml
 
@@ -28,13 +35,13 @@ METASCHEMA_RESOLVER = RefResolver(
 JUPYTER_EVENTS_SCHEMA_VALIDATOR = Draft7Validator(
     schema=EVENT_METASCHEMA,
     resolver=METASCHEMA_RESOLVER,
-    format_checker=Draft7Validator.FORMAT_CHECKER,
+    format_checker=draft7_format_checker,
 )
 
 JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator(
     schema=EVENT_CORE_SCHEMA,
     resolver=METASCHEMA_RESOLVER,
-    format_checker=Draft7Validator.FORMAT_CHECKER,
+    format_checker=draft7_format_checker,
 )
 
 
