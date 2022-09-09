@@ -241,7 +241,7 @@ def test_emit_badschema():
             schema_id="http://test/test", data={"something": "blah", "status": "hi"}
         )
 
-    assert "not-in-enum" in str(excinfo.value)
+    assert "'hi' is not one of" in str(excinfo.value)
 
 
 def test_emit_badschema_format():
@@ -264,35 +264,6 @@ def test_emit_badschema_format():
         el.emit(schema_id="http://test/test", data={"something": "chucknorris"})
 
     assert "'chucknorris' is not a 'date-time'" in str(excinfo.value)
-
-
-def test_emit_badschema():
-    """
-    Fail fast when an event doesn't conform to its schema
-    """
-    schema = {
-        "$id": "http://test/test",
-        "version": 1,
-        "type": "object",
-        "properties": {
-            "something": {
-                "type": "string",
-                "title": "test",
-            },
-            "status": {
-                "enum": ["success", "failure"],
-                "title": "test 2",
-            },
-        },
-    }
-
-    el = EventLogger(handlers=[logging.NullHandler()])
-    el.register_event_schema(schema)
-
-    with pytest.raises(jsonschema.ValidationError):
-        el.emit(
-            schema_id="http://test/test", data={"something": "blah", "status": "hi"}
-        )  # 'not-in-enum'
 
 
 def test_unique_logger_instances():
