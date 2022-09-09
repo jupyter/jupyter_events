@@ -19,6 +19,7 @@ console = Console()
 
 
 @click.group()
+@click.version_option()
 def main():
     """A simple CLI tool to quickly validate JSON schemas against
     Jupyter Event's custom validator.

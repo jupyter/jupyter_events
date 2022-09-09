@@ -47,6 +47,8 @@ jupyter-events = "jupyter_events.cli:main"
 test = [
     "coverage",
     "pre-commit",
+    "pytest-asyncio",
+    "pytest-console-scripts",
     "pytest-cov",
     "pytest>=6.0",
 ]
@@ -94,3 +96,5 @@ addopts = "-raXs --durations 10 --color=yes --doctest-modules"
 testpaths = [
     "tests/"
 ]
+asyncio_mode = "auto"
+script_launch_mode = "subprocess"
