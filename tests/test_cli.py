@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 import jupyter_events
@@ -12,6 +14,10 @@ VALIDATE = NAME, "validate"
 @pytest.fixture
 def cli(script_runner):
     def run_cli(*args, **kwargs):
+        env = dict(os.environ)
+        env.update(kwargs.pop("env", {}))
+        env["PYTHONIOENCODING"] = "utf-8"
+        kwargs["env"] = env
         return script_runner.run(NAME, *map(str, args), **kwargs)
 
     return run_cli
