@@ -5,18 +5,18 @@ from yaml import dump as ydump
 from yaml import load as yload
 
 try:
-    from yaml import CDumper as Dumper
-    from yaml import CLoader as Loader
+    from yaml import CSafeDumper as SafeDumper
+    from yaml import CSafeLoader as SafeLoader
 except ImportError:
-    from yaml import Dumper, Loader
+    from yaml import SafeDumper, SafeLoader
 
 
 def loads(stream):
-    return yload(stream, Loader=Loader)
+    return yload(stream, Loader=SafeLoader)
 
 
 def dumps(stream):
-    return ydump(stream, Dumper=Dumper)
+    return ydump(stream, Dumper=SafeDumper)
 
 
 def load(fpath):
