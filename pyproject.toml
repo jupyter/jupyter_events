@@ -48,7 +48,7 @@ test = [
     "click",
     "coverage",
     "pre-commit",
-    "pytest-asyncio",
+    "pytest-asyncio>=0.19.0",
     "pytest-console-scripts",
     "pytest-cov",
     "pytest>=6.0",
