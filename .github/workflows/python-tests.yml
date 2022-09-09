@@ -29,8 +29,11 @@ jobs:
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - name: Install the Python dependencies
         run: |
-          pip install -e ".[test]" codecov
+          pip install -e ".[test,cli]" codecov
+      - name: List and check the Python dependencies
+        run: |
           pip list
+          pip check
       - name: Run the tests
         if: ${{ !startsWith(matrix.python-version, 'pypy') && !startsWith(matrix.os, 'windows') }}
         run: |
