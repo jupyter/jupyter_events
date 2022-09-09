@@ -122,6 +122,7 @@ jobs:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - uses: jupyterlab/maintainer-tools/.github/actions/test-sdist@v1
         with:
+          package_spec: '--editable ."[test,cli]"'
           test_command: pytest -vv || pytest -vv --lf
 
   python_tests_check: # This job does nothing and is only used for the branch protection
