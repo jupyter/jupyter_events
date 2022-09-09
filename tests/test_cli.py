@@ -10,7 +10,7 @@ VALIDATE = NAME, "validate"
 def test_cli_version(script_runner):
     ret = script_runner.run(NAME, "--version")
     assert ret.success
-    assert ret.stdout.strip() == f"f{NAME}, version {jupyter_events.__version__}"
+    assert ret.stdout.strip() == f"{NAME}, version {jupyter_events.__version__}"
 
 
 def test_cli_help(script_runner):
