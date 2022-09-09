@@ -57,7 +57,7 @@ pip install "jupyter_events[cli]"
 Then, run the CLI against your schema:
 
 ```
-jupyter events validate path/to/my_schema.json
+jupyter-events validate path/to/my_schema.json
 ```
 
 The output will look like this, if it passes:
