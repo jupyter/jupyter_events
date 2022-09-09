@@ -24,7 +24,6 @@ patternProperties:
     type: string
     format: uri
 
-
 required:
   - $id
   - version
