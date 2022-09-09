@@ -1,5 +1,6 @@
 import json
 import pathlib
+import platform
 
 import click
 from jsonschema import ValidationError
@@ -15,8 +16,7 @@ from jupyter_events.schema import (
     EventSchemaLoadingError,
 )
 
-console = Console()
-error_console = Console(stderr=True)
+WIN = platform.system() == "Windows"
 
 
 class RC:
@@ -24,6 +24,15 @@ class RC:
     INVALID = 1
     UNPARSEABLE = 2
     NOT_FOUND = 3
+
+
+class EMOJI:
+    X = "XX" if WIN else "\u274c"
+    OK = "OK" if WIN else "\u2714"
+
+
+console = Console()
+error_console = Console(stderr=True)
 
 
 @click.group()
@@ -77,14 +86,14 @@ def validate(ctx: click.Context, schema: str):
         EventSchema(_schema)
         console.rule("Results", style=Style(color="green"))
         out = Padding(
-            "[green]\u2714[white] Nice work! This schema is valid.", (1, 0, 1, 0)
+            f"[green]{EMOJI.OK}[white] Nice work! This schema is valid.", (1, 0, 1, 0)
         )
         console.print(out)
         return ctx.exit(RC.OK)
     except ValidationError as err:
         error_console.rule("Results", style=Style(color="red"))
-        error_console.print("[red]\u274c [white]The schema failed to validate.\n")
-        error_console.print("We found the following error with your schema:")
+        error_console.print(f"[red]{EMOJI.X} [white]The schema failed to validate.")
+        error_console.print("\nWe found the following error with your schema:")
         out = escape(str(err))
         error_console.print(Padding(out, (1, 0, 1, 4)))
         return ctx.exit(RC.INVALID)
