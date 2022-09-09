@@ -19,6 +19,11 @@ properties:
       $ref: http://event.jupyter.org/property-metaschema
     propertyNames:
       pattern: ^(?!__.*)
+patternProperties:
+  "\\$id":
+    type: string
+    format: uri
+
 
 required:
   - $id

@@ -2,7 +2,7 @@ import json
 from pathlib import Path, PurePath
 from typing import Union
 
-from jsonschema import validators
+from jsonschema import FormatChecker, validators
 from jsonschema.protocols import Validator
 
 from . import yaml
@@ -47,13 +47,16 @@ class EventSchema:
         self,
         schema: Union[dict, str, PurePath],
         validator_class: Validator = validators.Draft7Validator,
+        format_checker: FormatChecker = validators.Draft7Validator.FORMAT_CHECKER,
         resolver=None,
     ):
         _schema = self._load_schema(schema)
         # Validate the schema against Jupyter Events metaschema.
         validate_schema(_schema)
         # Create a validator for this schema
-        self._validator = validator_class(_schema, resolver=resolver)
+        self._validator = validator_class(
+            _schema, resolver=resolver, format_checker=format_checker
+        )
         self._schema = _schema
 
     def __repr__(self):

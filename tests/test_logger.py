@@ -98,7 +98,7 @@ def test_timestamp_override():
     Simple test for overriding timestamp
     """
     schema = {
-        "$id": "test/test",
+        "$id": "http://test/test",
         "version": 1,
         "properties": {
             "something": {
@@ -116,7 +116,7 @@ def test_timestamp_override():
     timestamp_override = datetime.utcnow() - timedelta(days=1)
 
     el.emit(
-        schema_id="test/test",
+        schema_id="http://test/test",
         data={"something": "blah"},
         timestamp_override=timestamp_override,
     )
@@ -130,7 +130,7 @@ def test_emit():
     Simple test for emitting valid events
     """
     schema = {
-        "$id": "test/test",
+        "$id": "http://test/test",
         "version": 1,
         "properties": {
             "something": {
@@ -146,7 +146,7 @@ def test_emit():
     el.register_event_schema(schema)
 
     el.emit(
-        schema_id="test/test",
+        schema_id="http://test/test",
         data={
             "something": "blah",
         },
@@ -159,7 +159,7 @@ def test_emit():
     # Remove timestamp from capsule when checking equality, since it is gonna vary
     del event_capsule["__timestamp__"]
     assert event_capsule == {
-        "__schema__": "test/test",
+        "__schema__": "http://test/test",
         "__schema_version__": 1,
         "__metadata_version__": 1,
         "something": "blah",
@@ -171,7 +171,7 @@ def test_register_event_schema(tmp_path):
     Register schema from a file
     """
     schema = {
-        "$id": "test/test",
+        "$id": "http://test/test",
         "version": 1,
         "type": "object",
         "properties": {
@@ -186,7 +186,7 @@ def test_register_event_schema(tmp_path):
     schema_file = tmp_path.joinpath("schema.yml")
     yaml.dump(schema, schema_file)
     el.register_event_schema(schema_file)
-    assert "test/test" in el.schemas
+    assert "http://test/test" in el.schemas
 
 
 def test_register_event_schema_object(tmp_path):
@@ -194,7 +194,7 @@ def test_register_event_schema_object(tmp_path):
     Register schema from a file
     """
     schema = {
-        "$id": "test/test",
+        "$id": "http://test/test",
         "version": 1,
         "type": "object",
         "properties": {
@@ -210,7 +210,7 @@ def test_register_event_schema_object(tmp_path):
     yaml.dump(schema, schema_file)
     el.register_event_schema(schema_file)
 
-    assert "test/test" in el.schemas
+    assert "http://test/test" in el.schemas
 
 
 def test_emit_badschema():
@@ -218,7 +218,7 @@ def test_emit_badschema():
     Fail fast when an event doesn't conform to its schema
     """
     schema = {
-        "$id": "test/test",
+        "$id": "http://test/test",
         "version": 1,
         "type": "object",
         "properties": {
@@ -235,17 +235,69 @@ def test_emit_badschema():
 
     el = EventLogger(handlers=[logging.NullHandler()])
     el.register_event_schema(schema)
-    el.allowed_schemas = ["test/test"]
+
+    with pytest.raises(jsonschema.ValidationError) as excinfo:
+        el.emit(
+            schema_id="http://test/test", data={"something": "blah", "status": "hi"}
+        )
+
+    assert "not-in-enum" in str(excinfo.value)
+
+
+def test_emit_badschema_format():
+    """
+    Fail fast when an event doesn't conform to a specific format
+    """
+    schema = {
+        "$id": "http://test/test",
+        "version": 1,
+        "type": "object",
+        "properties": {
+            "something": {"type": "string", "title": "test", "format": "date-time"},
+        },
+    }
+
+    el = EventLogger(handlers=[logging.NullHandler()])
+    el.register_event_schema(schema)
+
+    with pytest.raises(jsonschema.ValidationError) as excinfo:
+        el.emit(schema_id="http://test/test", data={"something": "chucknorris"})
+
+    assert "'chucknorris' is not a 'date-time'" in str(excinfo.value)
+
+
+def test_emit_badschema():
+    """
+    Fail fast when an event doesn't conform to its schema
+    """
+    schema = {
+        "$id": "http://test/test",
+        "version": 1,
+        "type": "object",
+        "properties": {
+            "something": {
+                "type": "string",
+                "title": "test",
+            },
+            "status": {
+                "enum": ["success", "failure"],
+                "title": "test 2",
+            },
+        },
+    }
+
+    el = EventLogger(handlers=[logging.NullHandler()])
+    el.register_event_schema(schema)
 
     with pytest.raises(jsonschema.ValidationError):
         el.emit(
-            schema_id="test/test", data={"something": "blah", "status": "hi"}
+            schema_id="http://test/test", data={"something": "blah", "status": "hi"}
         )  # 'not-in-enum'
 
 
 def test_unique_logger_instances():
     schema0 = {
-        "$id": "test/test0",
+        "$id": "http://test/test0",
         "version": 1,
         "type": "object",
         "properties": {
@@ -257,7 +309,7 @@ def test_unique_logger_instances():
     }
 
     schema1 = {
-        "$id": "test/test1",
+        "$id": "http://test/test1",
         "version": 1,
         "type": "object",
         "properties": {
@@ -275,20 +327,18 @@ def test_unique_logger_instances():
 
     el0 = EventLogger(handlers=[handler0])
     el0.register_event_schema(schema0)
-    el0.allowed_schemas = ["test/test0"]
 
     el1 = EventLogger(handlers=[handler1])
     el1.register_event_schema(schema1)
-    el1.allowed_schemas = ["test/test1"]
 
     el0.emit(
-        schema_id="test/test0",
+        schema_id="http://test/test0",
         data={
             "something": "blah",
         },
     )
     el1.emit(
-        schema_id="test/test1",
+        schema_id="http://test/test1",
         data={
             "something": "blah",
         },
@@ -302,7 +352,7 @@ def test_unique_logger_instances():
     # Remove timestamp from capsule when checking equality, since it is gonna vary
     del event_capsule0["__timestamp__"]
     assert event_capsule0 == {
-        "__schema__": "test/test0",
+        "__schema__": "http://test/test0",
         "__schema_version__": 1,
         "__metadata_version__": 1,
         "something": "blah",
@@ -314,7 +364,7 @@ def test_unique_logger_instances():
     # Remove timestamp from capsule when checking equality, since it is gonna vary
     del event_capsule1["__timestamp__"]
     assert event_capsule1 == {
-        "__schema__": "test/test1",
+        "__schema__": "http://test/test1",
         "__schema_version__": 1,
         "__metadata_version__": 1,
         "something": "blah",
@@ -323,7 +373,7 @@ def test_unique_logger_instances():
 
 def test_register_duplicate_schemas():
     schema0 = {
-        "$id": "test/test",
+        "$id": "http://test/test",
         "version": 1,
         "type": "object",
         "properties": {
@@ -335,7 +385,7 @@ def test_register_duplicate_schemas():
     }
 
     schema1 = {
-        "$id": "test/test",
+        "$id": "http://test/test",
         "version": 1,
         "type": "object",
         "properties": {
@@ -365,7 +415,7 @@ async def test_noop_emit():
     # to ensure `emit` is returning when it should.
     el.schemas.validate_event = MagicMock(name="validate_event")
 
-    schema_id1 = "test/test"
+    schema_id1 = "http://test/test"
     schema1 = {
         "$id": schema_id1,
         "version": 1,
@@ -377,7 +427,7 @@ async def test_noop_emit():
             },
         },
     }
-    schema_id2 = "test/test2"
+    schema_id2 = "http://test/test2"
     schema2 = {
         "$id": schema_id2,
         "version": 1,

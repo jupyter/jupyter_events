@@ -18,6 +18,7 @@ from .utils import SCHEMA_PATH
 BAD_SCHEMAS = [
     ["reserved-property.yaml", "Properties starting with 'dunder'"],
     ["nested-reserved-property.yaml", "Properties starting with 'dunder'"],
+    ["bad-id.yaml", "'not-a-uri' is not a 'uri'"],
 ]
 
 GOOD_SCHEMAS = ["array.yaml", "nested-array.yaml", "basic.yaml"]

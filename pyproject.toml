@@ -25,7 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "jsonschema>=4.3.0",
+    "jsonschema[formats-nongpl]>=4.3.0",
     "python-json-logger",
     "pyyaml",
     "traitlets",

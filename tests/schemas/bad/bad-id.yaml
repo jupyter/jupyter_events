@@ -1,0 +1,11 @@
+$id: not-a-uri
+version: 1
+title: Schema with a Bad URI ID
+description: |
+  A schema with a bad id
+type: object
+properties:
+  bad:
+    title: Test Property
+    description: Test property.
+    type: string
