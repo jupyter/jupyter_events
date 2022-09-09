@@ -1,5 +1,6 @@
 import json
 import pathlib
+import platform
 
 import click
 from jsonschema import ValidationError
@@ -15,10 +16,27 @@ from jupyter_events.schema import (
     EventSchemaLoadingError,
 )
 
+WIN = platform.system() == "Windows"
+
+
+class RC:
+    OK = 0
+    INVALID = 1
+    UNPARSEABLE = 2
+    NOT_FOUND = 3
+
+
+class EMOJI:
+    X = "XX" if WIN else "\u274c"
+    OK = "OK" if WIN else "\u2714"
+
+
 console = Console()
+error_console = Console(stderr=True)
 
 
 @click.group()
+@click.version_option()
 def main():
     """A simple CLI tool to quickly validate JSON schemas against
     Jupyter Event's custom validator.
@@ -32,7 +50,8 @@ def main():
 
 @click.command()
 @click.argument("schema")
-def validate(schema: str):
+@click.pass_context
+def validate(ctx: click.Context, schema: str):
     """Validate a SCHEMA against Jupyter Event's meta schema.
 
     SCHEMA can be a JSON/YAML string or filepath to a schema.
@@ -56,8 +75,8 @@ def validate(schema: str):
         except (EventSchemaLoadingError, EventSchemaFileAbsent) as e:
             # no need for full tracestack for user error exceptions. just print
             # the error message and return
-            console.log(f"[bold red]ERROR[/]: {e}")
-            return
+            error_console.print(f"[bold red]ERROR[/]: {e}")
+            return ctx.exit(RC.UNPARSEABLE)
 
     # Print what was found.
     schema_json = JSON(json.dumps(_schema))
@@ -67,15 +86,17 @@ def validate(schema: str):
         EventSchema(_schema)
         console.rule("Results", style=Style(color="green"))
         out = Padding(
-            "[green]\u2714[white] Nice work! This schema is valid.", (1, 0, 1, 0)
+            f"[green]{EMOJI.OK}[white] Nice work! This schema is valid.", (1, 0, 1, 0)
         )
         console.print(out)
+        return ctx.exit(RC.OK)
     except ValidationError as err:
-        console.rule("Results", style=Style(color="red"))
-        console.print("[red]\u274c [white]The schema failed to validate.\n")
-        console.print("We found the following error with your schema:")
+        error_console.rule("Results", style=Style(color="red"))
+        error_console.print(f"[red]{EMOJI.X} [white]The schema failed to validate.")
+        error_console.print("\nWe found the following error with your schema:")
         out = escape(str(err))
-        console.print(Padding(out, (1, 0, 1, 4)))
+        error_console.print(Padding(out, (1, 0, 1, 4)))
+        return ctx.exit(RC.INVALID)
 
 
 main.add_command(validate)
