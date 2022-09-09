@@ -45,12 +45,14 @@ jupyter-events = "jupyter_events.cli:main"
 
 [project.optional-dependencies]
 test = [
+    "click",
     "coverage",
     "pre-commit",
     "pytest-asyncio",
     "pytest-console-scripts",
     "pytest-cov",
     "pytest>=6.0",
+    "rich",
 ]
 cli = [
     "click",
