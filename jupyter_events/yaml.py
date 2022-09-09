@@ -21,9 +21,9 @@ def dumps(stream):
 
 def load(fpath):
     # coerce PurePath into Path, then read its contents
-    data = Path(str(fpath)).read_text()
+    data = Path(str(fpath)).read_text(encoding="utf-8")
     return loads(data)
 
 
 def dump(data, outpath):
-    Path(outpath).write_text(dumps(data))
+    Path(outpath).write_text(dumps(data), encoding="utf-8")
