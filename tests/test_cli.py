@@ -37,6 +37,14 @@ def test_cli_good(cli):
     assert "This schema is valid" in ret.stdout
 
 
+def test_cli_good_raw(cli):
+    """jupyter events validate path/to/my_schema.json"""
+    ret = cli("validate", (SCHEMA_PATH / "good/array.yaml").read_text(encoding="utf-8"))
+    assert ret.success
+    assert not ret.stderr.strip()
+    assert "This schema is valid" in ret.stdout
+
+
 def test_cli_missing(cli):
     ret = cli("validate", SCHEMA_PATH / "bad/doesnt-exist.yaml")
     assert not ret.success

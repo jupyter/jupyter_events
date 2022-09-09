@@ -7,7 +7,7 @@ from yaml import load as yload
 try:
     from yaml import CSafeDumper as SafeDumper
     from yaml import CSafeLoader as SafeLoader
-except ImportError:
+except ImportError:  # pragma: no cover
     from yaml import SafeDumper, SafeLoader
 
 
