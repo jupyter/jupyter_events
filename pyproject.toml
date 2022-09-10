@@ -51,8 +51,6 @@ test = [
     "pytest-console-scripts",
     "pytest-cov",
     "pytest>=6.1.0",
-    # dependencies, again, for minimum version test
-    "jsonschema[format-nongpl]",
     # [cli]
     "click",
     "rich",
