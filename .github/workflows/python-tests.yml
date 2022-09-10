@@ -79,6 +79,9 @@ jobs:
           python_version: "3.7"
       - name: Install miniumum versions
         uses: jupyterlab/maintainer-tools/.github/actions/install-minimums@v1
+      - name: Ensure jsonschema[format-nongpl,format_nongpl]
+        run: |
+          pip install jsonschema[format-nongpl,format_nongpl]
       - name: List installed packages
         run: |
           pip freeze
