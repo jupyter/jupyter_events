@@ -26,7 +26,7 @@ At a minimum, a valid Jupyter event schema requires the following keys:
 Beyond these required items, any valid JSON should be possible. Here is a simple example of a valid JSON schema for an event.
 
 ```yaml
-$id: event.jupyter.org/example-event
+$id: https://event.jupyter.org/example-event
 version: 1
 title: My Event
 description: |

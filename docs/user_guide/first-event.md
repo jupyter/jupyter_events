@@ -14,7 +14,7 @@ To begin emitting events from a Python application, you need to tell the `EventL
 
 ```python
 schema = """
-$id: myapplication.org/example-event
+$id: http://myapplication.org/example-event
 version: 1
 title: Example Event
 description: An interesting event to collect
@@ -45,7 +45,7 @@ The logger knows about the event and where to send it; all that's left is to emi
 from jupyter_events import Event
 
 logger.emit(
-      schema_id="myapplication.org/example-event",
+      schema_id="http://myapplication.org/example-event",
       data={
          "name": "My Event"
       }

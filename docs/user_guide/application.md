@@ -22,7 +22,7 @@ Register an event schema with the logger.
 
 ```python
         schema = """
-        $id: myapplication.org/my-method
+        $id: http://myapplication.org/my-method
         version: 1
         title: My Method Executed
         description: My method was executed one time.

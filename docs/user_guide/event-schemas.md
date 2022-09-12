@@ -12,7 +12,7 @@ _So what exactly happens when we register a schema?_
 from jupyter_events.logger import EventLogger
 
 schema = """
-$id: myapplication.org/example-event
+$id: http://myapplication.org/example-event
 version: 1
 title: Example Event
 description: An interesting event to collect

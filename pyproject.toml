@@ -25,7 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "jsonschema>=4.3.0",
+    "jsonschema[format-nongpl,format_nongpl]>=4.3.0",
     "python-json-logger",
     "pyyaml",
     "traitlets",
@@ -45,13 +45,14 @@ jupyter-events = "jupyter_events.cli:main"
 
 [project.optional-dependencies]
 test = [
-    "click",
     "coverage",
     "pre-commit",
     "pytest-asyncio>=0.19.0",
     "pytest-console-scripts",
     "pytest-cov",
     "pytest>=6.1.0",
+    # [cli]
+    "click",
     "rich",
 ]
 cli = [
@@ -61,6 +62,9 @@ cli = [
 
 [tool.hatch.version]
 path = "jupyter_events/_version.py"
+
+[tool.isort]
+profile = "black"
 
 [tool.tbump.version]
 current = "0.5.0.dev0"

@@ -11,12 +11,14 @@ from datetime import datetime
 from pathlib import PurePath
 from typing import Callable, Union
 
+from jsonschema import ValidationError
 from pythonjsonlogger import jsonlogger
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 
 from .schema_registry import SchemaRegistry
 from .traits import Handlers
+from .validators import JUPYTER_EVENTS_CORE_VALIDATOR
 
 # Increment this version when the metadata included with each event
 # changes.
@@ -33,6 +35,10 @@ class ModifierError(Exception):
     """An exception to raise when a modifier does not
     show the proper signature.
     """
+
+
+class CoreMetadataError(Exception):
+    """An exception raised when event core metadata is not valid."""
 
 
 # Only show this warning on the first instance
@@ -377,6 +383,11 @@ class EventLogger(LoggingConfigurable):
             "__schema_version__": schema.version,
             "__metadata_version__": EVENTS_METADATA_VERSION,
         }
+        try:
+            JUPYTER_EVENTS_CORE_VALIDATOR.validate(capsule)
+        except ValidationError as err:
+            raise CoreMetadataError from err
+
         capsule.update(modified_data)
 
         self._logger.info(capsule)
