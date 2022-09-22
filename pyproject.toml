@@ -1,7 +1,5 @@
 [build-system]
-requires = [
-    "hatchling>=1.3.0",
-]
+requires = ["hatchling>=1.5"]
 build-backend = "hatchling.build"
 
 [project]
@@ -63,39 +61,11 @@ cli = [
 [tool.hatch.version]
 path = "jupyter_events/_version.py"
 
+[tool.jupyter-releaser]
+skip = ["check-links"]
+
 [tool.isort]
 profile = "black"
-
-[tool.tbump.version]
-current = "0.6.0.dev0"
-regex = '''
-  (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)
-  ((?P<channel>a|b|rc|.dev)(?P<release>\d+))?
-'''
-
-[tool.tbump.git]
-message_template = "Bump to {new_version}"
-tag_template = "v{new_version}"
-
-[[tool.tbump.file]]
-src = "jupyter_events/_version.py"
-version_template = '({major}, {minor}, {patch}, "{channel}", "{release}")'
-
-[[tool.tbump.file]]
-src = "jupyter_events/_version.py"
-version_template = "{major}.{minor}.{patch}{channel}{release}"
-
-[[tool.tbump.file]]
-src = "pyproject.toml"
-version_template = "{major}.{minor}.{patch}{channel}{release}"
-
-[[tool.tbump.field]]
-name = "channel"
-default = ""
-
-[[tool.tbump.field]]
-name = "release"
-default = ""
 
 [tool.pytest.ini_options]
 addopts = "-raXs --durations 10 --color=yes --doctest-modules"
