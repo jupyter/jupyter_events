@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file.
 
 ### Maintenance and upkeep improvements
 
-- add jsonschema[format-nongpl], core event schema [#31](https://github.com/jupyter/jupyter_events/pull/31) ([@bollwyvl](https://github.com/bollwyvl))
+- add jsonschema\[format-nongpl\], core event schema [#31](https://github.com/jupyter/jupyter_events/pull/31) ([@bollwyvl](https://github.com/bollwyvl))
 - Add CLI tests, return codes, version [#30](https://github.com/jupyter/jupyter_events/pull/30) ([@bollwyvl](https://github.com/bollwyvl))
 - Set version floor on jsonchema [#25](https://github.com/jupyter/jupyter_events/pull/25) ([@kevin-bates](https://github.com/kevin-bates))
 - Testing that the `.emit` call is a no-op when no listeners are registered. [#24](https://github.com/jupyter/jupyter_events/pull/24) ([@Zsailer](https://github.com/Zsailer))
