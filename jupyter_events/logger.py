@@ -193,7 +193,9 @@ class EventLogger(LoggingConfigurable):
         # Now let's verify the function signature.
         signature = inspect.signature(modifier)
 
-        def modifier_signature(schema_id: str, data: dict) -> dict:  # type:ignore[empty-body]
+        def modifier_signature(
+            schema_id: str, data: dict
+        ) -> dict:  # type:ignore[empty-body]
             """Signature to enforce"""
             ...
 
