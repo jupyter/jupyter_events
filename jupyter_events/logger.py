@@ -195,7 +195,7 @@ class EventLogger(LoggingConfigurable):
 
         def modifier_signature(  # type:ignore[empty-body]
             schema_id: str, data: dict
-        ) -> dict:  
+        ) -> dict:
             """Signature to enforce"""
             ...
 
