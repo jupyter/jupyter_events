@@ -193,7 +193,7 @@ class EventLogger(LoggingConfigurable):
         # Now let's verify the function signature.
         signature = inspect.signature(modifier)
 
-        def modifier_signature(schema_id: str, data: dict) -> dict:
+        def modifier_signature(schema_id: str, data: dict) -> dict:  # type:ignore[empty-body]
             """Signature to enforce"""
             ...
 
@@ -218,7 +218,7 @@ class EventLogger(LoggingConfigurable):
             )
 
     def remove_modifier(
-        self, *, schema_id: str = None, modifier: Callable[[str, dict], dict]
+        self, *, schema_id: Optional[str] = None, modifier: Callable[[str, dict], dict]
     ) -> None:
         """Remove a modifier from an event or all events.
 
@@ -297,7 +297,7 @@ class EventLogger(LoggingConfigurable):
     def remove_listener(
         self,
         *,
-        schema_id: str = None,
+        schema_id: Optional[str] = None,
         listener: Callable[["EventLogger", str, dict], None],
     ) -> None:
         """Remove a listener from an event or all events.
