@@ -9,7 +9,7 @@ import logging
 import warnings
 from datetime import datetime
 from pathlib import PurePath
-from typing import Callable, Union, Optional
+from typing import Callable, Optional, Union
 
 from jsonschema import ValidationError
 from pythonjsonlogger import jsonlogger
