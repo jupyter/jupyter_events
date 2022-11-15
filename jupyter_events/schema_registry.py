@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from .schema import EventSchema
 
@@ -10,7 +10,7 @@ class SchemaRegistryException(Exception):
 class SchemaRegistry:
     """A convenient API for storing and searching a group of schemas."""
 
-    def __init__(self, schemas: dict = None):
+    def __init__(self, schemas: Optional[dict] = None):
         self._schemas = schemas or {}
 
     def __contains__(self, key: str):
