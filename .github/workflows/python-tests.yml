@@ -51,6 +51,16 @@ jobs:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - uses: jupyterlab/maintainer-tools/.github/actions/pre-commit@v1
 
+  jupyter_server_downstream:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/downstream-test@v1
+        with:
+          package_name: jupyter_server
+
   test_minimum_versions:
     name: Test Minimum Versions
     timeout-minutes: 20
@@ -87,8 +97,7 @@ jobs:
           python_version: "3.11"
       - name: Run the tests
         run: |
-          export PIP_PRE=1
-          hatch run test:nowarn || hatch run test:nowarn --lf
+          PIP_PRE=1 hatch run test:nowarn || hatch run test:nowarn --lf
 
   make_sdist:
     name: Make SDist
@@ -143,6 +152,7 @@ jobs:
       - check_release
       - test_minimum_versions
       - test_prereleases
+      - jupyter_server_downstream
       - test_sdist
       - check_links
     runs-on: ubuntu-latest
