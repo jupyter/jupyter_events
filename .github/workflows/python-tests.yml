@@ -73,7 +73,7 @@ jobs:
           dependency_type: minimum
       - name: Install with miniumum versions and optional deps
         run: |
-          pip install -e .
+          pip install -e .[test]
           pip install jsonschema[format-nongpl,format_nongpl]
       - name: List installed packages
         run: |
