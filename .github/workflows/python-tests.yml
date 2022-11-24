@@ -70,11 +70,10 @@ jobs:
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
-          python_version: "3.7"
-      - name: Install miniumum versions
-        uses: jupyterlab/maintainer-tools/.github/actions/install-minimums@v1
-      - name: Ensure jsonschema[format-nongpl,format_nongpl]
+          dependency_type: minimum
+      - name: Install with miniumum versions and optional deps
         run: |
+          pip install -e .[test]
           pip install jsonschema[format-nongpl,format_nongpl]
       - name: List installed packages
         run: |
@@ -94,10 +93,10 @@ jobs:
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
-          python_version: "3.11"
+          dependency_type: pre
       - name: Run the tests
         run: |
-          PIP_PRE=1 hatch run test:nowarn || hatch run test:nowarn --lf
+          hatch run test:nowarn || hatch run test:nowarn --lf
 
   make_sdist:
     name: Make SDist
