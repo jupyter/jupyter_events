@@ -111,6 +111,7 @@ addopts = "-raXs --durations 10 --color=yes --doctest-modules"
 testpaths = [
     "tests/"
 ]
+asyncio_mode = "auto"
 script_launch_mode = "subprocess"
 
 [tool.coverage.report]
