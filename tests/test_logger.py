@@ -237,9 +237,7 @@ def test_emit_badschema():
     el.register_event_schema(schema)
 
     with pytest.raises(jsonschema.ValidationError) as excinfo:
-        el.emit(
-            schema_id="http://test/test", data={"something": "blah", "status": "hi"}
-        )
+        el.emit(schema_id="http://test/test", data={"something": "blah", "status": "hi"})
 
     assert "'hi' is not one of" in str(excinfo.value)
 

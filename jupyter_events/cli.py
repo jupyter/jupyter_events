@@ -10,11 +10,7 @@ from rich.markup import escape
 from rich.padding import Padding
 from rich.style import Style
 
-from jupyter_events.schema import (
-    EventSchema,
-    EventSchemaFileAbsent,
-    EventSchemaLoadingError,
-)
+from jupyter_events.schema import EventSchema, EventSchemaFileAbsent, EventSchemaLoadingError
 
 WIN = platform.system() == "Windows"
 
@@ -85,16 +81,14 @@ def validate(ctx: click.Context, schema: str):
     try:
         EventSchema(_schema)
         console.rule("Results", style=Style(color="green"))
-        out = Padding(
-            f"[green]{EMOJI.OK}[white] Nice work! This schema is valid.", (1, 0, 1, 0)
-        )
+        out = Padding(f"[green]{EMOJI.OK}[white] Nice work! This schema is valid.", (1, 0, 1, 0))
         console.print(out)
         return ctx.exit(RC.OK)
     except ValidationError as err:
         error_console.rule("Results", style=Style(color="red"))
         error_console.print(f"[red]{EMOJI.X} [white]The schema failed to validate.")
         error_console.print("\nWe found the following error with your schema:")
-        out = escape(str(err))
+        out = escape(str(err))  # type:ignore
         error_console.print(Padding(out, (1, 0, 1, 4)))
         return ctx.exit(RC.INVALID)
 

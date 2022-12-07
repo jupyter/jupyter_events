@@ -48,9 +48,7 @@ def test_file_absent():
 def test_string_intended_as_path():
     """Ensure EventSchema returns a helpful error message if user passes a
     string intended as a Path."""
-    expected_msg_contents = (
-        "Paths to schema files must be explicitly wrapped in a Pathlib object."
-    )
+    expected_msg_contents = "Paths to schema files must be explicitly wrapped in a Pathlib object."
     str_path = os.path.join(SCHEMA_PATH, "good", "some_schema.yaml")
     with pytest.raises(EventSchemaLoadingError) as e:
         EventSchema(str_path)

@@ -89,9 +89,7 @@ async def test_listener_that_raises_exception(jp_event_logger, schema):
     h = logging.StreamHandler(log_stream)
     app_log.addHandler(h)
 
-    async def listener_raise_exception(
-        logger: EventLogger, schema_id: str, data: dict
-    ) -> None:
+    async def listener_raise_exception(logger: EventLogger, schema_id: str, data: dict) -> None:
         raise Exception("This failed")
 
     event_logger.add_listener(schema_id=schema.id, listener=listener_raise_exception)
@@ -119,9 +117,7 @@ async def test_bad_listener_does_not_break_good_listener(jp_event_logger, schema
     global listener_was_called
     listener_was_called = False
 
-    async def listener_raise_exception(
-        logger: EventLogger, schema_id: str, data: dict
-    ) -> None:
+    async def listener_raise_exception(logger: EventLogger, schema_id: str, data: dict) -> None:
         raise Exception("This failed")
 
     async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:

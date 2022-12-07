@@ -1,6 +1,6 @@
 import json
 from pathlib import Path, PurePath
-from typing import Union
+from typing import Type, Union
 
 from jsonschema import FormatChecker, validators
 from jsonschema.protocols import Validator
@@ -9,7 +9,7 @@ from . import yaml
 from .validators import draft7_format_checker, validate_schema
 
 
-class EventSchemaUnrecognized(Exception):
+class EventSchemaUnrecognized(Exception):  # noqa
     pass
 
 
@@ -17,7 +17,7 @@ class EventSchemaLoadingError(Exception):
     pass
 
 
-class EventSchemaFileAbsent(Exception):
+class EventSchemaFileAbsent(Exception):  # noqa
     pass
 
 
@@ -46,7 +46,7 @@ class EventSchema:
     def __init__(
         self,
         schema: Union[dict, str, PurePath],
-        validator_class: Validator = validators.Draft7Validator,
+        validator_class: Type[Validator] = validators.Draft7Validator,  # type:ignore
         format_checker: FormatChecker = draft7_format_checker,
         resolver=None,
     ):
@@ -54,9 +54,7 @@ class EventSchema:
         # Validate the schema against Jupyter Events metaschema.
         validate_schema(_schema)
         # Create a validator for this schema
-        self._validator = validator_class(
-            _schema, resolver=resolver, format_checker=format_checker
-        )
+        self._validator = validator_class(_schema, resolver=resolver, format_checker=format_checker)
         self._schema = _schema
 
     def __repr__(self):
@@ -78,9 +76,7 @@ class EventSchema:
         # detect whether the user specified a string but intended a PurePath to
         # generate a more helpful error message
         if was_str and intended_as_path(schema):
-            error_msg += (
-                " Paths to schema files must be explicitly wrapped in a Pathlib object."
-            )
+            error_msg += " Paths to schema files must be explicitly wrapped in a Pathlib object."
         else:
             error_msg += " Double check the schema and ensure it is in the proper form."
 
@@ -103,9 +99,7 @@ class EventSchema:
         # if schema is PurePath, ensure file exists at path and then load from file
         if isinstance(schema, PurePath):
             if not Path(schema).exists():
-                raise EventSchemaFileAbsent(
-                    f'Schema file not present at path "{schema}".'
-                )
+                raise EventSchemaFileAbsent(f'Schema file not present at path "{schema}".')
 
             loaded_schema = yaml.load(schema)
             EventSchema._ensure_yaml_loaded(loaded_schema)

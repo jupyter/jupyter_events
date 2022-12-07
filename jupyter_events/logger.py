@@ -12,7 +12,7 @@ from pathlib import PurePath
 from typing import Callable, Optional, Union
 
 from jsonschema import ValidationError
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger import jsonlogger  # type:ignore
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 
@@ -80,9 +80,7 @@ class EventLogger(LoggingConfigurable):
 
     _modifiers = Dict({}, help="A mapping of schemas to their list of modifiers.")
 
-    _modified_listeners = Dict(
-        {}, help="A mapping of schemas to the listeners of modified events."
-    )
+    _modified_listeners = Dict({}, help="A mapping of schemas to the listeners of modified events.")
 
     _unmodified_listeners = Dict(
         {}, help="A mapping of schemas to the listeners of unmodified/raw events."
@@ -266,9 +264,7 @@ class EventLogger(LoggingConfigurable):
 
         signature = inspect.signature(listener)
 
-        async def listener_signature(
-            logger: EventLogger, schema_id: str, data: dict
-        ) -> None:
+        async def listener_signature(logger: EventLogger, schema_id: str, data: dict) -> None:
             ...
 
         expected_signature = inspect.signature(listener_signature)
@@ -421,9 +417,7 @@ class EventLogger(LoggingConfigurable):
             task.add_done_callback(_listener_task_done)
 
         for listener in self._unmodified_listeners[schema_id]:
-            task = asyncio.create_task(
-                listener(logger=self, schema_id=schema_id, data=data)
-            )
+            task = asyncio.create_task(listener(logger=self, schema_id=schema_id, data=data))
             self._active_listeners.add(task)
 
             # Remove task from active listeners once its finished.
