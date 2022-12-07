@@ -21,9 +21,7 @@ class Handlers(TraitType):
     def element_error(self, obj):
         raise TraitError(
             "Elements in the '{}' trait of an {} instance "
-            "must be Python `logging` handler instances.".format(
-                self.name, obj.__class__.__name__
-            )
+            "must be Python `logging` handler instances.".format(self.name, obj.__class__.__name__)
         )
 
     def validate(self, obj, value):

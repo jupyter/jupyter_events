@@ -3,7 +3,7 @@ from typing import Optional, Union
 from .schema import EventSchema
 
 
-class SchemaRegistryException(Exception):
+class SchemaRegistryException(Exception):  # noqa
     """Exception class for Jupyter Events Schema Registry Errors."""
 
 
@@ -49,11 +49,11 @@ class SchemaRegistry:
         """
         try:
             return self._schemas[id]
-        except KeyError:
+        except KeyError as e:
             raise KeyError(
                 f"The requested schema, {id}, was not found in the "
                 "schema registry. Are you sure it was previously registered?"
-            )
+            ) from e
 
     def remove(self, id: str) -> None:
         """Remove a given schema. If the schema is not found,
@@ -61,11 +61,11 @@ class SchemaRegistry:
         """
         try:
             del self._schemas[id]
-        except KeyError:
+        except KeyError as e:
             raise KeyError(
                 f"The requested schema, {id}, was not found in the "
                 "schema registry. Are you sure it was previously registered?"
-            )
+            ) from e
 
     def validate_event(self, id: str, data: dict) -> None:
         """Validate an event against a schema within this

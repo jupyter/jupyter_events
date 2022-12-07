@@ -58,5 +58,5 @@ def validate_schema(schema: dict):
                 f"{bad_property} is an invalid property name because it "
                 "starts with `__`. Properties starting with 'dunder' "
                 "are reserved as special meta-fields for Jupyter Events to use."
-            )
+            ) from err
         raise err
