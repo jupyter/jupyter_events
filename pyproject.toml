@@ -45,7 +45,8 @@ jupyter-events = "jupyter_events.cli:main"
 docs = [
     "jupyterlite-sphinx",
     "myst_parser",
-    "pydata_sphinx_theme"
+    "pydata_sphinx_theme",
+    "sphinxcontrib-spelling",
 ]
 test = [
     "coverage",
@@ -62,7 +63,7 @@ cli = [
     "click",
     "rich"
 ]
-lint = ["black>=22.6.0", "mdformat>0.7", "ruff>=0.0.156"]
+lint = ["black[jupyter]==22.10.0", "mdformat>0.7", "ruff==0.0.189"]
 typing = ["mypy>=0.990"]
 
 [tool.hatch.version]
@@ -152,7 +153,7 @@ ignore = [
   # Line too long
   "E501",
   # Relative imports are banned
-  "I252",
+  "TID252",
   # Boolean ... in function definition
   "FBT001", "FBT002",
   # Module level import not at top of file
@@ -191,3 +192,13 @@ unfixable = [
 # N802 Function name `assertIn` should be lowercase
 # F841 Local variable `t` is assigned to but never used
 "tests/*" = ["B011", "F841", "C408", "E402", "T201", "B007", "N802", "F841"]
+
+[tool.interrogate]
+ignore-init-module=true
+ignore-private=true
+ignore-semiprivate=true
+ignore-property-decorators=true
+ignore-nested-functions=true
+ignore-nested-classes=true
+fail-under=100
+exclude = ["docs", "tests"]

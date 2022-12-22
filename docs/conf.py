@@ -31,6 +31,13 @@ author = "Project Jupyter"
 # ones.
 extensions: List = ["myst_parser", "jupyterlite_sphinx"]
 
+try:
+    import enchant  # type:ignore  # noqa
+
+    extensions += ["sphinxcontrib.spelling"]
+except ImportError:
+    pass
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 

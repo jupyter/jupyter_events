@@ -1,3 +1,4 @@
+"""Event validators."""
 import pathlib
 
 import jsonschema
@@ -46,6 +47,7 @@ JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator(
 
 
 def validate_schema(schema: dict):
+    """Validate a schema dict."""
     try:
         # Validate the schema against Jupyter Events metaschema.
         JUPYTER_EVENTS_SCHEMA_VALIDATOR.validate(schema)

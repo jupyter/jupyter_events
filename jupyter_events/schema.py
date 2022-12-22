@@ -1,3 +1,4 @@
+"""Event schema objects."""
 import json
 from pathlib import Path, PurePath
 from typing import Type, Union
@@ -10,14 +11,20 @@ from .validators import draft7_format_checker, validate_schema
 
 
 class EventSchemaUnrecognized(Exception):  # noqa
+    """An error for an unrecognized event schema."""
+
     pass
 
 
 class EventSchemaLoadingError(Exception):
+    """An error for an event schema loading error."""
+
     pass
 
 
 class EventSchemaFileAbsent(Exception):  # noqa
+    """An error for an absent event schema file."""
+
     pass
 
 
@@ -50,6 +57,7 @@ class EventSchema:
         format_checker: FormatChecker = draft7_format_checker,
         resolver=None,
     ):
+        """Initialize an event schema."""
         _schema = self._load_schema(schema)
         # Validate the schema against Jupyter Events metaschema.
         validate_schema(_schema)
@@ -58,6 +66,7 @@ class EventSchema:
         self._schema = _schema
 
     def __repr__(self):
+        """A string repr for an event schema."""
         return json.dumps(self._schema, indent=2)
 
     @staticmethod

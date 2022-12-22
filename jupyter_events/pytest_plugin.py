@@ -1,3 +1,4 @@
+"""Fixtures for use with jupyter events."""
 import io
 import json
 import logging
