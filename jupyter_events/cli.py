@@ -1,3 +1,4 @@
+"""The cli for jupyter events."""
 import json
 import pathlib
 import platform
@@ -16,6 +17,8 @@ WIN = platform.system() == "Windows"
 
 
 class RC:
+    """Return code enum."""
+
     OK = 0
     INVALID = 1
     UNPARSEABLE = 2
@@ -23,6 +26,8 @@ class RC:
 
 
 class EMOJI:
+    """Terminal emoji enum"""
+
     X = "XX" if WIN else "\u274c"
     OK = "OK" if WIN else "\u2714"
 

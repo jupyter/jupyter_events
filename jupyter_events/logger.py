@@ -89,6 +89,7 @@ class EventLogger(LoggingConfigurable):
     _active_listeners = Set()
 
     async def gather_listeners(self):
+        """Gather all of the active listeners."""
         return await asyncio.gather(*self._active_listeners, return_exceptions=True)
 
     @default("schemas")
@@ -96,6 +97,7 @@ class EventLogger(LoggingConfigurable):
         return SchemaRegistry()
 
     def __init__(self, *args, **kwargs):
+        """Initialize the logger."""
         # We need to initialize the configurable before
         # adding the logging handlers.
         super().__init__(*args, **kwargs)
@@ -265,6 +267,7 @@ class EventLogger(LoggingConfigurable):
         signature = inspect.signature(listener)
 
         async def listener_signature(logger: EventLogger, schema_id: str, data: dict) -> None:
+            """An interface for a listener."""
             ...
 
         expected_signature = inspect.signature(listener_signature)

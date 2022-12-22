@@ -1,3 +1,4 @@
+""""An event schema registry."""
 from typing import Optional, Union
 
 from .schema import EventSchema
@@ -11,6 +12,7 @@ class SchemaRegistry:
     """A convenient API for storing and searching a group of schemas."""
 
     def __init__(self, schemas: Optional[dict] = None):
+        """Initialize the registry."""
         self._schemas = schemas or {}
 
     def __contains__(self, key: str):
@@ -18,6 +20,7 @@ class SchemaRegistry:
         return key in self._schemas
 
     def __repr__(self) -> str:
+        """The str repr of the registry."""
         return ",\n".join([str(s) for s in self._schemas.values()])
 
     def _add(self, schema_obj: EventSchema):
