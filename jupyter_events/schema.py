@@ -108,7 +108,8 @@ class EventSchema:
         # if schema is PurePath, ensure file exists at path and then load from file
         if isinstance(schema, PurePath):
             if not Path(schema).exists():
-                raise EventSchemaFileAbsent(f'Schema file not present at path "{schema}".')
+                msg = f'Schema file not present at path "{schema}".'
+                raise EventSchemaFileAbsent(msg)
 
             loaded_schema = yaml.load(schema)
             EventSchema._ensure_yaml_loaded(loaded_schema)
@@ -121,9 +122,8 @@ class EventSchema:
             EventSchema._ensure_yaml_loaded(loaded_schema, was_str=True)
             return loaded_schema
 
-        raise EventSchemaUnrecognized(
-            f"Expected a dictionary, string, or PurePath, but instead received {schema.__class__.__name__}."
-        )
+        msg = f"Expected a dictionary, string, or PurePath, but instead received {schema.__class__.__name__}."
+        raise EventSchemaUnrecognized(msg)
 
     @property
     def id(self) -> str:
