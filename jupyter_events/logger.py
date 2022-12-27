@@ -188,7 +188,8 @@ class EventLogger(LoggingConfigurable):
         """
         # Ensure that this is a callable function/method
         if not callable(modifier):
-            raise TypeError("`modifier` must be a callable")
+            msg = "`modifier` must be a callable"
+            raise TypeError(msg)
 
         # Now let's verify the function signature.
         signature = inspect.signature(modifier)
@@ -211,13 +212,14 @@ class EventLogger(LoggingConfigurable):
                 if schema_id is None or id == schema_id:
                     self._modifiers[id].add(modifier)
         else:
-            raise ModifierError(
+            msg = (
                 "Modifiers are required to follow an exact function/method "
                 "signature. The signature should look like:"
                 f"\n\n\tdef my_modifier{expected_signature}:\n\n"
                 "Check that you are using type annotations for each argument "
                 "and the return value."
             )
+            raise ModifierError(msg)
 
     def remove_modifier(
         self, *, schema_id: Optional[str] = None, modifier: Callable[[str, dict], dict]
@@ -262,7 +264,8 @@ class EventLogger(LoggingConfigurable):
             A callable function/method that executes when the named event occurs.
         """
         if not callable(listener):
-            raise TypeError("`listener` must be a callable")
+            msg = "`listener` must be a callable"
+            raise TypeError(msg)
 
         signature = inspect.signature(listener)
 
@@ -287,13 +290,15 @@ class EventLogger(LoggingConfigurable):
                     else:
                         self._unmodified_listeners[schema_id].add(listener)
         else:
-            raise ListenerError(
+            msg = (
                 "Listeners are required to follow an exact function/method "
                 "signature. The signature should look like:"
                 f"\n\n\tasync def my_listener{expected_signature}:\n\n"
                 "Check that you are using type annotations for each argument "
                 "and the return value."
             )
+
+            raise ListenerError(msg)
 
     def remove_listener(
         self,

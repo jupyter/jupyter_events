@@ -4,7 +4,7 @@ from typing import Optional, Union
 from .schema import EventSchema
 
 
-class SchemaRegistryException(Exception):  # noqa
+class SchemaRegistryException(Exception):  # noqa[N818]
     """Exception class for Jupyter Events Schema Registry Errors."""
 
 
@@ -25,10 +25,11 @@ class SchemaRegistry:
 
     def _add(self, schema_obj: EventSchema):
         if schema_obj.id in self._schemas:
-            raise SchemaRegistryException(
+            msg = (
                 f"The schema, {schema_obj.id}, is already "
                 "registered. Try removing it and registering it again."
             )
+            raise SchemaRegistryException(msg)
         self._schemas[schema_obj.id] = schema_obj
 
     @property
@@ -52,11 +53,12 @@ class SchemaRegistry:
         """
         try:
             return self._schemas[id]
-        except KeyError as e:
-            raise KeyError(
+        except KeyError:
+            msg = (
                 f"The requested schema, {id}, was not found in the "
                 "schema registry. Are you sure it was previously registered?"
-            ) from e
+            )
+            raise KeyError(msg) from None
 
     def remove(self, id: str) -> None:
         """Remove a given schema. If the schema is not found,
@@ -64,11 +66,12 @@ class SchemaRegistry:
         """
         try:
             del self._schemas[id]
-        except KeyError as e:
-            raise KeyError(
+        except KeyError:
+            msg = (
                 f"The requested schema, {id}, was not found in the "
                 "schema registry. Are you sure it was previously registered?"
-            ) from e
+            )
+            raise KeyError(msg) from None
 
     def validate_event(self, id: str, data: dict) -> None:
         """Validate an event against a schema within this

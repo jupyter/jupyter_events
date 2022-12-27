@@ -22,10 +22,8 @@ class Handlers(TraitType):
 
     def element_error(self, obj):
         """Raise an error for bad elements."""
-        raise TraitError(
-            "Elements in the '{}' trait of an {} instance "
-            "must be Python `logging` handler instances.".format(self.name, obj.__class__.__name__)
-        )
+        msg = f"Elements in the '{self.name}' trait of an {obj.__class__.__name__} instance must be Python `logging` handler instances."
+        raise TraitError(msg)
 
     def validate(self, obj, value):
         """Validate an object."""
