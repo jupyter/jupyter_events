@@ -258,6 +258,7 @@ def test_emit_badschema_format():
     el = EventLogger(handlers=[logging.NullHandler()])
     el.register_event_schema(schema)
 
+    el.emit(schema_id="http://test/test", data={"something": "chucknorris"})
     with pytest.raises(jsonschema.ValidationError) as excinfo:
         el.emit(schema_id="http://test/test", data={"something": "chucknorris"})
 
