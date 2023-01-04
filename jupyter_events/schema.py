@@ -4,10 +4,12 @@ from pathlib import Path, PurePath
 from typing import Type, Union
 
 from jsonschema import FormatChecker, validators
+
 try:
     from jsonschema.protocols import Validator
 except ImportError:
     from typing import Any
+
     Validator = Any
 
 from . import yaml
