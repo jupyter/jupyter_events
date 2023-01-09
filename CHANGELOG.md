@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.6.0
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.5.0...83f01b142c3190074d9e6108155514ddc6237d2c))
+
+### Maintenance and upkeep improvements
+
+- Add typing file [#60](https://github.com/jupyter/jupyter_events/pull/60) ([@blink1073](https://github.com/blink1073))
+- More lint cleanup [#56](https://github.com/jupyter/jupyter_events/pull/56) ([@blink1073](https://github.com/blink1073))
+- Add more ci checks [#53](https://github.com/jupyter/jupyter_events/pull/53) ([@blink1073](https://github.com/blink1073))
+- Allow releasing from repo [#52](https://github.com/jupyter/jupyter_events/pull/52) ([@blink1073](https://github.com/blink1073))
+- Adopt ruff and address lint [#51](https://github.com/jupyter/jupyter_events/pull/51) ([@blink1073](https://github.com/blink1073))
+- Use base setup dependency type [#47](https://github.com/jupyter/jupyter_events/pull/47) ([@blink1073](https://github.com/blink1073))
+- Clean up CI [#45](https://github.com/jupyter/jupyter_events/pull/45) ([@blink1073](https://github.com/blink1073))
+- CI Cleanup [#44](https://github.com/jupyter/jupyter_events/pull/44) ([@blink1073](https://github.com/blink1073))
+- Bump actions/checkout from 2 to 3 [#42](https://github.com/jupyter/jupyter_events/pull/42) ([@dependabot](https://github.com/dependabot))
+- Add dependabot [#41](https://github.com/jupyter/jupyter_events/pull/41) ([@blink1073](https://github.com/blink1073))
+- Maintenance cleanup [#36](https://github.com/jupyter/jupyter_events/pull/36) ([@blink1073](https://github.com/blink1073))
+- Clean up CI checks [#35](https://github.com/jupyter/jupyter_events/pull/35) ([@blink1073](https://github.com/blink1073))
+- Clean up pyproject and ci [#33](https://github.com/jupyter/jupyter_events/pull/33) ([@blink1073](https://github.com/blink1073))
+
+### Documentation improvements
+
+- Fix listener example [#34](https://github.com/jupyter/jupyter_events/pull/34) ([@dlqqq](https://github.com/dlqqq))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2022-09-12&to=2023-01-09&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2022-09-12..2023-01-09&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adependabot+updated%3A2022-09-12..2023-01-09&type=Issues) | [@dlqqq](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adlqqq+updated%3A2022-09-12..2023-01-09&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Apre-commit-ci+updated%3A2022-09-12..2023-01-09&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.5.0
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.4.0...af1db6f5b9052e54d5a65797b67bff17b80e7eec))
@@ -34,8 +66,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2022-08-29&to=2022-09-12&type=c))
 
 [@bollwyvl](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Abollwyvl+updated%3A2022-08-29..2022-09-12&type=Issues) | [@dlqqq](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adlqqq+updated%3A2022-08-29..2022-09-12&type=Issues) | [@kevin-bates](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Akevin-bates+updated%3A2022-08-29..2022-09-12&type=Issues) | [@Zsailer](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2022-08-29..2022-09-12&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.4.0
 
