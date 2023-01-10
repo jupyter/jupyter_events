@@ -31,7 +31,7 @@ dependencies = [
     # such that 'format_nongpl' is normalized to 'format-nongpl' which prevents these two validators from
     # from being installed when jsonschema is <= 4.9 because jsonschema uses 'format_nongpl' in those releases.
     "rfc3339-validator",
-    "rfc3986-validator>=0.1.0",
+    "rfc3986-validator>=0.1.1",
 ]
 dynamic = [
     "version",
