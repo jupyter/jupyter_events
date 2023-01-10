@@ -4,7 +4,13 @@ from pathlib import Path, PurePath
 from typing import Type, Union
 
 from jsonschema import FormatChecker, validators
-from jsonschema.protocols import Validator
+
+try:
+    from jsonschema.protocols import Validator
+except ImportError:
+    from typing import Any
+
+    Validator = Any  # type:ignore
 
 from . import yaml
 from .validators import draft7_format_checker, validate_schema
