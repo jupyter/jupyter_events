@@ -10,7 +10,7 @@ try:
 except ImportError:
     from typing import Any
 
-    Validator = Any
+    Validator = Any  # type:ignore
 
 from . import yaml
 from .validators import draft7_format_checker, validate_schema
