@@ -25,7 +25,7 @@ classifiers = [
 dependencies = [
     "jsonschema[format-nongpl,format_nongpl]>=3.2.0",
     "python-json-logger>=2.0.4",
-    "pyyaml>=6.0",
+    "pyyaml>=5.3",
     "traitlets>=5.3",
     # The following are necessary to address an issue where pyproject.toml normalizes extra dependencies
     # such that 'format_nongpl' is normalized to 'format-nongpl' which prevents these two validators from
