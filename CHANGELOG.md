@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.6.1
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.6.0...1aa57024d0a8c73b10d9944375f84c01ee9f5c33))
+
+### Maintenance and upkeep improvements
+
+- Remove artificial cap on jsonschema dependency [#61](https://github.com/jupyter/jupyter_events/pull/61) ([@kevin-bates](https://github.com/kevin-bates))
+- Try dropping jsonschema dependency [#59](https://github.com/jupyter/jupyter_events/pull/59) ([@bretttully](https://github.com/bretttully))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-01-09&to=2023-01-10&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2023-01-09..2023-01-10&type=Issues) | [@bretttully](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Abretttully+updated%3A2023-01-09..2023-01-10&type=Issues) | [@kevin-bates](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Akevin-bates+updated%3A2023-01-09..2023-01-10&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.6.0
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.5.0...83f01b142c3190074d9e6108155514ddc6237d2c))
@@ -33,8 +50,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2022-09-12&to=2023-01-09&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2022-09-12..2023-01-09&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adependabot+updated%3A2022-09-12..2023-01-09&type=Issues) | [@dlqqq](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adlqqq+updated%3A2022-09-12..2023-01-09&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Apre-commit-ci+updated%3A2022-09-12..2023-01-09&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.5.0
 
