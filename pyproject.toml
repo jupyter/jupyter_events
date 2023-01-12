@@ -133,6 +133,20 @@ exclude_lines = [
 "@(abc\\.)?abstractmethod",
 ]
 
+[tool.mypy]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+pretty = true
+show_error_context = true
+show_error_codes = true
+strict_equality = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+explicit_package_bases = true
+namespace_packages = true
+
 [tool.black]
 line-length = 100
 skip-string-normalization = true

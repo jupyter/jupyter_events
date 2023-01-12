@@ -23,7 +23,6 @@ def jp_event_schemas(schema):
 
 async def test_listener_function(jp_event_logger, schema):
     event_logger = jp_event_logger
-    global listener_was_called
     listener_was_called = False
 
     async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
@@ -41,7 +40,6 @@ async def test_listener_function(jp_event_logger, schema):
 
 async def test_remove_listener_function(jp_event_logger, schema):
     event_logger = jp_event_logger
-    global listener_was_called
     listener_was_called = False
 
     async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
@@ -114,7 +112,6 @@ async def test_bad_listener_does_not_break_good_listener(jp_event_logger, schema
     h = logging.StreamHandler(log_stream)
     app_log.addHandler(h)
 
-    global listener_was_called
     listener_was_called = False
 
     async def listener_raise_exception(logger: EventLogger, schema_id: str, data: dict) -> None:

@@ -16,10 +16,10 @@ def get_event_data(event, schema, schema_id, version, unredacted_policies):
     handler = logging.StreamHandler(sink)
 
     e = EventLogger(handlers=[handler], unredacted_policies=unredacted_policies)
-    e.register_schema(schema)
+    e.register_event_schema(schema)
 
     # Record event and read output
-    e.emit(schema_id, version, deepcopy(event))
+    e.emit(schema_id=schema_id, data=deepcopy(event))
 
     recorded_event = json.loads(sink.getvalue())
     return {key: value for key, value in recorded_event.items() if not key.startswith("__")}
