@@ -52,7 +52,7 @@ def main():
 @click.command()
 @click.argument("schema")
 @click.pass_context
-def validate(ctx: click.Context, schema: str):
+def validate(ctx: click.Context, schema: str) -> int:
     """Validate a SCHEMA against Jupyter Event's meta schema.
 
     SCHEMA can be a JSON/YAML string or filepath to a schema.

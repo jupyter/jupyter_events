@@ -15,7 +15,7 @@ class SchemaRegistry:
         """Initialize the registry."""
         self._schemas = schemas or {}
 
-    def __contains__(self, key: str):
+    def __contains__(self, key: str) -> bool:
         """Syntax sugar to check if a schema is found in the registry"""
         return key in self._schemas
 
@@ -23,7 +23,7 @@ class SchemaRegistry:
         """The str repr of the registry."""
         return ",\n".join([str(s) for s in self._schemas.values()])
 
-    def _add(self, schema_obj: EventSchema):
+    def _add(self, schema_obj: EventSchema) -> None:
         if schema_obj.id in self._schemas:
             msg = (
                 f"The schema, {schema_obj.id}, is already "

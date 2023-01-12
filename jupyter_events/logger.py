@@ -8,14 +8,14 @@ import json
 import logging
 import warnings
 from datetime import datetime
-from pathlib import PurePath
-from typing import Callable, Optional, Union
+from typing import Any, Callable, Coroutine, Optional, Union
 
 from jsonschema import ValidationError
 from pythonjsonlogger import jsonlogger  # type:ignore
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 
+from .schema import SchemaType
 from .schema_registry import SchemaRegistry
 from .traits import Handlers
 from .validators import JUPYTER_EVENTS_CORE_VALIDATOR
@@ -131,7 +131,7 @@ class EventLogger(LoggingConfigurable):
         eventlogger_cfg = Config({"EventLogger": my_cfg})
         super()._load_config(eventlogger_cfg, section_names=None, traits=None)
 
-    def register_event_schema(self, schema: Union[dict, str, PurePath]):
+    def register_event_schema(self, schema: SchemaType) -> None:
         """Register this schema with the schema registry.
 
         Get this registered schema using the EventLogger.schema.get() method.
@@ -143,7 +143,7 @@ class EventLogger(LoggingConfigurable):
         self._modified_listeners[key] = set()
         self._unmodified_listeners[key] = set()
 
-    def register_handler(self, handler: logging.Handler):
+    def register_handler(self, handler: logging.Handler) -> None:
         """Register a new logging handler to the Event Logger.
 
         All outgoing messages will be formatted as a JSON string.
@@ -164,7 +164,7 @@ class EventLogger(LoggingConfigurable):
         if handler not in self.handlers:
             self.handlers.append(handler)
 
-    def remove_handler(self, handler: logging.Handler):
+    def remove_handler(self, handler: logging.Handler) -> None:
         """Remove a logging handler from the logger and list of handlers."""
         self._logger.removeHandler(handler)
         if handler in self.handlers:
@@ -175,7 +175,7 @@ class EventLogger(LoggingConfigurable):
         *,
         schema_id: Union[str, None] = None,
         modifier: Callable[[str, dict], dict],
-    ):
+    ) -> None:
         """Add a modifier (callable) to a registered event.
 
         Parameters
@@ -249,8 +249,8 @@ class EventLogger(LoggingConfigurable):
         *,
         modified: bool = True,
         schema_id: Union[str, None] = None,
-        listener: Callable[["EventLogger", str, dict], None],
-    ):
+        listener: Callable[["EventLogger", str, dict], Coroutine[Any, Any, None]],
+    ) -> None:
         """Add a listener (callable) to a registered event.
 
         Parameters
@@ -304,7 +304,7 @@ class EventLogger(LoggingConfigurable):
         self,
         *,
         schema_id: Optional[str] = None,
-        listener: Callable[["EventLogger", str, dict], None],
+        listener: Callable[["EventLogger", str, dict], Coroutine[Any, Any, None]],
     ) -> None:
         """Remove a listener from an event or all events.
 
@@ -327,7 +327,9 @@ class EventLogger(LoggingConfigurable):
                 self._modified_listeners[schema_id].discard(listener)
                 self._unmodified_listeners[schema_id].discard(listener)
 
-    def emit(self, *, schema_id: str, data: dict, timestamp_override=None):
+    def emit(
+        self, *, schema_id: str, data: dict, timestamp_override: Optional[datetime] = None
+    ) -> Optional[dict]:
         """
         Record given event with schema has occurred.
 
@@ -351,7 +353,7 @@ class EventLogger(LoggingConfigurable):
             and not self._modified_listeners[schema_id]
             and not self._unmodified_listeners[schema_id]
         ):
-            return
+            return None
 
         # If the schema hasn't been registered, raise a warning to make sure
         # this was intended.
@@ -362,7 +364,7 @@ class EventLogger(LoggingConfigurable):
                 "`register_event_schema` method.",
                 SchemaNotRegistered,
             )
-            return
+            return None
 
         schema = self.schemas.get(schema_id)
 
@@ -400,7 +402,7 @@ class EventLogger(LoggingConfigurable):
 
         # callback for removing from finished listeners
         # from active listeners set.
-        def _listener_task_done(task: asyncio.Task):
+        def _listener_task_done(task: asyncio.Task) -> None:
             # If an exception happens, log it to the main
             # applications logger
             err = task.exception()
@@ -429,7 +431,7 @@ class EventLogger(LoggingConfigurable):
             self._active_listeners.add(task)
 
             # Remove task from active listeners once its finished.
-            def _listener_task_done(task: asyncio.Task):
+            def _listener_task_done(task: asyncio.Task) -> None:
                 # If an exception happens, log it to the main
                 # applications logger
                 err = task.exception()

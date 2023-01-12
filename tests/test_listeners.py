@@ -23,12 +23,11 @@ def jp_event_schemas(schema):
 
 async def test_listener_function(jp_event_logger, schema):
     event_logger = jp_event_logger
-    global listener_was_called
     listener_was_called = False
 
     async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
-        global listener_was_called
-        listener_was_called = True  # type: ignore
+        nonlocal listener_was_called
+        listener_was_called = True
 
     # Add the modifier
     event_logger.add_listener(schema_id=schema.id, listener=my_listener)
@@ -41,12 +40,11 @@ async def test_listener_function(jp_event_logger, schema):
 
 async def test_remove_listener_function(jp_event_logger, schema):
     event_logger = jp_event_logger
-    global listener_was_called
     listener_was_called = False
 
     async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
-        global listener_was_called
-        listener_was_called = True  # type: ignore
+        nonlocal listener_was_called
+        listener_was_called = True
 
     # Add the modifier
     event_logger.add_listener(schema_id=schema.id, listener=my_listener)
@@ -114,15 +112,14 @@ async def test_bad_listener_does_not_break_good_listener(jp_event_logger, schema
     h = logging.StreamHandler(log_stream)
     app_log.addHandler(h)
 
-    global listener_was_called
     listener_was_called = False
 
     async def listener_raise_exception(logger: EventLogger, schema_id: str, data: dict) -> None:
         raise Exception("This failed")  # noqa
 
     async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
-        global listener_was_called
-        listener_was_called = True  # type: ignore
+        nonlocal listener_was_called
+        listener_was_called = True
 
     # Add a bad listener and a good listener and ensure that
     # emitting still works and the bad listener's exception is is logged.

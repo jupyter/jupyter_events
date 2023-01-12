@@ -59,7 +59,7 @@ def test_string_intended_as_path():
 def test_unrecognized_type():
     """Validation fails because file is not of valid type."""
     with pytest.raises(EventSchemaUnrecognized):
-        EventSchema(9001)
+        EventSchema(9001)  # type:ignore[arg-type]
 
 
 def test_invalid_yaml():
