@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.6.3
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.6.2...ac65980322317f1f30bc07150c9e14afaad03d40))
+
+### Maintenance and upkeep improvements
+
+- Clean up typing [#64](https://github.com/jupyter/jupyter_events/pull/64) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-01-10&to=2023-01-12&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2023-01-10..2023-01-12&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.6.2
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.6.1...a00859944090df5277f263fcfe72ae48b8cc2382))
@@ -17,8 +33,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-01-10&to=2023-01-10&type=c))
 
 [@kevin-bates](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Akevin-bates+updated%3A2023-01-10..2023-01-10&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.6.1
 
