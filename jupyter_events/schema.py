@@ -1,10 +1,16 @@
 """Event schema objects."""
 import json
 from pathlib import Path, PurePath
-from typing import Type, Union
+from typing import Optional, Type, Union
 
-from jsonschema import FormatChecker, validators
-from jsonschema.protocols import Validator
+from jsonschema import FormatChecker, RefResolver, validators
+
+try:
+    from jsonschema.protocols import Validator
+except ImportError:
+    from typing import Any
+
+    Validator = Any  # type:ignore
 
 from . import yaml
 from .validators import draft7_format_checker, validate_schema
@@ -26,6 +32,9 @@ class EventSchemaFileAbsent(Exception):  # noqa
     """An error for an absent event schema file."""
 
     pass
+
+
+SchemaType = Union[dict, str, PurePath]
 
 
 class EventSchema:
@@ -52,10 +61,10 @@ class EventSchema:
 
     def __init__(
         self,
-        schema: Union[dict, str, PurePath],
-        validator_class: Type[Validator] = validators.Draft7Validator,  # type:ignore
+        schema: SchemaType,
+        validator_class: Type[Validator] = validators.Draft7Validator,  # type:ignore[assignment]
         format_checker: FormatChecker = draft7_format_checker,
-        resolver=None,
+        resolver: Optional[RefResolver] = None,
     ):
         """Initialize an event schema."""
         _schema = self._load_schema(schema)
@@ -70,7 +79,7 @@ class EventSchema:
         return json.dumps(self._schema, indent=2)
 
     @staticmethod
-    def _ensure_yaml_loaded(schema, was_str=False) -> None:
+    def _ensure_yaml_loaded(schema: SchemaType, was_str: bool = False) -> None:
         """Ensures schema was correctly loaded into a dictionary. Raises
         EventSchemaLoadingError otherwise."""
         if isinstance(schema, dict):
@@ -78,13 +87,13 @@ class EventSchema:
 
         error_msg = "Could not deserialize schema into a dictionary."
 
-        def intended_as_path(schema):
+        def intended_as_path(schema: str) -> bool:
             path = Path(schema)
             return path.match("*.yml") or path.match("*.yaml") or path.match("*.json")
 
         # detect whether the user specified a string but intended a PurePath to
         # generate a more helpful error message
-        if was_str and intended_as_path(schema):
+        if was_str and intended_as_path(schema):  # type:ignore[arg-type]
             error_msg += " Paths to schema files must be explicitly wrapped in a Pathlib object."
         else:
             error_msg += " Double check the schema and ensure it is in the proper form."
@@ -92,7 +101,7 @@ class EventSchema:
         raise EventSchemaLoadingError(error_msg)
 
     @staticmethod
-    def _load_schema(schema: Union[dict, str, PurePath]) -> dict:
+    def _load_schema(schema: SchemaType) -> dict:
         """Load a JSON schema from different sources/data types.
 
         `schema` could be a dictionary or serialized string representing the

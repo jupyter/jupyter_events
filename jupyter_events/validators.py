@@ -46,7 +46,7 @@ JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator(
 )
 
 
-def validate_schema(schema: dict):
+def validate_schema(schema: dict) -> None:
     """Validate a schema dict."""
     try:
         # Validate the schema against Jupyter Events metaschema.

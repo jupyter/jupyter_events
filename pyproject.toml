@@ -23,10 +23,15 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "jsonschema[format-nongpl,format_nongpl]>=4.3.0",
+    "jsonschema[format-nongpl,format_nongpl]>=3.2.0",
     "python-json-logger>=2.0.4",
-    "pyyaml>=6.0",
+    "pyyaml>=5.3",
     "traitlets>=5.3",
+    # The following are necessary to address an issue where pyproject.toml normalizes extra dependencies
+    # such that 'format_nongpl' is normalized to 'format-nongpl' which prevents these two validators from
+    # from being installed when jsonschema is <= 4.9 because jsonschema uses 'format_nongpl' in those releases.
+    "rfc3339-validator",
+    "rfc3986-validator>=0.1.1",
 ]
 dynamic = [
     "version",
@@ -127,6 +132,20 @@ exclude_lines = [
   "class .*\bProtocol\\):",
 "@(abc\\.)?abstractmethod",
 ]
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+pretty = true
+show_error_context = true
+show_error_codes = true
+strict_equality = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+explicit_package_bases = true
+namespace_packages = true
 
 [tool.black]
 line-length = 100
