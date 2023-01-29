@@ -7,7 +7,7 @@ import inspect
 import json
 import logging
 import warnings
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable, Coroutine, Optional, Union
 
 from jsonschema import ValidationError
@@ -208,9 +208,9 @@ class EventLogger(LoggingConfigurable):
             if schema_id:
                 self._modifiers[schema_id].add(modifier)
                 return
-            for id in self._modifiers:
-                if schema_id is None or id == schema_id:
-                    self._modifiers[id].add(modifier)
+            for id_ in self._modifiers:
+                if schema_id is None or id_ == schema_id:
+                    self._modifiers[id_].add(modifier)
         else:
             msg = (
                 "Modifiers are required to follow an exact function/method "
@@ -283,10 +283,10 @@ class EventLogger(LoggingConfigurable):
                     self._modified_listeners[schema_id].add(listener)
                     return
                 self._unmodified_listeners[schema_id].add(listener)
-            for id in self.schemas.schema_ids:
-                if schema_id is None or id == schema_id:
+            for id_ in self.schemas.schema_ids:
+                if schema_id is None or id_ == schema_id:
                     if modified:
-                        self._modified_listeners[id].add(listener)
+                        self._modified_listeners[id_].add(listener)
                     else:
                         self._unmodified_listeners[schema_id].add(listener)
         else:
@@ -327,7 +327,7 @@ class EventLogger(LoggingConfigurable):
                 self._modified_listeners[schema_id].discard(listener)
                 self._unmodified_listeners[schema_id].discard(listener)
 
-    def emit(
+    def emit(  # noqa
         self, *, schema_id: str, data: dict, timestamp_override: Optional[datetime] = None
     ) -> Optional[dict]:
         """
@@ -381,10 +381,9 @@ class EventLogger(LoggingConfigurable):
         self.schemas.validate_event(schema_id, modified_data)
 
         # Generate the empty event capsule.
-        if timestamp_override is None:
-            timestamp = datetime.utcnow()
-        else:
-            timestamp = timestamp_override
+        timestamp = (
+            datetime.now(tz=timezone.utc) if timestamp_override is None else timestamp_override
+        )
         capsule = {
             "__timestamp__": timestamp.isoformat() + "Z",
             "__schema__": schema_id,

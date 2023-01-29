@@ -135,7 +135,7 @@ class EventSchema:
         raise EventSchemaUnrecognized(msg)
 
     @property
-    def id(self) -> str:
+    def id(self) -> str:  # noqa
         """Schema $id field."""
         return self._schema["$id"]
 

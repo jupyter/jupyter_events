@@ -47,35 +47,35 @@ class SchemaRegistry:
         self._add(schema)
         return schema
 
-    def get(self, id: str) -> EventSchema:
+    def get(self, id_: str) -> EventSchema:
         """Fetch a given schema. If the schema is not found,
         this will raise a KeyError.
         """
         try:
-            return self._schemas[id]
+            return self._schemas[id_]
         except KeyError:
             msg = (
-                f"The requested schema, {id}, was not found in the "
+                f"The requested schema, {id_}, was not found in the "
                 "schema registry. Are you sure it was previously registered?"
             )
             raise KeyError(msg) from None
 
-    def remove(self, id: str) -> None:
+    def remove(self, id_: str) -> None:
         """Remove a given schema. If the schema is not found,
         this will raise a KeyError.
         """
         try:
-            del self._schemas[id]
+            del self._schemas[id_]
         except KeyError:
             msg = (
-                f"The requested schema, {id}, was not found in the "
+                f"The requested schema, {id_}, was not found in the "
                 "schema registry. Are you sure it was previously registered?"
             )
             raise KeyError(msg) from None
 
-    def validate_event(self, id: str, data: dict) -> None:
+    def validate_event(self, id_: str, data: dict) -> None:
         """Validate an event against a schema within this
         registry.
         """
-        schema = self.get(id)
+        schema = self.get(id_)
         schema.validate(data)

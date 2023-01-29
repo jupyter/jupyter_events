@@ -1,7 +1,7 @@
 import io
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
 import jsonschema
@@ -113,7 +113,7 @@ def test_timestamp_override():
     el = EventLogger(handlers=[handler])
     el.register_event_schema(schema)
 
-    timestamp_override = datetime.utcnow() - timedelta(days=1)
+    timestamp_override = datetime.now(tz=timezone.utc) - timedelta(days=1)
 
     el.emit(
         schema_id="http://test/test",

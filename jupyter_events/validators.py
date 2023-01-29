@@ -4,13 +4,14 @@ import pathlib
 import jsonschema
 from jsonschema import Draft7Validator, RefResolver, ValidationError
 
+from . import yaml
+
 draft7_format_checker = (
     Draft7Validator.FORMAT_CHECKER
     if hasattr(Draft7Validator, "FORMAT_CHECKER")
     else jsonschema.draft7_format_checker
 )
 
-from . import yaml
 
 METASCHEMA_PATH = pathlib.Path(__file__).parent.joinpath("schemas")
 
