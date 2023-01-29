@@ -20,7 +20,7 @@
 from typing import List
 
 project = "jupyter_events"
-copyright = "2019, Project Jupyter"
+copyright = "2019, Project Jupyter"  # noqa
 author = "Project Jupyter"
 
 
