@@ -38,7 +38,7 @@ dynamic = [
 ]
 
 [project.license]
-file = 'COPYING.md'
+file = 'LICENSE'
 
 [project.urls]
 Homepage = "http://jupyter.org"
