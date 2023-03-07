@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Coroutine, Optional, Union
 
 from jsonschema import ValidationError
-from pythonjsonlogger import jsonlogger  # type:ignore
+from pythonjsonlogger import jsonlogger
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 
