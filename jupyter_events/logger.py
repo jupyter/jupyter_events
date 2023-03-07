@@ -327,7 +327,7 @@ class EventLogger(LoggingConfigurable):
                 self._modified_listeners[schema_id].discard(listener)
                 self._unmodified_listeners[schema_id].discard(listener)
 
-    def emit(  # noqa
+    def emit(
         self, *, schema_id: str, data: dict, timestamp_override: Optional[datetime] = None
     ) -> Optional[dict]:
         """
