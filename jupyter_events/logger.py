@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Coroutine, Optional, Union
 
 from jsonschema import ValidationError
-from pythonjsonlogger import jsonlogger  # type:ignore
+from pythonjsonlogger import jsonlogger
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 
@@ -327,7 +327,7 @@ class EventLogger(LoggingConfigurable):
                 self._modified_listeners[schema_id].discard(listener)
                 self._unmodified_listeners[schema_id].discard(listener)
 
-    def emit(  # noqa
+    def emit(
         self, *, schema_id: str, data: dict, timestamp_override: Optional[datetime] = None
     ) -> Optional[dict]:
         """
