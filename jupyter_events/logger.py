@@ -363,6 +363,7 @@ class EventLogger(LoggingConfigurable):
                 "this was not intentional, please register the schema using the "
                 "`register_event_schema` method.",
                 SchemaNotRegistered,
+                stacklevel=2,
             )
             return None
 
