@@ -155,10 +155,19 @@ class EventLogger(LoggingConfigurable):
             It is always emitted with 'null', and we do not want it,
             since we are always emitting events only
             """
-            del record["message"]
+            # Python's logger always emits the "message" field with
+            # the value as "null" unless it's present in the schema/data.
+            # Message happens to be a common field for event logs,
+            # so special case it here and only emit it if "message"
+            # is found the in the schema's property list.
+            schema = self.schemas.get(record["__schema__"])
+            if "message" not in schema.properties:
+                del record["message"]
             return json.dumps(record, **kwargs)
 
-        formatter = jsonlogger.JsonFormatter(json_serializer=_skip_message)
+        formatter = jsonlogger.JsonFormatter(
+            json_serializer=_skip_message,
+        )
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
         if handler not in self.handlers:
