@@ -149,16 +149,21 @@ class EventLogger(LoggingConfigurable):
         All outgoing messages will be formatted as a JSON string.
         """
 
-        def _skip_message(record, **kwargs):
+        def _handle_message_field(record, **kwargs):
+            """Python's logger always emits the "message" field with
+            the value as "null" unless it's present in the schema/data.
+            Message happens to be a common field for event logs,
+            so special case it here and only emit it if "message"
+            is found the in the schema's property list.
             """
-            Remove 'message' from log record.
-            It is always emitted with 'null', and we do not want it,
-            since we are always emitting events only
-            """
-            del record["message"]
+            schema = self.schemas.get(record["__schema__"])
+            if "message" not in schema.properties:
+                del record["message"]
             return json.dumps(record, **kwargs)
 
-        formatter = jsonlogger.JsonFormatter(json_serializer=_skip_message)
+        formatter = jsonlogger.JsonFormatter(
+            json_serializer=_handle_message_field,
+        )
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
         if handler not in self.handlers:

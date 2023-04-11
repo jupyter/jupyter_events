@@ -144,6 +144,10 @@ class EventSchema:
         """Schema's version."""
         return self._schema["version"]
 
+    @property
+    def properties(self) -> dict:
+        return self._schema["properties"]
+
     def validate(self, data: dict) -> None:
         """Validate an incoming instance of this event schema."""
         self._validator.validate(data)
