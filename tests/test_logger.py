@@ -211,6 +211,52 @@ def test_message_field():
     }
 
 
+def test_nested_message_field():
+    """
+    Simple test for emitting an event with
+    the literal property "message".
+    """
+    schema = {
+        "$id": "http://test/test",
+        "version": 1,
+        "properties": {
+            "thing": {
+                "type": "object",
+                "title": "thing",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "title": "message",
+                    },
+                },
+            },
+        },
+    }
+
+    output = io.StringIO()
+    handler = logging.StreamHandler(output)
+    el = EventLogger(handlers=[handler])
+    el.register_event_schema(schema)
+
+    el.emit(
+        schema_id="http://test/test",
+        data={"thing": {"message": "a nested message was seen"}},
+    )
+    handler.flush()
+
+    event_capsule = json.loads(output.getvalue())
+
+    assert "__timestamp__" in event_capsule
+    # Remove timestamp from capsule when checking equality, since it is gonna vary
+    del event_capsule["__timestamp__"]
+    assert event_capsule == {
+        "__schema__": "http://test/test",
+        "__schema_version__": 1,
+        "__metadata_version__": 1,
+        "thing": {"message": "a nested message was seen"},
+    }
+
+
 def test_register_event_schema(tmp_path):
     """
     Register schema from a file
