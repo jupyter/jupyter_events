@@ -54,11 +54,9 @@ docs = [
     "sphinxcontrib-spelling",
 ]
 test = [
-    "coverage",
     "pre-commit",
     "pytest-asyncio>=0.19.0",
     "pytest-console-scripts",
-    "pytest-cov",
     "pytest>=7.0",
     # [cli]
     "click",
@@ -85,9 +83,9 @@ nowarn = "test -W default {args}"
 
 [tool.hatch.envs.cov]
 features = ["test"]
-dependencies = ["coverage", "pytest-cov"]
+dependencies = ["coverage[toml]", "pytest-cov"]
 [tool.hatch.envs.cov.scripts]
-test = "python -m pytest -vv --cov jupyter_events --cov-branch --cov-report term-missing:skip-covered --cov-fail-under 80 {args}"
+test = "python -m pytest -vv --cov jupyter_events --cov-branch --cov-report term-missing:skip-covered {args}"
 nowarn = "test -W default {args}"
 
 [tool.hatch.envs.typing]
@@ -132,6 +130,10 @@ exclude_lines = [
   "class .*\bProtocol\\):",
 "@(abc\\.)?abstractmethod",
 ]
+
+[tool.coverage.run]
+relative_files = true
+source = ["jupyter_events"]
 
 [tool.mypy]
 check_untyped_defs = true
