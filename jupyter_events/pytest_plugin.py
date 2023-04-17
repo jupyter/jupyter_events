@@ -26,8 +26,8 @@ def jp_read_emitted_events(jp_event_handler, jp_event_sink):
 
     def _read():
         jp_event_handler.flush()
-        lines = jp_event_sink.getvalue().strip().split("\n")
-        output = [json.loads(item) for item in lines]
+        event_buf = jp_event_sink.getvalue().strip()
+        output = [json.loads(item) for item in event_buf.split("\n")] if event_buf else None
         # Clear the sink.
         jp_event_sink.truncate(0)
         jp_event_sink.seek(0)
