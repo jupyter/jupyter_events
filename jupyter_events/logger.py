@@ -63,7 +63,7 @@ class EventLogger(LoggingConfigurable):
     """
 
     handlers = Handlers(
-        default_value=[],
+        default_value=None,
         allow_none=True,
         help="""A list of logging.Handler instances to send events to.
 
