@@ -163,6 +163,7 @@ def test_emit():
         "__schema_version__": 1,
         "__metadata_version__": 1,
         "something": "blah",
+        "taskName": None,
     }
 
 
@@ -416,6 +417,7 @@ def test_unique_logger_instances():
         "__schema_version__": 1,
         "__metadata_version__": 1,
         "something": "blah",
+        "taskName": None,
     }
 
     event_capsule1 = json.loads(output1.getvalue())
@@ -428,6 +430,7 @@ def test_unique_logger_instances():
         "__schema_version__": 1,
         "__metadata_version__": 1,
         "something": "blah",
+        "taskName": None,
     }
 
 
