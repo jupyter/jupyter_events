@@ -3,7 +3,8 @@ import json
 from pathlib import Path, PurePath
 from typing import Optional, Type, Union
 
-from jsonschema import FormatChecker, RefResolver, validators
+from jsonschema import FormatChecker, validators
+from referencing import Registry
 
 try:
     from jsonschema.protocols import Validator
@@ -55,8 +56,8 @@ class EventSchema:
         any schema registered here follows the expected form
         of Jupyter Events.
 
-    resolver:
-        RefResolver for nested JSON schema references.
+    registry:
+        Registry for nested JSON schema references.
     """
 
     def __init__(
@@ -64,14 +65,14 @@ class EventSchema:
         schema: SchemaType,
         validator_class: Type[Validator] = validators.Draft7Validator,  # type:ignore[assignment]
         format_checker: FormatChecker = draft7_format_checker,
-        resolver: Optional[RefResolver] = None,
+        registry: Optional[Registry] = None,
     ):
         """Initialize an event schema."""
         _schema = self._load_schema(schema)
         # Validate the schema against Jupyter Events metaschema.
         validate_schema(_schema)
         # Create a validator for this schema
-        self._validator = validator_class(_schema, resolver=resolver, format_checker=format_checker)
+        self._validator = validator_class(_schema, registry=registry, format_checker=format_checker)
         self._schema = _schema
 
     def __repr__(self):

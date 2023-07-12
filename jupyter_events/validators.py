@@ -2,7 +2,9 @@
 import pathlib
 
 import jsonschema
-from jsonschema import Draft7Validator, RefResolver, ValidationError
+from jsonschema import Draft7Validator, ValidationError
+from referencing import Registry
+from referencing.jsonschema import DRAFT7
 
 from . import yaml
 
@@ -30,19 +32,23 @@ SCHEMA_STORE = {
     EVENT_CORE_SCHEMA["$id"]: EVENT_CORE_SCHEMA,
 }
 
-METASCHEMA_RESOLVER = RefResolver(
-    base_uri=EVENT_METASCHEMA["$id"], referrer=EVENT_METASCHEMA, store=SCHEMA_STORE
+METASCHEMA_REGISTRY = Registry().with_resources(
+    [
+        (EVENT_METASCHEMA["$id"], DRAFT7.create_resource(EVENT_METASCHEMA)),
+        (PROPERTY_METASCHEMA["$id"], DRAFT7.create_resource(PROPERTY_METASCHEMA)),
+        (EVENT_CORE_SCHEMA["$id"], DRAFT7.create_resource(EVENT_CORE_SCHEMA))
+    ]
 )
 
 JUPYTER_EVENTS_SCHEMA_VALIDATOR = Draft7Validator(
     schema=EVENT_METASCHEMA,
-    resolver=METASCHEMA_RESOLVER,
+    registry=METASCHEMA_REGISTRY,
     format_checker=draft7_format_checker,
 )
 
 JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator(
     schema=EVENT_CORE_SCHEMA,
-    resolver=METASCHEMA_RESOLVER,
+    registry=METASCHEMA_REGISTRY,
     format_checker=draft7_format_checker,
 )
 
