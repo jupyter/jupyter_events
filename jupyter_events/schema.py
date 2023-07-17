@@ -5,6 +5,7 @@ from typing import Optional, Type, Union
 
 from jsonschema import FormatChecker, validators
 from referencing import Registry
+from referencing.jsonschema import DRAFT7
 
 try:
     from jsonschema.protocols import Validator
@@ -71,6 +72,10 @@ class EventSchema:
         _schema = self._load_schema(schema)
         # Validate the schema against Jupyter Events metaschema.
         validate_schema(_schema)
+
+        if registry is None:
+            registry = Registry().with_resource(_schema["$id"], DRAFT7.create_resource(_schema))
+
         # Create a validator for this schema
         self._validator = validator_class(_schema, registry=registry, format_checker=format_checker)
         self._schema = _schema
