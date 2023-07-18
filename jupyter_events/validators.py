@@ -40,13 +40,13 @@ METASCHEMA_REGISTRY = Registry().with_resources(  # type:ignore
     ]
 )
 
-JUPYTER_EVENTS_SCHEMA_VALIDATOR = Draft7Validator( # type: ignore
+JUPYTER_EVENTS_SCHEMA_VALIDATOR = Draft7Validator(  # type: ignore
     schema=EVENT_METASCHEMA,
     registry=METASCHEMA_REGISTRY,
     format_checker=draft7_format_checker,
 )
 
-JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator( # type: ignore
+JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator(  # type: ignore
     schema=EVENT_CORE_SCHEMA,
     registry=METASCHEMA_REGISTRY,
     format_checker=draft7_format_checker,

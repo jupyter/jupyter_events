@@ -77,7 +77,7 @@ class EventSchema:
             registry = Registry().with_resource(_schema["$id"], DRAFT7.create_resource(_schema))
 
         # Create a validator for this schema
-        self._validator = validator_class(_schema, registry=registry, format_checker=format_checker) # type: ignore
+        self._validator = validator_class(_schema, registry=registry, format_checker=format_checker)  # type: ignore
         self._schema = _schema
 
     def __repr__(self):
