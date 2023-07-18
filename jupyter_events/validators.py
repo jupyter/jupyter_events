@@ -32,7 +32,7 @@ SCHEMA_STORE = {
     EVENT_CORE_SCHEMA["$id"]: EVENT_CORE_SCHEMA,
 }
 
-METASCHEMA_REGISTRY = Registry().with_resources(
+METASCHEMA_REGISTRY = Registry().with_resources( # type:ignore
     [
         (EVENT_METASCHEMA["$id"], DRAFT7.create_resource(EVENT_METASCHEMA)),
         (PROPERTY_METASCHEMA["$id"], DRAFT7.create_resource(PROPERTY_METASCHEMA)),
