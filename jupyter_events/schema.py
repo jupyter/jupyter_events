@@ -4,7 +4,7 @@ from pathlib import Path, PurePath
 from typing import Optional, Type, Union
 
 from jsonschema import FormatChecker, validators
-from referencing import Registry, Resource
+from referencing import Registry
 from referencing.jsonschema import DRAFT7
 
 try:

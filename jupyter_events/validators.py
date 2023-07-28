@@ -32,7 +32,10 @@ SCHEMA_STORE = {
     EVENT_CORE_SCHEMA["$id"]: EVENT_CORE_SCHEMA,
 }
 
-resources = [DRAFT7.create_resource(each) for each in (EVENT_METASCHEMA, PROPERTY_METASCHEMA, EVENT_CORE_SCHEMA)]
+resources = [
+    DRAFT7.create_resource(each)
+    for each in (EVENT_METASCHEMA, PROPERTY_METASCHEMA, EVENT_CORE_SCHEMA)
+]
 METASCHEMA_REGISTRY = resources @ Registry()
 
 JUPYTER_EVENTS_SCHEMA_VALIDATOR = Draft7Validator(  # type: ignore
