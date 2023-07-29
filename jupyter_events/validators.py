@@ -1,5 +1,6 @@
 """Event validators."""
 from __future__ import annotations
+
 import pathlib
 
 import jsonschema
