@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.7.0
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.6.3...56e7d2660b59632765a85859217cddc7304e82f8))
+
+### Enhancements made
+
+- allow a 'message' field in an event schema [#72](https://github.com/jupyter/jupyter_events/pull/72) ([@Zsailer](https://github.com/Zsailer))
+
+### Bugs fixed
+
+- Improve usability of jp_read_emitted_events fixture [#74](https://github.com/jupyter/jupyter_events/pull/74) ([@kevin-bates](https://github.com/kevin-bates))
+
+### Maintenance and upkeep improvements
+
+- Migrate RefResolver to referencing.Registry [#80](https://github.com/jupyter/jupyter_events/pull/80) ([@hbcarlos](https://github.com/hbcarlos))
+- Use local coverage [#73](https://github.com/jupyter/jupyter_events/pull/73) ([@blink1073](https://github.com/blink1073))
+- Clean up license [#67](https://github.com/jupyter/jupyter_events/pull/67) ([@dcsaba89](https://github.com/dcsaba89))
+- Add more linting [#65](https://github.com/jupyter/jupyter_events/pull/65) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-01-12&to=2023-07-31&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2023-01-12..2023-07-31&type=Issues) | [@dcsaba89](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adcsaba89+updated%3A2023-01-12..2023-07-31&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ahbcarlos+updated%3A2023-01-12..2023-07-31&type=Issues) | [@kevin-bates](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Akevin-bates+updated%3A2023-01-12..2023-07-31&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Apre-commit-ci+updated%3A2023-01-12..2023-07-31&type=Issues) | [@Zsailer](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2023-01-12..2023-07-31&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.6.3
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.6.2...ac65980322317f1f30bc07150c9e14afaad03d40))
@@ -17,8 +44,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-01-10&to=2023-01-12&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2023-01-10..2023-01-12&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.6.2
 
