@@ -43,6 +43,9 @@ file = 'LICENSE'
 
 [project.urls]
 Homepage = "http://jupyter.org"
+documentation = "https://jupyter-events.readthedocs.io/"
+repository = "https://github.com/jupyter/jupyter_events.git"
+changelog = "https://github.com/jupyter/jupyter_events/blob/main/CHANGELOG.md"
 
 [project.scripts]
 jupyter-events = "jupyter_events.cli:main"
