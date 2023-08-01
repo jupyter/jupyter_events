@@ -4,7 +4,7 @@ from typing import Optional, Union
 from .schema import EventSchema
 
 
-class SchemaRegistryException(Exception):  # noqa[N818]
+class SchemaRegistryException(Exception):  # noqa: N818
     """Exception class for Jupyter Events Schema Registry Errors."""
 
 
