@@ -37,7 +37,7 @@ class Handlers(TraitType):
             return out
         # If a list, check it's elements to verify
         # that each element is a logging handler instance.
-        elif type(value) == list:
+        elif isinstance(value, list):
             self.validate_elements(obj, value)
             return value
         else:
