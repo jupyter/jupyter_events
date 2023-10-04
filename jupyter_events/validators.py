@@ -38,13 +38,13 @@ resources = [
 ]
 METASCHEMA_REGISTRY: Registry = resources @ Registry()
 
-JUPYTER_EVENTS_SCHEMA_VALIDATOR = Draft7Validator(  # type: ignore
+JUPYTER_EVENTS_SCHEMA_VALIDATOR = Draft7Validator(
     schema=EVENT_METASCHEMA,
     registry=METASCHEMA_REGISTRY,
     format_checker=draft7_format_checker,
 )
 
-JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator(  # type: ignore
+JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator(
     schema=EVENT_CORE_SCHEMA,
     registry=METASCHEMA_REGISTRY,
     format_checker=draft7_format_checker,

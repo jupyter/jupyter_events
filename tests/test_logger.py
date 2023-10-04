@@ -489,7 +489,7 @@ async def test_noop_emit():
     # it doesn't return immediately. We'll use the
     # MagicMock here to see if/when this method is called
     # to ensure `emit` is returning when it should.
-    el.schemas.validate_event = MagicMock(name="validate_event")
+    el.schemas.validate_event = MagicMock(name="validate_event")  # type:ignore[method-assign]
 
     schema_id1 = "http://test/test"
     schema1 = {
