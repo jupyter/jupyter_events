@@ -137,7 +137,7 @@ class EventLogger(LoggingConfigurable):
         Get this registered schema using the EventLogger.schema.get() method.
         """
 
-        event_schema = self.schemas.register(schema)
+        event_schema = self.schemas.register(schema)  # type:ignore[arg-type]
         key = event_schema.id
         self._modifiers[key] = set()
         self._modified_listeners[key] = set()
