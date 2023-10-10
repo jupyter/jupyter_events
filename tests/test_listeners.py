@@ -38,6 +38,23 @@ async def test_listener_function(jp_event_logger, schema):
     assert len(event_logger._active_listeners) == 0
 
 
+async def test_listener_function_str_annotations(jp_event_logger, schema):
+    event_logger = jp_event_logger
+    listener_was_called = False
+
+    async def my_listener(logger: "EventLogger", schema_id: "str", data: "dict") -> "None":
+        nonlocal listener_was_called
+        listener_was_called = True
+
+    # Add the modifier
+    event_logger.add_listener(schema_id=schema.id, listener=my_listener)
+    event_logger.emit(schema_id=schema.id, data={"prop": "hello, world"})
+    await event_logger.gather_listeners()
+    assert listener_was_called
+    # Check that the active listeners are cleaned up.
+    assert len(event_logger._active_listeners) == 0
+
+
 async def test_remove_listener_function(jp_event_logger, schema):
     event_logger = jp_event_logger
     listener_was_called = False
