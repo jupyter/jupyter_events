@@ -278,9 +278,16 @@ class EventLogger(LoggingConfigurable):
             """An interface for a listener."""
             ...
 
+        async def listener_signature_str_ann(
+            logger: "EventLogger", schema_id: "str", data: "dict"
+        ) -> "None":
+            """An interface for a listener."""
+            ...
+
         expected_signature = inspect.signature(listener_signature)
+        expected_signature_str_ann = inspect.signature(listener_signature_str_ann)
         # Assert this signature or raise an exception
-        if signature == expected_signature:
+        if signature in [expected_signature, expected_signature_str_ann]:
             # If the schema ID and version is given, only add
             # this modifier to that schema
             if schema_id:
