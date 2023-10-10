@@ -1,11 +1,17 @@
 """Trait types for events."""
+from __future__ import annotations
+
 import logging
 import typing as t
 
 from traitlets import TraitError, TraitType
 
+baseclass = TraitType
+if t.TYPE_CHECKING:
+    baseclass = TraitType[t.Any, t.Any]
 
-class Handlers(TraitType[t.Any, t.Any]):
+
+class Handlers(baseclass):
     """A trait that takes a list of logging handlers and converts
     it to a callable that returns that list (thus, making this
     trait pickleable).

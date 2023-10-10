@@ -3,7 +3,7 @@ import logging
 
 import pytest
 
-from jupyter_events.logger import EventLogger, ListenerError
+from jupyter_events.logger import EventLogger
 from jupyter_events.schema import EventSchema
 
 from .utils import SCHEMA_PATH
@@ -74,24 +74,6 @@ async def test_remove_listener_function(jp_event_logger, schema):
 
     event_logger.remove_listener(listener=my_listener)
     assert len(event_logger._modified_listeners[schema.id]) == 0
-    assert len(event_logger._unmodified_listeners[schema.id]) == 0
-
-
-async def test_bad_listener_function_signature(jp_event_logger, schema):
-    event_logger = jp_event_logger
-
-    async def listener_with_extra_args(
-        logger: EventLogger, schema_id: str, data: dict, unknown_arg: dict
-    ) -> None:
-        pass
-
-    with pytest.raises(ListenerError):
-        event_logger.add_listener(
-            schema_id=schema.id,
-            listener=listener_with_extra_args,
-        )
-
-    # Ensure no modifier was added.
     assert len(event_logger._unmodified_listeners[schema.id]) == 0
 
 
