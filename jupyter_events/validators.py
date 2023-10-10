@@ -1,5 +1,8 @@
 """Event validators."""
+from __future__ import annotations
+
 import pathlib
+from typing import Any
 
 import jsonschema
 from jsonschema import Draft7Validator, ValidationError
@@ -36,22 +39,22 @@ resources = [
     DRAFT7.create_resource(each)
     for each in (EVENT_METASCHEMA, PROPERTY_METASCHEMA, EVENT_CORE_SCHEMA)
 ]
-METASCHEMA_REGISTRY: Registry = resources @ Registry()
+METASCHEMA_REGISTRY: Registry[Any] = resources @ Registry()
 
 JUPYTER_EVENTS_SCHEMA_VALIDATOR = Draft7Validator(
     schema=EVENT_METASCHEMA,
-    registry=METASCHEMA_REGISTRY,
+    registry=METASCHEMA_REGISTRY,  # type:ignore[call-arg]
     format_checker=draft7_format_checker,
 )
 
 JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator(
     schema=EVENT_CORE_SCHEMA,
-    registry=METASCHEMA_REGISTRY,
+    registry=METASCHEMA_REGISTRY,  # type:ignore[call-arg]
     format_checker=draft7_format_checker,
 )
 
 
-def validate_schema(schema: dict) -> None:
+def validate_schema(schema: dict[str, Any]) -> None:
     """Validate a schema dict."""
     try:
         # Validate the schema against Jupyter Events metaschema.

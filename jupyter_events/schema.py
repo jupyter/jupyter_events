@@ -128,32 +128,32 @@ class EventSchema:
 
             loaded_schema = yaml.load(schema)
             EventSchema._ensure_yaml_loaded(loaded_schema)
-            return loaded_schema
+            return loaded_schema  # type:ignore[no-any-return]
 
         # finally, if schema is string, attempt to deserialize and return the output
         if isinstance(schema, str):
             # note the diff b/w load v.s. loads
             loaded_schema = yaml.loads(schema)
             EventSchema._ensure_yaml_loaded(loaded_schema, was_str=True)
-            return loaded_schema
+            return loaded_schema  # type:ignore[no-any-return]
 
-        msg = f"Expected a dictionary, string, or PurePath, but instead received {schema.__class__.__name__}."
+        msg = f"Expected a dictionary, string, or PurePath, but instead received {schema.__class__.__name__}."  # type:ignore[unreachable]
         raise EventSchemaUnrecognized(msg)
 
     @property
     def id(self) -> str:  # noqa
         """Schema $id field."""
-        return self._schema["$id"]
+        return self._schema["$id"]  # type:ignore[no-any-return]
 
     @property
     def version(self) -> int:
         """Schema's version."""
-        return self._schema["version"]
+        return self._schema["version"]  # type:ignore[no-any-return]
 
     @property
-    def properties(self) -> dict:
-        return self._schema["properties"]
+    def properties(self) -> dict[str, Any]:
+        return self._schema["properties"]  # type:ignore[no-any-return]
 
-    def validate(self, data: dict) -> None:
+    def validate(self, data: dict[str, Any]) -> None:
         """Validate an incoming instance of this event schema."""
         self._validator.validate(data)
