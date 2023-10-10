@@ -9,7 +9,7 @@ This is usually done using a Jupyter configuration file, e.g. `jupyter_config.py
 from logging import FileHandler
 
 # Log events to a local file on disk.
-handler = FileHandler('events.txt')
+handler = FileHandler("events.txt")
 
 # Explicitly list the types of events
 # to record and what properties or what categories

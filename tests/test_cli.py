@@ -18,7 +18,7 @@ def cli(script_runner):
         env.update(kwargs.pop("env", {}))
         env["PYTHONIOENCODING"] = "utf-8"
         kwargs["env"] = env
-        return script_runner.run(NAME, *map(str, args), **kwargs)
+        return script_runner.run([NAME, *list(map(str, args))], **kwargs)
 
     return run_cli
 
@@ -54,14 +54,14 @@ def test_cli_good_raw(cli):
 def test_cli_missing(cli):
     ret = cli("validate", SCHEMA_PATH / "bad/doesnt-exist.yaml")
     assert not ret.success
-    assert ret.returncode == RC.UNPARSEABLE
+    assert ret.returncode == RC.UNPARSABLE
     assert "Schema file not present" in ret.stderr.strip()
 
 
 def test_cli_malformed(cli):
     ret = cli("validate", SCHEMA_PATH / "bad/invalid.yaml")
     assert not ret.success
-    assert ret.returncode == RC.UNPARSEABLE
+    assert ret.returncode == RC.UNPARSABLE
     assert "Could not deserialize" in ret.stderr.strip()
 
 

@@ -21,7 +21,7 @@ class RC:
 
     OK = 0
     INVALID = 1
-    UNPARSEABLE = 2
+    UNPARSABLE = 2
     NOT_FOUND = 3
 
 
@@ -38,7 +38,7 @@ error_console = Console(stderr=True)
 
 @click.group()
 @click.version_option()
-def main():
+def main() -> None:
     """A simple CLI tool to quickly validate JSON schemas against
     Jupyter Event's custom validator.
 
@@ -77,7 +77,7 @@ def validate(ctx: click.Context, schema: str) -> int:
             # no need for full tracestack for user error exceptions. just print
             # the error message and return
             error_console.print(f"[bold red]ERROR[/]: {e}")
-            return ctx.exit(RC.UNPARSEABLE)
+            return ctx.exit(RC.UNPARSABLE)
 
     # Print what was found.
     schema_json = JSON(json.dumps(_schema))
@@ -93,7 +93,7 @@ def validate(ctx: click.Context, schema: str) -> int:
         error_console.rule("Results", style=Style(color="red"))
         error_console.print(f"[red]{EMOJI.X} [white]The schema failed to validate.")
         error_console.print("\nWe found the following error with your schema:")
-        out = escape(str(err))  # type:ignore
+        out = escape(str(err))  # type:ignore[assignment]
         error_console.print(Padding(out, (1, 0, 1, 4)))
         return ctx.exit(RC.INVALID)
 

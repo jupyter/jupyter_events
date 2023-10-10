@@ -1,7 +1,9 @@
 """Event schema objects."""
+from __future__ import annotations
+
 import json
 from pathlib import Path, PurePath
-from typing import Optional, Type, Union
+from typing import Any, Union
 
 from jsonschema import FormatChecker, validators
 from referencing import Registry
@@ -10,9 +12,7 @@ from referencing.jsonschema import DRAFT7
 try:
     from jsonschema.protocols import Validator
 except ImportError:
-    from typing import Any
-
-    Validator = Any  # type:ignore
+    Validator = Any  # type:ignore[assignment, misc]
 
 from . import yaml
 from .validators import draft7_format_checker, validate_schema
@@ -64,9 +64,9 @@ class EventSchema:
     def __init__(
         self,
         schema: SchemaType,
-        validator_class: Type[Validator] = validators.Draft7Validator,  # type:ignore[assignment]
+        validator_class: type[Validator] = validators.Draft7Validator,  # type:ignore[assignment]
         format_checker: FormatChecker = draft7_format_checker,
-        registry: Optional[Registry] = None,
+        registry: Registry[Any] | None = None,
     ):
         """Initialize an event schema."""
         _schema = self._load_schema(schema)
@@ -77,10 +77,10 @@ class EventSchema:
             registry = DRAFT7.create_resource(_schema) @ Registry()
 
         # Create a validator for this schema
-        self._validator = validator_class(_schema, registry=registry, format_checker=format_checker)  # type: ignore
+        self._validator = validator_class(_schema, registry=registry, format_checker=format_checker)  # type: ignore[call-arg]
         self._schema = _schema
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """A string repr for an event schema."""
         return json.dumps(self._schema, indent=2)
 
@@ -107,7 +107,7 @@ class EventSchema:
         raise EventSchemaLoadingError(error_msg)
 
     @staticmethod
-    def _load_schema(schema: SchemaType) -> dict:
+    def _load_schema(schema: SchemaType) -> dict[str, Any]:
         """Load a JSON schema from different sources/data types.
 
         `schema` could be a dictionary or serialized string representing the

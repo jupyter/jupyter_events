@@ -52,4 +52,4 @@ Schema: {
 
 The registry's validators will be used to check incoming events to ensure all outgoing, emitted events are registered and follow the expected form.
 
-Lastly, if an incoming event is not found in the registry, it does not get emitted. This ensures that we only collect data that we explicity register with the logger.
+Lastly, if an incoming event is not found in the registry, it does not get emitted. This ensures that we only collect data that we explicitly register with the logger.
