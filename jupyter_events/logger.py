@@ -1,14 +1,15 @@
 """
 Emit structured, discrete events when various actions happen.
 """
+from __future__ import annotations
+
 import asyncio
 import copy
-import inspect
 import json
 import logging
+import typing as t
 import warnings
 from datetime import datetime, timezone
-from typing import Any, Callable, Coroutine, Optional, Union
 
 from jsonschema import ValidationError
 from pythonjsonlogger import jsonlogger
@@ -86,17 +87,19 @@ class EventLogger(LoggingConfigurable):
         {}, help="A mapping of schemas to the listeners of unmodified/raw events."
     )
 
-    _active_listeners = Set()
+    _active_listeners: set[asyncio.Task[t.Any]] = Set()  # type:ignore[assignment]
 
-    async def gather_listeners(self):
+    async def gather_listeners(self) -> list[t.Any]:
         """Gather all of the active listeners."""
-        return await asyncio.gather(*self._active_listeners, return_exceptions=True)
+        return await asyncio.gather(  # type:ignore[no-any-return]
+            *self._active_listeners, return_exceptions=True
+        )
 
     @default("schemas")
     def _default_schemas(self) -> SchemaRegistry:
         return SchemaRegistry()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
         """Initialize the logger."""
         # We need to initialize the configurable before
         # adding the logging handlers.
@@ -114,15 +117,20 @@ class EventLogger(LoggingConfigurable):
             for handler in self.handlers:
                 self.register_handler(handler)
 
-    def _load_config(self, cfg, section_names=None, traits=None):
+    def _load_config(
+        self,
+        cfg: Config,
+        section_names: list[str] | None = None,
+        traits: list[str] | None = None,
+    ) -> None:
         """Load EventLogger traits from a Config object, patching the
         handlers trait in the Config object to avoid deepcopy errors.
         """
         my_cfg = self._find_my_config(cfg)
-        handlers = my_cfg.pop("handlers", [])
+        handlers: list[logging.Handler] = my_cfg.pop("handlers", [])
 
         # Turn handlers list into a pickeable function
-        def get_handlers():
+        def get_handlers() -> list[logging.Handler]:
             return handlers
 
         my_cfg["handlers"] = get_handlers
@@ -149,7 +157,7 @@ class EventLogger(LoggingConfigurable):
         All outgoing messages will be formatted as a JSON string.
         """
 
-        def _handle_message_field(record, **kwargs):
+        def _handle_message_field(record: t.Any, **kwargs: t.Any) -> str:
             """Python's logger always emits the "message" field with
             the value as "null" unless it's present in the schema/data.
             Message happens to be a common field for event logs,
@@ -161,7 +169,7 @@ class EventLogger(LoggingConfigurable):
                 del record["message"]
             return json.dumps(record, **kwargs)
 
-        formatter = jsonlogger.JsonFormatter(
+        formatter = jsonlogger.JsonFormatter(  # type:ignore [no-untyped-call]
             json_serializer=_handle_message_field,
         )
         handler.setFormatter(formatter)
@@ -178,8 +186,8 @@ class EventLogger(LoggingConfigurable):
     def add_modifier(
         self,
         *,
-        schema_id: Union[str, None] = None,
-        modifier: Callable[[str, dict], dict],
+        schema_id: str | None = None,
+        modifier: t.Callable[[str, dict[str, t.Any]], dict[str, t.Any]],
     ) -> None:
         """Add a modifier (callable) to a registered event.
 
@@ -193,41 +201,23 @@ class EventLogger(LoggingConfigurable):
         """
         # Ensure that this is a callable function/method
         if not callable(modifier):
-            msg = "`modifier` must be a callable"
+            msg = "`modifier` must be a callable"  # type:ignore[unreachable]
             raise TypeError(msg)
 
-        # Now let's verify the function signature.
-        signature = inspect.signature(modifier)
-
-        def modifier_signature(  # type:ignore[empty-body]
-            schema_id: str, data: dict
-        ) -> dict:
-            """Signature to enforce"""
-            ...
-
-        expected_signature = inspect.signature(modifier_signature)
-        # Assert this signature or raise an exception
-        if signature == expected_signature:
-            # If the schema ID and version is given, only add
-            # this modifier to that schema
-            if schema_id:
-                self._modifiers[schema_id].add(modifier)
-                return
-            for id_ in self._modifiers:
-                if schema_id is None or id_ == schema_id:
-                    self._modifiers[id_].add(modifier)
-        else:
-            msg = (
-                "Modifiers are required to follow an exact function/method "
-                "signature. The signature should look like:"
-                f"\n\n\tdef my_modifier{expected_signature}:\n\n"
-                "Check that you are using type annotations for each argument "
-                "and the return value."
-            )
-            raise ModifierError(msg)
+        # If the schema ID and version is given, only add
+        # this modifier to that schema
+        if schema_id:
+            self._modifiers[schema_id].add(modifier)
+            return
+        for id_ in self._modifiers:
+            if schema_id is None or id_ == schema_id:
+                self._modifiers[id_].add(modifier)
 
     def remove_modifier(
-        self, *, schema_id: Optional[str] = None, modifier: Callable[[str, dict], dict]
+        self,
+        *,
+        schema_id: str | None = None,
+        modifier: t.Callable[[str, dict[str, t.Any]], dict[str, t.Any]],
     ) -> None:
         """Remove a modifier from an event or all events.
 
@@ -253,8 +243,8 @@ class EventLogger(LoggingConfigurable):
         self,
         *,
         modified: bool = True,
-        schema_id: Union[str, None] = None,
-        listener: Callable[["EventLogger", str, dict], Coroutine[Any, Any, None]],
+        schema_id: str | None = None,
+        listener: t.Callable[[EventLogger, str, dict[str, t.Any]], t.Coroutine[t.Any, t.Any, None]],
     ) -> None:
         """Add a listener (callable) to a registered event.
 
@@ -269,54 +259,28 @@ class EventLogger(LoggingConfigurable):
             A callable function/method that executes when the named event occurs.
         """
         if not callable(listener):
-            msg = "`listener` must be a callable"
+            msg = "`listener` must be a callable"  # type:ignore[unreachable]
             raise TypeError(msg)
 
-        signature = inspect.signature(listener)
-
-        async def listener_signature(logger: EventLogger, schema_id: str, data: dict) -> None:
-            """An interface for a listener."""
-            ...
-
-        async def listener_signature_str_ann(
-            logger: "EventLogger", schema_id: "str", data: "dict"
-        ) -> "None":
-            """An interface for a listener."""
-            ...
-
-        expected_signature = inspect.signature(listener_signature)
-        expected_signature_str_ann = inspect.signature(listener_signature_str_ann)
-        # Assert this signature or raise an exception
-        if signature in [expected_signature, expected_signature_str_ann]:
-            # If the schema ID and version is given, only add
-            # this modifier to that schema
-            if schema_id:
+        # If the schema ID and version is given, only add
+        # this modifier to that schema
+        if schema_id:
+            if modified:
+                self._modified_listeners[schema_id].add(listener)
+                return
+            self._unmodified_listeners[schema_id].add(listener)
+        for id_ in self.schemas.schema_ids:
+            if schema_id is None or id_ == schema_id:
                 if modified:
-                    self._modified_listeners[schema_id].add(listener)
-                    return
-                self._unmodified_listeners[schema_id].add(listener)
-            for id_ in self.schemas.schema_ids:
-                if schema_id is None or id_ == schema_id:
-                    if modified:
-                        self._modified_listeners[id_].add(listener)
-                    else:
-                        self._unmodified_listeners[schema_id].add(listener)
-        else:
-            msg = (
-                "Listeners are required to follow an exact function/method "
-                "signature. The signature should look like:"
-                f"\n\n\tasync def my_listener{expected_signature}:\n\n"
-                "Check that you are using type annotations for each argument "
-                "and the return value."
-            )
-
-            raise ListenerError(msg)
+                    self._modified_listeners[id_].add(listener)
+                else:
+                    self._unmodified_listeners[schema_id].add(listener)
 
     def remove_listener(
         self,
         *,
-        schema_id: Optional[str] = None,
-        listener: Callable[["EventLogger", str, dict], Coroutine[Any, Any, None]],
+        schema_id: str | None = None,
+        listener: t.Callable[[EventLogger, str, dict[str, t.Any]], t.Coroutine[t.Any, t.Any, None]],
     ) -> None:
         """Remove a listener from an event or all events.
 
@@ -340,8 +304,8 @@ class EventLogger(LoggingConfigurable):
                 self._unmodified_listeners[schema_id].discard(listener)
 
     def emit(
-        self, *, schema_id: str, data: dict, timestamp_override: Optional[datetime] = None
-    ) -> Optional[dict]:
+        self, *, schema_id: str, data: dict[str, t.Any], timestamp_override: datetime | None = None
+    ) -> dict[str, t.Any] | None:
         """
         Record given event with schema has occurred.
 
@@ -414,7 +378,7 @@ class EventLogger(LoggingConfigurable):
 
         # callback for removing from finished listeners
         # from active listeners set.
-        def _listener_task_done(task: asyncio.Task) -> None:
+        def _listener_task_done(task: asyncio.Task[t.Any]) -> None:
             # If an exception happens, log it to the main
             # applications logger
             err = task.exception()
@@ -443,7 +407,7 @@ class EventLogger(LoggingConfigurable):
             self._active_listeners.add(task)
 
             # Remove task from active listeners once its finished.
-            def _listener_task_done(task: asyncio.Task) -> None:
+            def _listener_task_done(task: asyncio.Task[t.Any]) -> None:
                 # If an exception happens, log it to the main
                 # applications logger
                 err = task.exception()

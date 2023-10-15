@@ -9,7 +9,6 @@ from jupyter_events import Event
 
 
 class MyApplication(JupyterApp):
-
     classes = [EventLogger, ...]
     eventlogger = Instance(EventLogger)
 
@@ -32,9 +31,7 @@ Register an event schema with the logger.
             type: string
         """
 
-        self.eventlogger.register_event_schema(
-            schema=schema
-        )
+        self.eventlogger.register_event_schema(schema=schema)
 ```
 
 Call `.emit(...)` within the application to emit an instance of the event.
@@ -44,7 +41,9 @@ Call `.emit(...)` within the application to emit an instance of the event.
         # Do something
         ...
         # Emit event telling listeners that this event happened.
-        self.eventlogger.emit(schema_id="myapplication.org/my-method", data={"msg": "Hello, world!"})
+        self.eventlogger.emit(
+            schema_id="myapplication.org/my-method", data={"msg": "Hello, world!"}
+        )
         # Do something else...
         ...
 ```

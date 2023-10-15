@@ -31,7 +31,7 @@ logger.register_event_schema(schema)
 Now that the logger knows about the event, it needs to know _where_ to send it. To do this, we register a logging _Handler_ —borrowed from Python's standard [`logging`](https://docs.python.org/3/library/logging.html) library—to route the events to the proper place.
 
 ```python
-# We will import one of the handlers from Python's logging libray
+# We will import one of the handlers from Python's logging library
 from logging import StreamHandler
 
 handler = StreamHandler()
@@ -45,11 +45,7 @@ The logger knows about the event and where to send it; all that's left is to emi
 from jupyter_events import Event
 
 logger.emit(
-      schema_id="http://myapplication.org/example-event",
-      data={
-         "name": "My Event"
-      }
-   )
+    schema_id="http://myapplication.org/example-event", data={"name": "My Event"}
 )
 ```
 

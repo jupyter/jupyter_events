@@ -1,5 +1,7 @@
 """"An event schema registry."""
-from typing import Optional, Union
+from __future__ import annotations
+
+from typing import Any
 
 from .schema import EventSchema
 
@@ -11,9 +13,9 @@ class SchemaRegistryException(Exception):  # noqa: N818
 class SchemaRegistry:
     """A convenient API for storing and searching a group of schemas."""
 
-    def __init__(self, schemas: Optional[dict] = None):
+    def __init__(self, schemas: dict[str, EventSchema] | None = None):
         """Initialize the registry."""
-        self._schemas = schemas or {}
+        self._schemas: dict[str, EventSchema] = schemas or {}
 
     def __contains__(self, key: str) -> bool:
         """Syntax sugar to check if a schema is found in the registry"""
@@ -33,10 +35,10 @@ class SchemaRegistry:
         self._schemas[schema_obj.id] = schema_obj
 
     @property
-    def schema_ids(self):
-        return self._schemas.keys()
+    def schema_ids(self) -> list[str]:
+        return list(self._schemas.keys())
 
-    def register(self, schema: Union[dict, str, EventSchema]) -> EventSchema:
+    def register(self, schema: dict[str, Any] | (str | EventSchema)) -> EventSchema:
         """Add a valid schema to the registry.
 
         All schemas are validated against the Jupyter Events meta-schema
@@ -73,7 +75,7 @@ class SchemaRegistry:
             )
             raise KeyError(msg) from None
 
-    def validate_event(self, id_: str, data: dict) -> None:
+    def validate_event(self, id_: str, data: dict[str, Any]) -> None:
         """Validate an event against a schema within this
         registry.
         """

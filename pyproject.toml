@@ -94,9 +94,9 @@ nowarn = "test -W default {args}"
 
 [tool.hatch.envs.typing]
 features = ["test"]
-dependencies = ["mypy>=0.990"]
+dependencies = ["mypy~=1.6", "traitlets>=5.11.1", "jupyter_core>=5.4"]
 [tool.hatch.envs.typing.scripts]
-test = "mypy --install-types --non-interactive {args:.}"
+test = "mypy --install-types --non-interactive {args}"
 
 [tool.hatch.envs.lint]
 dependencies = ["black[jupyter]==23.3.0", "mdformat>0.7", "ruff==0.0.287"]
@@ -114,12 +114,26 @@ fmt = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-raXs --durations 10 --color=yes --doctest-modules"
+minversion = "6.0"
+xfail_strict = true
+log_cli_level = "info"
+addopts = [
+  "-raXs", "--durations=10", "--color=yes", "--doctest-modules",
+   "--showlocals", "--strict-markers", "--strict-config"
+]
 testpaths = [
     "tests/"
 ]
 asyncio_mode = "auto"
 script_launch_mode = "subprocess"
+filterwarnings= [
+  # Fail on warnings
+  "error",
+  # Upstream warnings from python-dateutil
+  "module:datetime.datetime.utc:DeprecationWarning",
+  # Ignore importwarning on pypy for yaml
+  "module:can't resolve package from __spec__ or __package__:ImportWarning",
+]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -140,18 +154,12 @@ relative_files = true
 source = ["jupyter_events"]
 
 [tool.mypy]
-check_untyped_defs = true
-disallow_incomplete_defs = true
-no_implicit_optional = true
-pretty = true
-show_error_context = true
+files = "jupyter_events"
+python_version = "3.8"
+strict = true
 show_error_codes = true
-strict_equality = true
-warn_unused_configs = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-explicit_package_bases = true
-namespace_packages = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+warn_unreachable = true
 
 [tool.black]
 line-length = 100
@@ -207,3 +215,6 @@ ignore-nested-functions=true
 ignore-nested-classes=true
 fail-under=100
 exclude = ["docs", "tests"]
+
+[tool.repo-review]
+ignore = ["PY007", "PP308", "GH102", "PC140"]

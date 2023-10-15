@@ -56,8 +56,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      -  name: Run Linters
-         run: |
+      - name: Run Linters
+        run: |
           hatch run typing:test
           hatch run lint:style
           pipx run interrogate .
@@ -83,7 +83,7 @@ jobs:
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
           dependency_type: minimum
-      - name: Install with miniumum versions and optional deps
+      - name: Install with minimum versions and optional deps
         run: |
           pip install -e .[test]
           pip install jsonschema[format-nongpl,format_nongpl]
