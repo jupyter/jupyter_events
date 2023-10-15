@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path, PurePath
-from typing import Any, cast
+from typing import Any
 
 from yaml import dump as ydump
 from yaml import load as yload
@@ -21,7 +21,7 @@ def loads(stream: Any) -> Any:
 
 def dumps(stream: Any) -> str:
     """Parse the first YAML document in a stream as an object."""
-    return cast(str, ydump(stream, Dumper=SafeDumper))
+    return ydump(stream, Dumper=SafeDumper)
 
 
 def load(fpath: str | PurePath) -> Any:
