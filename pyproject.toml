@@ -131,6 +131,8 @@ filterwarnings= [
   "error",
   # Upstream warnings from python-dateutil
   "module:datetime.datetime.utc:DeprecationWarning",
+  # Ignore importwarning on pypy for yaml
+  "module:can't resolve package from __spec__ or __package__:ImportWarning",
 ]
 
 [tool.coverage.report]

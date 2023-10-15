@@ -31,11 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - name: Run Tests on pypy
-        if: ${{ startsWith( matrix.python-version, 'pypy') }}
-        run: hatch run test:test
       - name: Run Tests
-        if: ${{ ! startsWith( matrix.python-version, 'pypy') }}
         run: hatch run cov:test
       - uses: jupyterlab/maintainer-tools/.github/actions/upload-coverage@v1
 
