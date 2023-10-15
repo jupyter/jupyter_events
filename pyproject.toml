@@ -94,7 +94,7 @@ nowarn = "test -W default {args}"
 
 [tool.hatch.envs.typing]
 features = ["test"]
-dependencies = ["mypy>=1.5.1", "traitlets>=5.11.1"]
+dependencies = ["mypy~=1.6", "traitlets>=5.11.1", "jupyter_core>=5.4"]
 [tool.hatch.envs.typing.scripts]
 test = "mypy --install-types --non-interactive {args}"
 
@@ -129,6 +129,8 @@ script_launch_mode = "subprocess"
 filterwarnings= [
   # Fail on warnings
   "error",
+  # Upstream warnings from python-dateutil
+  "module:datetime.datetime.utc:DeprecationWarning",
 ]
 
 [tool.coverage.report]

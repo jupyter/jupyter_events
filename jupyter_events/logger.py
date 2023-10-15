@@ -12,7 +12,7 @@ import warnings
 from datetime import datetime, timezone
 
 from jsonschema import ValidationError
-from pythonjsonlogger import jsonlogger  # type:ignore[import]
+from pythonjsonlogger import jsonlogger  # type:ignore[import-untyped]
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 

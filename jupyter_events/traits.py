@@ -8,10 +8,10 @@ from traitlets import TraitError, TraitType
 
 baseclass = TraitType
 if t.TYPE_CHECKING:
-    baseclass = TraitType[t.Any, t.Any]
+    baseclass = TraitType[t.Any, t.Any]  # type:ignore[misc]
 
 
-class Handlers(baseclass):
+class Handlers(baseclass):  # type:ignore[type-arg]
     """A trait that takes a list of logging handlers and converts
     it to a callable that returns that list (thus, making this
     trait pickleable).
