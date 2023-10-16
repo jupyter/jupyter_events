@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.8.0
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.7.0...e3edb6a868924d3f1b15eaf18d45be621ad77cef))
+
+### Bugs fixed
+
+- Allow for string annotations in listener signature [#88](https://github.com/jupyter/jupyter_events/pull/88) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Adopt sp-repo-review [#89](https://github.com/jupyter/jupyter_events/pull/89) ([@blink1073](https://github.com/blink1073))
+- Bump actions/checkout from 3 to 4 [#84](https://github.com/jupyter/jupyter_events/pull/84) ([@dependabot](https://github.com/dependabot))
+- Add more PyPI URLs [#82](https://github.com/jupyter/jupyter_events/pull/82) ([@pydanny](https://github.com/pydanny))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-07-31&to=2023-10-16&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2023-07-31..2023-10-16&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adependabot+updated%3A2023-07-31..2023-10-16&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Apre-commit-ci+updated%3A2023-07-31..2023-10-16&type=Issues) | [@pydanny](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Apydanny+updated%3A2023-07-31..2023-10-16&type=Issues) | [@Zsailer](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2023-07-31..2023-10-16&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.7.0
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.6.3...56e7d2660b59632765a85859217cddc7304e82f8))
@@ -28,8 +50,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-01-12&to=2023-07-31&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2023-01-12..2023-07-31&type=Issues) | [@dcsaba89](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adcsaba89+updated%3A2023-01-12..2023-07-31&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ahbcarlos+updated%3A2023-01-12..2023-07-31&type=Issues) | [@kevin-bates](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Akevin-bates+updated%3A2023-01-12..2023-07-31&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Apre-commit-ci+updated%3A2023-01-12..2023-07-31&type=Issues) | [@Zsailer](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2023-01-12..2023-07-31&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.6.3
 
