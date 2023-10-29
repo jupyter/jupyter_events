@@ -121,7 +121,7 @@ class EventLogger(LoggingConfigurable):
         self,
         cfg: Config,
         section_names: list[str] | None = None,
-        traits: list[str] | None = None,
+        traits: list[str] | None = None,  # type:ignore[override]
     ) -> None:
         """Load EventLogger traits from a Config object, patching the
         handlers trait in the Config object to avoid deepcopy errors.
