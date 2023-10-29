@@ -78,6 +78,7 @@ html_theme_options = {
     "logo": {
         "text": "Jupyter Events",
     },
+    "navigation_with_keys": False,
     "icon_links": [
         {
             # Label for this link
