@@ -51,6 +51,24 @@ repos:
       - id: codespell
         args: ["-L", "sur,nd"]
 
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: "v1.6.1"
+    hooks:
+      - id: mypy
+        files: "^jupyter_events"
+        stages: [manual]
+        args: ["--install-types", "--non-interactive"]
+        additional_dependencies:
+          [
+            "traitlets>=5.13",
+            "jupyter_core>=5.4",
+            "pyyaml",
+            "python-json-logger",
+            "pytest>=7",
+            "click",
+            "rich",
+          ]
+
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: "v1.10.0"
     hooks:

@@ -48,4 +48,4 @@ class Handlers(baseclass):  # type:ignore[type-arg]
             self.validate_elements(obj, value)
             return value
         else:
-            self.error(obj, value)  # type:ignore[no-untyped-call]
+            self.error(obj, value)
