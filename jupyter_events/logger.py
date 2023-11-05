@@ -274,7 +274,7 @@ class EventLogger(LoggingConfigurable):
                 if modified:
                     self._modified_listeners[id_].add(listener)
                 else:
-                    self._unmodified_listeners[schema_id].add(listener)
+                    self._unmodified_listeners[id_].add(listener)
 
     def remove_listener(
         self,
