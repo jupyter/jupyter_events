@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.9.0
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.8.0...228a04801224d127f4304e17398464d045794cf0))
+
+### Bugs fixed
+
+- Clean up linting and fix a bug that was found [#91](https://github.com/jupyter/jupyter_events/pull/91) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Clean up linting and fix a bug that was found [#91](https://github.com/jupyter/jupyter_events/pull/91) ([@blink1073](https://github.com/blink1073))
+- Adopt ruff format [#90](https://github.com/jupyter/jupyter_events/pull/90) ([@blink1073](https://github.com/blink1073))
+- Normalize "jsonschema\[format-nongpl\]" in  pyproject.toml [#86](https://github.com/jupyter/jupyter_events/pull/86) ([@frenzymadness](https://github.com/frenzymadness))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-10-16&to=2023-11-06&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2023-10-16..2023-11-06&type=Issues) | [@frenzymadness](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Afrenzymadness+updated%3A2023-10-16..2023-11-06&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.8.0
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.7.0...e3edb6a868924d3f1b15eaf18d45be621ad77cef))
@@ -23,8 +45,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-07-31&to=2023-10-16&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2023-07-31..2023-10-16&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adependabot+updated%3A2023-07-31..2023-10-16&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Apre-commit-ci+updated%3A2023-07-31..2023-10-16&type=Issues) | [@pydanny](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Apydanny+updated%3A2023-07-31..2023-10-16&type=Issues) | [@Zsailer](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2023-07-31..2023-10-16&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.7.0
 
