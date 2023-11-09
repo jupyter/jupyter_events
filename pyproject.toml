@@ -195,7 +195,7 @@ unfixable = [
 "tests/*" = ["B011", "F841", "C408", "E402", "T201", "B007", "N802", "F841", "S101"]
 # C901 Function is too complex
 "jupyter_events/logger.py" = ["C901"] # `emit` is too complex (12 > 10)
-
+"docs/demo/demo-notebook.ipynb" = ["PLE1142", "E402", "T201"]
 
 [tool.interrogate]
 ignore-init-module=true
