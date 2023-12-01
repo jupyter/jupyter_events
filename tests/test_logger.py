@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import io
 import json
 import logging
@@ -40,8 +42,7 @@ def get_config_from_file(path, content):
 
     # Load written file.
     loader = PyFileConfigLoader(filename, path=str(path))
-    cfg = loader.load_config()
-    return cfg
+    return loader.load_config()
 
 
 def test_good_config_file(tmp_path):

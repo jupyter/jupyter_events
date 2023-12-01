@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path, PurePath
-from typing import Any, Union
+from typing import Any, Dict, Union
 
 from jsonschema import FormatChecker, validators
 from referencing import Registry
@@ -18,25 +18,19 @@ from . import yaml
 from .validators import draft7_format_checker, validate_schema
 
 
-class EventSchemaUnrecognized(Exception):  # noqa
+class EventSchemaUnrecognized(Exception):
     """An error for an unrecognized event schema."""
-
-    pass
 
 
 class EventSchemaLoadingError(Exception):
     """An error for an event schema loading error."""
 
-    pass
 
-
-class EventSchemaFileAbsent(Exception):  # noqa
+class EventSchemaFileAbsent(Exception):
     """An error for an absent event schema file."""
 
-    pass
 
-
-SchemaType = Union[dict, str, PurePath]
+SchemaType = Union[Dict[str, Any], str, PurePath]
 
 
 class EventSchema:
@@ -141,7 +135,7 @@ class EventSchema:
         raise EventSchemaUnrecognized(msg)
 
     @property
-    def id(self) -> str:  # noqa
+    def id(self) -> str:
         """Schema $id field."""
         return self._schema["$id"]  # type:ignore[no-any-return]
 

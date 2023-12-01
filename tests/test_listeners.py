@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import io
 import logging
 
@@ -42,7 +44,7 @@ async def test_listener_function_str_annotations(jp_event_logger, schema):
     event_logger = jp_event_logger
     listener_was_called = False
 
-    async def my_listener(logger: "EventLogger", schema_id: "str", data: "dict") -> "None":
+    async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
         nonlocal listener_was_called
         listener_was_called = True
 

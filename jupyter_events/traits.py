@@ -44,8 +44,8 @@ class Handlers(baseclass):  # type:ignore[type-arg]
             return out
         # If a list, check it's elements to verify
         # that each element is a logging handler instance.
-        elif isinstance(value, list):
+        if isinstance(value, list):
             self.validate_elements(obj, value)
             return value
-        else:
-            self.error(obj, value)
+        self.error(obj, value)
+        return None  # type:ignore[unreachable]

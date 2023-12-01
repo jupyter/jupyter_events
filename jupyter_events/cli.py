@@ -1,4 +1,6 @@
 """The cli for jupyter events."""
+from __future__ import annotations
+
 import json
 import pathlib
 import platform
@@ -46,7 +48,6 @@ def main() -> None:
 
         https://raw.githubusercontent.com/jupyter/jupyter_events/main/jupyter_events/schemas/event-metaschema.yml
     """
-    pass
 
 
 @click.command()

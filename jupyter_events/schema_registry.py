@@ -6,7 +6,7 @@ from typing import Any
 from .schema import EventSchema
 
 
-class SchemaRegistryException(Exception):  # noqa: N818
+class SchemaRegistryException(Exception):
     """Exception class for Jupyter Events Schema Registry Errors."""
 
 
