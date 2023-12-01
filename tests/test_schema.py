@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from pathlib import Path
 
@@ -31,7 +33,7 @@ def test_bad_validations(schema_file, validation_error_msg):
     a redactionPolicies field.
     """
     # Read the schema file
-    with open(SCHEMA_PATH / "bad" / schema_file) as f:
+    with Path.open(SCHEMA_PATH / "bad" / schema_file) as f:
         schema = yaml.loads(f)
     # Assert that the schema files for a known reason.
     with pytest.raises(ValidationError) as err:
@@ -49,7 +51,7 @@ def test_string_intended_as_path():
     """Ensure EventSchema returns a helpful error message if user passes a
     string intended as a Path."""
     expected_msg_contents = "Paths to schema files must be explicitly wrapped in a Pathlib object."
-    str_path = os.path.join(SCHEMA_PATH, "good", "some_schema.yaml")
+    str_path = os.path.join(SCHEMA_PATH, "good", "some_schema.yaml")  # noqa: PTH118
     with pytest.raises(EventSchemaLoadingError) as e:
         EventSchema(str_path)
 
@@ -79,7 +81,7 @@ def test_valid_json():
 def test_good_validations(schema_file):
     """Ensure validation passes for good schemas."""
     # Read the schema file
-    with open(SCHEMA_PATH / "good" / schema_file) as f:
+    with Path.open(SCHEMA_PATH / "good" / schema_file) as f:
         schema = yaml.loads(f)
     # assert that no exception gets raised
     validate_schema(schema)

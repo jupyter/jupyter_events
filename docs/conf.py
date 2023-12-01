@@ -16,11 +16,10 @@
 
 
 # -- Project information -----------------------------------------------------
-
-from typing import List
+from __future__ import annotations
 
 project = "jupyter_events"
-copyright = "2019, Project Jupyter"  # noqa
+copyright = "2019, Project Jupyter"
 author = "Project Jupyter"
 
 
@@ -29,10 +28,10 @@ author = "Project Jupyter"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions: List = ["myst_parser", "jupyterlite_sphinx"]
+extensions: list = ["myst_parser", "jupyterlite_sphinx"]
 
 try:
-    import enchant  # type:ignore  # noqa
+    import enchant  # noqa: F401
 
     extensions += ["sphinxcontrib.spelling"]
 except ImportError:

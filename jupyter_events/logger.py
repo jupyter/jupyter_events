@@ -91,9 +91,7 @@ class EventLogger(LoggingConfigurable):
 
     async def gather_listeners(self) -> list[t.Any]:
         """Gather all of the active listeners."""
-        return await asyncio.gather(  # type:ignore[no-any-return]
-            *self._active_listeners, return_exceptions=True
-        )
+        return await asyncio.gather(*self._active_listeners, return_exceptions=True)
 
     @default("schemas")
     def _default_schemas(self) -> SchemaRegistry:
@@ -120,8 +118,8 @@ class EventLogger(LoggingConfigurable):
     def _load_config(
         self,
         cfg: Config,
-        section_names: list[str] | None = None,
-        traits: list[str] | None = None,  # type:ignore[override]
+        section_names: list[str] | None = None,  # noqa: ARG002
+        traits: list[str] | None = None,  # type:ignore[override]  # noqa: ARG002
     ) -> None:
         """Load EventLogger traits from a Config object, patching the
         handlers trait in the Config object to avoid deepcopy errors.
