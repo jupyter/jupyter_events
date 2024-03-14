@@ -142,7 +142,11 @@ async def test_bad_listener_does_not_break_good_listener(jp_event_logger, schema
 
 @pytest.mark.parametrize(
     # Make sure no schemas are added at the start of this test.
-    "jp_event_schemas", ([],) 
+    "jp_event_schemas",
+    [
+        # Empty events list.
+        []
+    ],
 )
 async def test_listener_added_before_schemas_passes(jp_event_logger, schema):
     # Ensure there are no schemas listed.
@@ -164,7 +168,7 @@ async def test_listener_added_before_schemas_passes(jp_event_logger, schema):
     assert not listener_was_called
 
     # Now register the event and emit.
-    jp_event_logger.register_event_schema(schema)        
+    jp_event_logger.register_event_schema(schema)
 
     # Try emitting the event again and ensure the listener saw it.
     jp_event_logger.emit(schema_id=schema.id, data={"prop": "hello, world"})
