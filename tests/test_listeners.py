@@ -5,7 +5,7 @@ import logging
 
 import pytest
 
-from jupyter_events.logger import EventLogger
+from jupyter_events.logger import EventLogger, SchemaNotRegistered
 from jupyter_events.schema import EventSchema
 
 from .utils import SCHEMA_PATH
@@ -138,3 +138,37 @@ async def test_bad_listener_does_not_break_good_listener(jp_event_logger, schema
     assert listener_was_called
     # Check that the active listeners are cleaned up.
     assert len(event_logger._active_listeners) == 0
+
+
+@pytest.mark.parametrize(
+    # Make sure no schemas are added at the start of this test.
+    "jp_event_schemas", ([],) 
+)
+async def test_listener_added_before_schemas_passes(jp_event_logger, schema):
+    # Ensure there are no schemas listed.
+    assert len(jp_event_logger.schemas.schema_ids) == 0
+
+    listener_was_called = False
+
+    async def my_listener(logger: EventLogger, schema_id: str, data: dict) -> None:
+        nonlocal listener_was_called
+        listener_was_called = True
+
+    # Add the listener without any schemas
+    jp_event_logger.add_listener(schema_id=schema.id, listener=my_listener)
+
+    # Proof that emitting the event won't success
+    with pytest.raises(SchemaNotRegistered):
+        jp_event_logger.emit(schema_id=schema.id, data={"prop": "hello, world"})
+
+    assert not listener_was_called
+
+    # Now register the event and emit.
+    jp_event_logger.register_event_schema(schema)        
+
+    # Try emitting the event again and ensure the listener saw it.
+    jp_event_logger.emit(schema_id=schema.id, data={"prop": "hello, world"})
+    await jp_event_logger.gather_listeners()
+    assert listener_was_called
+    # Check that the active listeners are cleaned up.
+    assert len(jp_event_logger._active_listeners) == 0
