@@ -162,7 +162,7 @@ async def test_listener_added_before_schemas_passes(jp_event_logger, schema):
     jp_event_logger.add_listener(schema_id=schema.id, listener=my_listener)
 
     # Proof that emitting the event won't success
-    with pytest.raises(SchemaNotRegistered):
+    with pytest.warns(SchemaNotRegistered):
         jp_event_logger.emit(schema_id=schema.id, data={"prop": "hello, world"})
 
     assert not listener_was_called
