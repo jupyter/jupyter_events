@@ -142,12 +142,16 @@ class EventLogger(LoggingConfigurable):
 
         Get this registered schema using the EventLogger.schema.get() method.
         """
-
         event_schema = self.schemas.register(schema)  # type:ignore[arg-type]
         key = event_schema.id
-        self._modifiers[key] = set()
-        self._modified_listeners[key] = set()
-        self._unmodified_listeners[key] = set()
+        # It's possible that listeners and modifiers have been added for this
+        # schema before the schema is registered.
+        if key not in self._modifiers:
+            self._modifiers[key] = set()
+        if key not in self._modified_listeners:
+            self._modified_listeners[key] = set()
+        if key not in self._unmodified_listeners:
+            self._unmodified_listeners[key] = set()
 
     def register_handler(self, handler: logging.Handler) -> None:
         """Register a new logging handler to the Event Logger.
@@ -205,7 +209,11 @@ class EventLogger(LoggingConfigurable):
         # If the schema ID and version is given, only add
         # this modifier to that schema
         if schema_id:
-            self._modifiers[schema_id].add(modifier)
+            # If the schema hasn't been added yet,
+            # start a placeholder set.
+            modifiers = self._modifiers.get(schema_id, set())
+            modifiers.add(modifier)
+            self._modifiers[schema_id] = modifiers
             return
         for id_ in self._modifiers:
             if schema_id is None or id_ == schema_id:
@@ -264,9 +272,16 @@ class EventLogger(LoggingConfigurable):
         # this modifier to that schema
         if schema_id:
             if modified:
-                self._modified_listeners[schema_id].add(listener)
+                # If the schema hasn't been added yet,
+                # start a placeholder set.
+                listeners = self._modified_listeners.get(schema_id, set())
+                listeners.add(listener)
+                self._modified_listeners[schema_id] = listeners
                 return
-            self._unmodified_listeners[schema_id].add(listener)
+            listeners = self._unmodified_listeners.get(schema_id, set())
+            listeners.add(listener)
+            self._unmodified_listeners[schema_id] = listeners
+            return
         for id_ in self.schemas.schema_ids:
             if schema_id is None or id_ == schema_id:
                 if modified:
