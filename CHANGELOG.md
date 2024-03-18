@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.10.0
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.9.1...e7784fd09356ef074d69d1c2f192f1ad96f5f00c))
+
+### Enhancements made
+
+- Enable adding listeners to event before the event is registered [#97](https://github.com/jupyter/jupyter_events/pull/97) ([@Zsailer](https://github.com/Zsailer))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2024-03-12&to=2024-03-18&type=c))
+
+[@Zsailer](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2024-03-12..2024-03-18&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.9.1
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.9.0...014a91c793b12d008bb744614a280bc14b5be7eb))
@@ -21,8 +37,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2023-11-06&to=2024-03-12&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Ablink1073+updated%3A2023-11-06..2024-03-12&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Apre-commit-ci+updated%3A2023-11-06..2024-03-12&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.9.0
 
