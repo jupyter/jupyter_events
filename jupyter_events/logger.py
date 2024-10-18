@@ -339,8 +339,8 @@ class EventLogger(LoggingConfigurable):
         # If no handlers are routing these events, there's no need to proceed.
         if (
             not self.handlers
-            and not self._modified_listeners[schema_id]
-            and not self._unmodified_listeners[schema_id]
+            and not self._modified_listeners.get(schema_id)
+            and not self._unmodified_listeners.get(schema_id)
         ):
             return None
 
