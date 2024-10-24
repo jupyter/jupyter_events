@@ -10,7 +10,7 @@ A common pattern is to define these schemas in separate files and register them 
 schema_filepath = Path("/path/to/schema.yaml")
 
 logger = EventLogger()
-logger.register_event_schema(schema_file)
+logger.register_event_schema(schema_filepath)
 ```
 
 Note that a file path passed to `register_event_schema()` **must** be a Pathlib
