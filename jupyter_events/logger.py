@@ -12,7 +12,10 @@ import warnings
 from datetime import datetime, timezone
 
 from jsonschema import ValidationError
-from pythonjsonlogger import jsonlogger
+try:
+    from pythonjsonlogger.json import JsonFormatter
+except ImportError:
+    from pythonjsonlogger.jsonlogger import JsonFormatter
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 
@@ -171,7 +174,7 @@ class EventLogger(LoggingConfigurable):
                 del record["message"]
             return json.dumps(record, **kwargs)
 
-        formatter = jsonlogger.JsonFormatter(  # type:ignore [no-untyped-call]
+        formatter = JsonFormatter(  # type:ignore [no-untyped-call]
             json_serializer=_handle_message_field,
         )
         handler.setFormatter(formatter)
