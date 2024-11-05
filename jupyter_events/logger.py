@@ -12,6 +12,7 @@ import warnings
 from datetime import datetime, timezone
 
 from jsonschema import ValidationError
+
 try:
     from pythonjsonlogger.json import JsonFormatter
 except ImportError:
