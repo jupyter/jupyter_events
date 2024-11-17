@@ -128,6 +128,7 @@ filterwarnings= [
   "module:datetime.datetime.utc:DeprecationWarning",
   # Ignore importwarning on pypy for yaml
   "module:can't resolve package from __spec__ or __package__:ImportWarning",
+  "ignore::jupyter_events.utils.JupyterEventsVersionWarning",
 ]
 
 [tool.coverage.report]

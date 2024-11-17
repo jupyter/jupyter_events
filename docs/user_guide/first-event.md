@@ -15,7 +15,7 @@ To begin emitting events from a Python application, you need to tell the `EventL
 ```python
 schema = """
 $id: http://myapplication.org/example-event
-version: 1
+version: "1"
 title: Example Event
 description: An interesting event to collect
 properties:

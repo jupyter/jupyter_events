@@ -1,5 +1,5 @@
 $id: http://event.jupyter.org/test
-version: 1
+version: "1"
 title: Simple Test Schema
 description: |
   A simple schema for testing
