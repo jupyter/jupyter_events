@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "jupyter-events"
 description = "Jupyter Event System library"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
     { name = "Jupyter Development Team", email = "jupyter@googlegroups.com" },
 ]
@@ -150,7 +150,7 @@ source = ["jupyter_events"]
 
 [tool.mypy]
 files = "jupyter_events"
-python_version = "3.8"
+python_version = "3.9"
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
