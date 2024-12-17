@@ -27,7 +27,7 @@ version_info = version("python-json-logger")
 if parse(version_info) >= parse("3.1.0"):
     from pythonjsonlogger.json import JsonFormatter
 else:
-    from pythonjsonlogger.jsonlogger import JsonFormatter
+    from pythonjsonlogger.jsonlogger import JsonFormatter  # type: ignore[attr-defined]
 
 # Increment this version when the metadata included with each event
 # changes.
@@ -179,7 +179,7 @@ class EventLogger(LoggingConfigurable):
                 del record["message"]
             return json.dumps(record, **kwargs)
 
-        formatter = JsonFormatter(  # type:ignore [no-untyped-call]
+        formatter = JsonFormatter(
             json_serializer=_handle_message_field,
         )
         handler.setFormatter(formatter)
