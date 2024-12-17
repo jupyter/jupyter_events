@@ -14,7 +14,6 @@ from importlib.metadata import version
 
 from jsonschema import ValidationError
 from packaging.version import parse
-
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 import io
 import json
 import logging
-import sys
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
