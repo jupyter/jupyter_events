@@ -38,7 +38,7 @@ print(logger.schemas)
 Validator class: Draft7Validator
 Schema: {
   "$id": "myapplication.org/example-event",
-  ""version": 1",
+  "version": "1",
   "title": "Example Event",
   "description": "An interesting event to collect",
   "properties": {
