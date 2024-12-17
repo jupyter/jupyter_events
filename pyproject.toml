@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "jupyter-events"
 description = "Jupyter Event System library"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
     { name = "Jupyter Development Team", email = "jupyter@googlegroups.com" },
 ]
@@ -52,9 +52,10 @@ jupyter-events = "jupyter_events.cli:main"
 
 [project.optional-dependencies]
 docs = [
+    "sphinx>=8",
     "jupyterlite-sphinx",
     "myst_parser",
-    "pydata_sphinx_theme",
+    "pydata_sphinx_theme>=0.16",
     "sphinxcontrib-spelling",
 ]
 test = [
@@ -150,7 +151,7 @@ source = ["jupyter_events"]
 
 [tool.mypy]
 files = "jupyter_events"
-python_version = "3.8"
+python_version = "3.9"
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
@@ -181,6 +182,7 @@ extend-select = [
   "EXE",         # flake8-executable
   "PYI",         # flake8-pyi
   "S",           # flake8-bandit
+  "G001",        # .format and co in logging methods
 ]
 ignore = [
   "E501",     # E501 Line too long (158 > 100 characters)

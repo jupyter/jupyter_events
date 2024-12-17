@@ -10,9 +10,10 @@ import logging
 import typing as t
 import warnings
 from datetime import datetime, timezone
+from importlib.metadata import version
 
 from jsonschema import ValidationError
-from pythonjsonlogger import jsonlogger
+from packaging.version import parse
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 
@@ -20,6 +21,13 @@ from .schema import SchemaType
 from .schema_registry import SchemaRegistry
 from .traits import Handlers
 from .validators import JUPYTER_EVENTS_CORE_VALIDATOR
+
+# Check if the version is greater than 3.1.0
+version_info = version("python-json-logger")
+if parse(version_info) >= parse("3.1.0"):
+    from pythonjsonlogger.json import JsonFormatter
+else:
+    from pythonjsonlogger.jsonlogger import JsonFormatter  # type: ignore[attr-defined]
 
 # Increment this version when the metadata included with each event
 # changes.
@@ -171,7 +179,7 @@ class EventLogger(LoggingConfigurable):
                 del record["message"]
             return json.dumps(record, **kwargs)
 
-        formatter = jsonlogger.JsonFormatter(  # type:ignore [no-untyped-call]
+        formatter = JsonFormatter(
             json_serializer=_handle_message_field,
         )
         handler.setFormatter(formatter)
