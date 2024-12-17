@@ -82,7 +82,7 @@ jobs:
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
-          dependency_type: minimum
+          python_version: 3.9
       - name: Install with minimum versions and optional deps
         run: |
           pip install -e .[test]
