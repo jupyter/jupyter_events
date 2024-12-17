@@ -181,6 +181,7 @@ extend-select = [
   "EXE",         # flake8-executable
   "PYI",         # flake8-pyi
   "S",           # flake8-bandit
+  "G001",        # .format and co in logging methods
 ]
 ignore = [
   "E501",     # E501 Line too long (158 > 100 characters)
