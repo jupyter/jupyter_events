@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.11.0
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.10.0...f8012610f86408908004febed9e0e06ef71ca951))
+
+### Bugs fixed
+
+- Switch schema `version` type to `str` [#104](https://github.com/jupyter/jupyter_events/pull/104) ([@afshin](https://github.com/afshin))
+- Fix DeprecationWarning with patched python-json-logger [#103](https://github.com/jupyter/jupyter_events/pull/103) ([@cjwatson](https://github.com/cjwatson))
+- Prevent unintended `KeyError` when emitting an unregistered event schema [#101](https://github.com/jupyter/jupyter_events/pull/101) ([@afshin](https://github.com/afshin))
+
+### Maintenance and upkeep improvements
+
+- Fix typo and remove double check. [#107](https://github.com/jupyter/jupyter_events/pull/107) ([@Carreau](https://github.com/Carreau))
+- test on 3.13 [#106](https://github.com/jupyter/jupyter_events/pull/106) ([@Carreau](https://github.com/Carreau))
+
+### Documentation improvements
+
+- Fix typo [#102](https://github.com/jupyter/jupyter_events/pull/102) ([@davidbrochart](https://github.com/davidbrochart))
+- Update notebook to match current version of jupyter-events [#98](https://github.com/jupyter/jupyter_events/pull/98) ([@manics](https://github.com/manics))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2024-03-18&to=2024-12-17&type=c))
+
+[@afshin](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Aafshin+updated%3A2024-03-18..2024-12-17&type=Issues) | [@Carreau](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3ACarreau+updated%3A2024-03-18..2024-12-17&type=Issues) | [@cjwatson](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Acjwatson+updated%3A2024-03-18..2024-12-17&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adavidbrochart+updated%3A2024-03-18..2024-12-17&type=Issues) | [@manics](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Amanics+updated%3A2024-03-18..2024-12-17&type=Issues) | [@Zsailer](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2024-03-18..2024-12-17&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.10.0
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.9.1...e7784fd09356ef074d69d1c2f192f1ad96f5f00c))
@@ -17,8 +45,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2024-03-12&to=2024-03-18&type=c))
 
 [@Zsailer](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2024-03-12..2024-03-18&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.9.1
 
