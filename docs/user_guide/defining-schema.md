@@ -27,7 +27,7 @@ Beyond these required items, any valid JSON should be possible. Here is a simple
 
 ```yaml
 $id: https://event.jupyter.org/example-event
-version: 1
+version: "1"
 title: My Event
 description: |
   Some information about my event
@@ -67,7 +67,7 @@ The output will look like this, if it passes:
 
     {
       "$id": "http://event.jupyter.org/test",
-      "version": 1,
+      "version": "1",
       "title": "Simple Test Schema",
       "description": "A simple schema for testing\n",
       "type": "object",
@@ -92,7 +92,7 @@ or this if fails:
 
     {
       "$id": "http://event.jupyter.org/test",
-      "version": 1,
+      "version": "1",
       "title": "Simple Test Schema",
       "description": "A simple schema for testing\n",
       "type": "object",

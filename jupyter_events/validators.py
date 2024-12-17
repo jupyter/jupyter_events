@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import pathlib
+import warnings
 from typing import Any
 
 import jsonschema
@@ -10,6 +11,7 @@ from referencing import Registry
 from referencing.jsonschema import DRAFT7
 
 from . import yaml
+from .utils import JupyterEventsVersionWarning
 
 draft7_format_checker = (
     Draft7Validator.FORMAT_CHECKER
@@ -57,6 +59,17 @@ JUPYTER_EVENTS_CORE_VALIDATOR = Draft7Validator(
 def validate_schema(schema: dict[str, Any]) -> None:
     """Validate a schema dict."""
     try:
+        # If the `version` attribute is an integer, coerce to string.
+        # TODO: remove this in a future version.
+        if "version" in schema and isinstance(schema["version"], int):
+            schema["version"] = str(schema["version"])
+            msg = (
+                "The `version` property of an event schema must be a string. "
+                "It has been type coerced, but in a future version of this "
+                "library, it will fail to validate. Please update schema: "
+                f"{schema['$id']}"
+            )
+            warnings.warn(JupyterEventsVersionWarning(msg), stacklevel=2)
         # Validate the schema against Jupyter Events metaschema.
         JUPYTER_EVENTS_SCHEMA_VALIDATOR.validate(schema)
     except ValidationError as err:

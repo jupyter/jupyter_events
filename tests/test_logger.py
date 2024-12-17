@@ -100,7 +100,7 @@ def test_timestamp_override():
     """
     schema = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "properties": {
             "something": {
                 "type": "string",
@@ -132,7 +132,7 @@ def test_emit():
     """
     schema = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "properties": {
             "something": {
                 "type": "string",
@@ -161,7 +161,7 @@ def test_emit():
     del event_capsule["__timestamp__"]
     expected = {
         "__schema__": "http://test/test",
-        "__schema_version__": 1,
+        "__schema_version__": "1",
         "__metadata_version__": 1,
         "something": "blah",
     }
@@ -175,7 +175,7 @@ def test_message_field():
     """
     schema = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "properties": {
             "something": {
                 "type": "string",
@@ -206,7 +206,7 @@ def test_message_field():
     del event_capsule["__timestamp__"]
     expected = {
         "__schema__": "http://test/test",
-        "__schema_version__": 1,
+        "__schema_version__": "1",
         "__metadata_version__": 1,
         "something": "blah",
         "message": "a message was seen",
@@ -221,7 +221,7 @@ def test_nested_message_field():
     """
     schema = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "properties": {
             "thing": {
                 "type": "object",
@@ -254,7 +254,7 @@ def test_nested_message_field():
     del event_capsule["__timestamp__"]
     expected = {
         "__schema__": "http://test/test",
-        "__schema_version__": 1,
+        "__schema_version__": "1",
         "__metadata_version__": 1,
         "thing": {"message": "a nested message was seen"},
     }
@@ -267,7 +267,7 @@ def test_register_event_schema(tmp_path):
     """
     schema = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something": {
@@ -290,7 +290,7 @@ def test_register_event_schema_object(tmp_path):
     """
     schema = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something": {
@@ -314,7 +314,7 @@ def test_emit_badschema():
     """
     schema = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something": {
@@ -343,7 +343,7 @@ def test_emit_badschema_format():
     """
     schema = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something": {"type": "string", "title": "test", "format": "date-time"},
@@ -362,7 +362,7 @@ def test_emit_badschema_format():
 def test_unique_logger_instances():
     schema0 = {
         "$id": "http://test/test0",
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something": {
@@ -374,7 +374,7 @@ def test_unique_logger_instances():
 
     schema1 = {
         "$id": "http://test/test1",
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something": {
@@ -417,7 +417,7 @@ def test_unique_logger_instances():
     del event_capsule0["__timestamp__"]
     expected = {
         "__schema__": "http://test/test0",
-        "__schema_version__": 1,
+        "__schema_version__": "1",
         "__metadata_version__": 1,
         "something": "blah",
     }
@@ -430,7 +430,7 @@ def test_unique_logger_instances():
     del event_capsule1["__timestamp__"]
     expected = {
         "__schema__": "http://test/test1",
-        "__schema_version__": 1,
+        "__schema_version__": "1",
         "__metadata_version__": 1,
         "something": "blah",
     }
@@ -440,7 +440,7 @@ def test_unique_logger_instances():
 def test_register_duplicate_schemas():
     schema0 = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something": {
@@ -452,7 +452,7 @@ def test_register_duplicate_schemas():
 
     schema1 = {
         "$id": "http://test/test",
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something": {
@@ -484,7 +484,7 @@ async def test_noop_emit():
     schema_id1 = "http://test/test"
     schema1 = {
         "$id": schema_id1,
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something": {
@@ -496,7 +496,7 @@ async def test_noop_emit():
     schema_id2 = "http://test/test2"
     schema2 = {
         "$id": schema_id2,
-        "version": 1,
+        "version": "1",
         "type": "object",
         "properties": {
             "something_elss": {
