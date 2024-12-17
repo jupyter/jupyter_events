@@ -166,8 +166,6 @@ def test_emit():
         "__metadata_version__": 1,
         "something": "blah",
     }
-    if sys.version_info >= (3, 12):
-        expected["taskName"] = None
     assert event_capsule == expected
 
 
@@ -214,8 +212,6 @@ def test_message_field():
         "something": "blah",
         "message": "a message was seen",
     }
-    if sys.version_info >= (3, 12):
-        expected["taskName"] = None
     assert event_capsule == expected
 
 
@@ -263,8 +259,6 @@ def test_nested_message_field():
         "__metadata_version__": 1,
         "thing": {"message": "a nested message was seen"},
     }
-    if sys.version_info >= (3, 12):
-        expected["taskName"] = None
     assert event_capsule == expected
 
 
@@ -428,8 +422,6 @@ def test_unique_logger_instances():
         "__metadata_version__": 1,
         "something": "blah",
     }
-    if sys.version_info >= (3, 12):
-        expected["taskName"] = None
     assert event_capsule0 == expected
 
     event_capsule1 = json.loads(output1.getvalue())
@@ -443,8 +435,6 @@ def test_unique_logger_instances():
         "__metadata_version__": 1,
         "something": "blah",
     }
-    if sys.version_info >= (3, 12):
-        expected["taskName"] = None
     assert event_capsule1 == expected
 
 
