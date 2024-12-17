@@ -155,22 +155,3 @@ jobs:
         with:
           version_spec: 100.100.100
           token: ${{ secrets.GITHUB_TOKEN }}
-
-  tests_check: # This job does nothing and is only used for the branch protection
-    if: always()
-    needs:
-      - coverage
-      - docs
-      - test_lint
-      - check_release
-      - test_minimum_versions
-      - test_prereleases
-      - jupyter_server_downstream
-      - test_sdist
-      - check_links
-    runs-on: ubuntu-latest
-    steps:
-      - name: Decide whether the needed jobs succeeded or failed
-        uses: re-actors/alls-green@release/v1
-        with:
-          jobs: ${{ toJSON(needs) }}
