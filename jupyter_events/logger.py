@@ -15,7 +15,6 @@ from importlib.metadata import version
 from jsonschema import ValidationError
 from packaging.version import parse
 
-# Check if the version is greater than 3.0.0
 from traitlets import Dict, Instance, Set, default
 from traitlets.config import Config, LoggingConfigurable
 
@@ -24,7 +23,8 @@ from .schema_registry import SchemaRegistry
 from .traits import Handlers
 from .validators import JUPYTER_EVENTS_CORE_VALIDATOR
 
-version_info = version("pythonjsonlogger")
+# Check if the version is greater than 3.1.0
+version_info = version("python-json-logger")
 if parse(version_info) >= parse("3.1.0"):
     from pythonjsonlogger.json import JsonFormatter
 else:
