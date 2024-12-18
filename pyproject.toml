@@ -28,6 +28,7 @@ dependencies = [
     "python-json-logger>=2.0.4",
     "pyyaml>=5.3",
     "traitlets>=5.3",
+    "packaging",
     # The following are necessary to address an issue where pyproject.toml normalizes extra dependencies
     # such that 'format_nongpl' is normalized to 'format-nongpl' which prevents these two validators from
     # from being installed when jsonschema is <= 4.9 because jsonschema uses 'format_nongpl' in those releases.
