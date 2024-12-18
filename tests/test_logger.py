@@ -123,6 +123,7 @@ def test_timestamp_override():
     )
     handler.flush()
     event_capsule = json.loads(output.getvalue())
+    event_capsule.pop("taskName", None)
     assert event_capsule["__timestamp__"] == timestamp_override.isoformat() + "Z"
 
 
@@ -155,6 +156,7 @@ def test_emit():
     handler.flush()
 
     event_capsule = json.loads(output.getvalue())
+    event_capsule.pop("taskName", None)
 
     assert "__timestamp__" in event_capsule
     # Remove timestamp from capsule when checking equality, since it is gonna vary
@@ -200,6 +202,7 @@ def test_message_field():
     handler.flush()
 
     event_capsule = json.loads(output.getvalue())
+    event_capsule.pop("taskName", None)
 
     assert "__timestamp__" in event_capsule
     # Remove timestamp from capsule when checking equality, since it is gonna vary
@@ -248,6 +251,7 @@ def test_nested_message_field():
     handler.flush()
 
     event_capsule = json.loads(output.getvalue())
+    event_capsule.pop("taskName", None)
 
     assert "__timestamp__" in event_capsule
     # Remove timestamp from capsule when checking equality, since it is gonna vary
@@ -411,6 +415,7 @@ def test_unique_logger_instances():
     handler1.flush()
 
     event_capsule0 = json.loads(output0.getvalue())
+    event_capsule0.pop("taskName", None)
 
     assert "__timestamp__" in event_capsule0
     # Remove timestamp from capsule when checking equality, since it is gonna vary
@@ -424,6 +429,7 @@ def test_unique_logger_instances():
     assert event_capsule0 == expected
 
     event_capsule1 = json.loads(output1.getvalue())
+    event_capsule1.pop("taskName", None)
 
     assert "__timestamp__" in event_capsule1
     # Remove timestamp from capsule when checking equality, since it is gonna vary
