@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.12.0
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.11.0...6704ea630522f44542d83608f750da0068e41443))
+
+### Bugs fixed
+
+- pop taskName for older version of python-json-logger [#110](https://github.com/jupyter/jupyter_events/pull/110) ([@Carreau](https://github.com/Carreau))
+
+### Maintenance and upkeep improvements
+
+- declare dependency on packaging [#109](https://github.com/jupyter/jupyter_events/pull/109) ([@bollwyvl](https://github.com/bollwyvl))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2024-12-17&to=2025-02-03&type=c))
+
+[@bollwyvl](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Abollwyvl+updated%3A2024-12-17..2025-02-03&type=Issues) | [@Carreau](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3ACarreau+updated%3A2024-12-17..2025-02-03&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.11.0
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.10.0...f8012610f86408908004febed9e0e06ef71ca951))
@@ -29,8 +49,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2024-03-18&to=2024-12-17&type=c))
 
 [@afshin](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Aafshin+updated%3A2024-03-18..2024-12-17&type=Issues) | [@Carreau](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3ACarreau+updated%3A2024-03-18..2024-12-17&type=Issues) | [@cjwatson](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Acjwatson+updated%3A2024-03-18..2024-12-17&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Adavidbrochart+updated%3A2024-03-18..2024-12-17&type=Issues) | [@manics](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Amanics+updated%3A2024-03-18..2024-12-17&type=Issues) | [@Zsailer](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2024-03-18..2024-12-17&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.10.0
 
