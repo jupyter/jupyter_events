@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.12.1
+
+([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.12.0...69306b1d1577a1a71ba27a4b12314fa31771ee71))
+
+### Bugs fixed
+
+- [Bug] Fix empty error messages from failing event listeners [#118](https://github.com/jupyter/jupyter_events/pull/118) ([@Zsailer](https://github.com/Zsailer))
+
+### Maintenance and upkeep improvements
+
+- Add security.md [#113](https://github.com/jupyter/jupyter_events/pull/113) ([@Carreau](https://github.com/Carreau))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2025-02-03&to=2026-04-20&type=c))
+
+@Carreau ([activity](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3ACarreau+updated%3A2025-02-03..2026-04-20&type=Issues)) | @Zsailer ([activity](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3AZsailer+updated%3A2025-02-03..2026-04-20&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.12.0
 
 ([Full Changelog](https://github.com/jupyter/jupyter_events/compare/v0.11.0...6704ea630522f44542d83608f750da0068e41443))
@@ -21,8 +44,6 @@ All notable changes to this project will be documented in this file.
 ([GitHub contributors page for this release](https://github.com/jupyter/jupyter_events/graphs/contributors?from=2024-12-17&to=2025-02-03&type=c))
 
 [@bollwyvl](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3Abollwyvl+updated%3A2024-12-17..2025-02-03&type=Issues) | [@Carreau](https://github.com/search?q=repo%3Ajupyter%2Fjupyter_events+involves%3ACarreau+updated%3A2024-12-17..2025-02-03&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.11.0
 
