@@ -140,6 +140,33 @@ async def test_bad_listener_does_not_break_good_listener(jp_event_logger, schema
     assert len(event_logger._active_listeners) == 0
 
 
+async def test_listener_that_raises_exception_with_empty_message(jp_event_logger, schema):
+    """Exceptions with empty str() should still produce useful log output."""
+    event_logger = jp_event_logger
+
+    # Get an application logger that will show the exception
+    app_log = event_logger.log
+    log_stream = io.StringIO()
+    h = logging.StreamHandler(log_stream)
+    app_log.addHandler(h)
+
+    async def listener_raise_empty(logger: EventLogger, schema_id: str, data: dict) -> None:
+        raise RuntimeError()  # Empty message — str(err) == ""
+
+    event_logger.add_listener(schema_id=schema.id, listener=listener_raise_empty)
+    event_logger.emit(schema_id=schema.id, data={"prop": "hello, world"})
+
+    await event_logger.gather_listeners()
+
+    # Check that the log output is NOT empty — the exception type should appear
+    h.flush()
+    log_output = log_stream.getvalue()
+    assert "RuntimeError" in log_output
+    assert "failed" in log_output
+    # Check that the active listeners are cleaned up.
+    assert len(event_logger._active_listeners) == 0
+
+
 @pytest.mark.parametrize(
     # Make sure no schemas are added at the start of this test.
     "jp_event_schemas",

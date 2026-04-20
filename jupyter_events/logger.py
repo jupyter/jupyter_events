@@ -402,9 +402,19 @@ class EventLogger(LoggingConfigurable):
         def _listener_task_done(task: asyncio.Task[t.Any]) -> None:
             # If an exception happens, log it to the main
             # applications logger
-            err = task.exception()
+            try:
+                err = task.exception()
+            except asyncio.CancelledError:
+                self._active_listeners.discard(task)
+                return
             if err:
-                self.log.error(err)
+                self.log.error(
+                    "Event listener %s failed for %s: %s",
+                    task.get_name(),
+                    schema_id,
+                    err,
+                    exc_info=err,
+                )
             self._active_listeners.discard(task)
 
         # Loop over listeners and execute them.
