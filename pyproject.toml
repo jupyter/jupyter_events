@@ -54,7 +54,7 @@ jupyter-events = "jupyter_events.cli:main"
 [project.optional-dependencies]
 docs = [
     "sphinx>=8",
-    "jupyterlite-sphinx",
+    "jupyterlite-sphinx>=0.21.0,<0.22",
     "myst_parser",
     "pydata_sphinx_theme>=0.16",
     "sphinxcontrib-spelling",
