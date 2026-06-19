@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Bugs fixed
 
-- [Bug] Fix empty error messages from failing event listeners [#118](https://github.com/jupyter/jupyter_events/pull/118) ([@Zsailer](https://github.com/Zsailer))
+- \[Bug\] Fix empty error messages from failing event listeners [#118](https://github.com/jupyter/jupyter_events/pull/118) ([@Zsailer](https://github.com/Zsailer))
 
 ### Maintenance and upkeep improvements
 
